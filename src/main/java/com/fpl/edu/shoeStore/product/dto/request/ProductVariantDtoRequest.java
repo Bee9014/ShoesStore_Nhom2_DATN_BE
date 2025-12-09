@@ -5,7 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
-
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProductVariantDtoRequest {
     private Long productId;
     private String variantName;          // VD: "Size 41", "Màu Xanh - Size 42"

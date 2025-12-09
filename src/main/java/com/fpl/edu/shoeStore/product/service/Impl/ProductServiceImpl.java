@@ -1,4 +1,4 @@
-package com.fpl.edu.shoeStore.product.service.Impl;
+package com.fpl.edu.shoeStore.product.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
