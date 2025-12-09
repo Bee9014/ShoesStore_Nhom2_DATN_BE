@@ -11,6 +11,7 @@ import com.fpl.edu.shoeStore.product.entity.Product;
 public interface ProductMapper {
     List<Product> findAll();
     Product findById(@Param("productId") Long productId);
+    Product findByName(@Param("name") String name);
     int insert(Product product);
     int update(Product product);
     int deleteById(@Param("productId") Long productId);

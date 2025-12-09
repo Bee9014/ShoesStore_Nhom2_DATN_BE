@@ -1,3 +1,4 @@
+
 package com.fpl.edu.shoeStore.product.mapper;
 
 import java.util.List;
@@ -20,5 +21,6 @@ public interface ProductVariantMapper {
 
     int deleteById(@Param("variantId") Long variantId);
 }
+
 
 

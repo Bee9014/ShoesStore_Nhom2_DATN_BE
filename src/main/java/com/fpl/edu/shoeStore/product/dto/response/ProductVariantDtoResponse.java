@@ -21,3 +21,4 @@ public class ProductVariantDtoResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
+

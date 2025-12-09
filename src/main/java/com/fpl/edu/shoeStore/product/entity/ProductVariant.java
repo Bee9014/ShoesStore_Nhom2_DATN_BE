@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class ProductVariant {
     private Long variantId;              // variant_id
@@ -18,3 +19,4 @@ public class ProductVariant {
     private LocalDateTime createdAt;     // created_at
     private LocalDateTime updatedAt;     // updated_at
 }
+

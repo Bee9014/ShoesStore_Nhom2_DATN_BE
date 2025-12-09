@@ -14,6 +14,8 @@ public interface ProductService {
 
     ProductDtoResponse findById(Long id);
 
+    ProductDtoResponse findByName(String name); 
+
     PageResponse<ProductDtoResponse> findAllPaged(
             Long categoryId,
             String name,

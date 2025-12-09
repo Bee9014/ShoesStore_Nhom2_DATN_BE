@@ -1,4 +1,4 @@
-package com.fpl.edu.shoeStore.product.service.impl;
+package com.fpl.edu.shoeStore.product.service.Impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -71,6 +71,12 @@ public class ProductServiceImpl implements ProductService {
         Product product = productMapper.findById(id);
         return product == null ? null : ProductConverter.toResponse(product);
     }
+
+    @Override
+         public ProductDtoResponse findByName(String name) {
+             Product product = productMapper.findByName(name);
+             return product == null ? null : ProductConverter.toResponse(product);
+         }
 
     @Override
     public PageResponse<ProductDtoResponse> findAllPaged(

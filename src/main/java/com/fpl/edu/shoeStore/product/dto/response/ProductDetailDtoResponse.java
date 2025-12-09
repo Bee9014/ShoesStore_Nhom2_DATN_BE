@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
-//import java.math.BigDecimal;
 import java.util.List;
 @Data
 @Builder
@@ -27,3 +26,4 @@ public class ProductDetailDtoResponse {
     // Danh sách các variant của product
     private List<ProductVariantDtoResponse> variants;
 }
+
