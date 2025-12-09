@@ -1,10 +1,6 @@
-package com.fpl.edu.shoeStore.payment.entity;
+package com.fpl.edu.shoeStore.payment.dto.response;
 
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,8 +9,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
-public class Payment {
+@ToString
+public class PaymentDTOResponse {
     private Integer paymentId;
     private Integer orderId;
     private Integer payerId;
@@ -24,5 +20,4 @@ public class Payment {
     private String status;
     private String transactionCode;
     private LocalDateTime createdAt;
-
 }

@@ -1,14 +1,13 @@
 package com.fpl.edu.shoeStore.product.convert;
 
+import com.fpl.edu.shoeStore.product.dto.request.ProductDtoRequest;
+import com.fpl.edu.shoeStore.product.dto.response.ProductDetailDtoResponse;
+import com.fpl.edu.shoeStore.product.dto.response.ProductDtoResponse;
 import com.fpl.edu.shoeStore.product.entity.Product;
 import com.fpl.edu.shoeStore.product.entity.ProductVariant;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.fpl.edu.shoeStore.product.dto.request.ProductDtoRequest;
-import com.fpl.edu.shoeStore.product.dto.response.ProductDetailDtoResponse;
-import com.fpl.edu.shoeStore.product.dto.response.ProductDtoResponse;
 
 public class ProductConverter {
     public static Product toEntity(ProductDtoRequest dto) {
