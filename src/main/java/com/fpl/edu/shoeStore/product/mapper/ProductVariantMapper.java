@@ -1,24 +1,26 @@
- package com.fpl.edu.shoeStore.product.mapper;
 
-     import java.util.List;
+package com.fpl.edu.shoeStore.product.mapper;
 
-     import org.apache.ibatis.annotations.Mapper;
-     import org.apache.ibatis.annotations.Param;
+import java.util.List;
 
-     import com.fpl.edu.shoeStore.product.entity.ProductVariant;  // Add this line
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
-     @Mapper
-     public interface ProductVariantMapper {
-        
-         List<ProductVariant>findByProductId(@Param("productId") Long productId);
+import com.fpl.edu.shoeStore.product.entity.ProductVariant;  // Add this line
 
-         void ProductVariantfindById(@Param("variantId") Long variantId);
+@Mapper
+public interface ProductVariantMapper {
 
-         int insert(ProductVariant variant);
+    List<ProductVariant>findByProductId(@Param("productId") Long productId);
 
-         int update(ProductVariant variant);
+    void ProductVariantfindById(@Param("variantId") Long variantId);
 
-         int deleteById(@Param("variantId") Long variantId);
-     }
+    int insert(ProductVariant variant);
+
+    int update(ProductVariant variant);
+
+    int deleteById(@Param("variantId") Long variantId);
+}
+
 
 

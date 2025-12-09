@@ -1,9 +1,8 @@
 package com.fpl.edu.shoeStore.product.convert;
 import com.fpl.edu.shoeStore.product.entity.ProductVariant;
-     import com.fpl.edu.shoeStore.product.dto.request.
-     ProductVariantDtoRequest;
-     import com.fpl.edu.shoeStore.product.dto.response
-     .ProductVariantDtoResponse;
+
+     import com.fpl.edu.shoeStore.product.dto.request.ProductVariantDtoRequest;
+     import com.fpl.edu.shoeStore.product.dto.response.ProductVariantDtoResponse;
 
      
  public class ProductVariantConverter {
