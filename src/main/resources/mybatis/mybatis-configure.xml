@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE configuration
-        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
@@ -31,7 +30,7 @@
         <mapper resource="mybatis/mapper/order/OrderMapper.xml"/>
         <mapper resource="mybatis/mapper/shipment/ShipmentMapper.xml"/>
         <mapper resource="mybatis/mapper/promotion/VoucherMapper.xml"/>
-
+        <mapper resource="mybatis/mapper/product/ProductMapper.xml"/>
         <!-- Annotation-based mappers -->
         <package name="com.fpl.edu.shoeStore.auth.mapper"/>
         <package name="com.fpl.edu.shoeStore.user.mapper"/>

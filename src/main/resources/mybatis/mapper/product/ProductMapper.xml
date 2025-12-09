@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+     <mapper namespace="com.fpl.edu.shoeStore.product.mapper.ProductMapper">
+
+         <!-- Result Map -->
+         <resultMap id="ProductResultMap" type="com.fpl.edu.shoeStore.product.entity.Product">
+             <id property="productId" column="product_id"/>
+             <result property="categoryId" column="category_id"/>
+             <result property="name" column="name"/>
+             <result property="slug" column="url"/>
+             <result property="description" column="description"/>
+             <result property="sku" column="product_code"/>
+             <result property="basePrice" column="base_price"/>
+             <result property="isActive" column="is_active"/>
+             <result property="createdAt" column="created_at"/>
+             <result property="updatedAt" column="updated_at"/>
+         </resultMap>
+
+         <!-- Select All -->
+         <select id="findAll" resultMap="ProductResultMap">
+             SELECT product_id,
+                    category_id,
+                    name,
+                    url,
+                    description,
+                    product_code,
+                    base_price,
+                    is_active,
+                    created_at,
+                    updated_at
+             FROM products
+         </select>
+
+         <!-- Select by ID -->
+         <select id="findById" parameterType="long" resultMap="ProductResultMap">
+             SELECT product_id,
+                    category_id,
+                    name,
+                    url,
+                    description,
+                    product_code,
+                    base_price,
+                    is_active,
+                    created_at,
+                    updated_at
+             FROM products
+             WHERE product_id = #{productId}
+         </select>
+
+         <!-- Select by Name (exact match) -->
+         <select id="findByName" parameterType="string" resultMap="ProductResultMap">
+             SELECT product_id,
+                    category_id,
+                    name,
+                    url,
+                    description,
+                    product_code,
+                    base_price,
+                    is_active,
+                    created_at,
+                    updated_at
+             FROM products
+             WHERE name = #{name}
+         </select>
+
+         <!-- Insert -->
+         <insert id="insert" parameterType="com.fpl.edu.shoeStore.product.entity.Product"
+         useGeneratedKeys="true" 
+         keyProperty="productId">
+             INSERT INTO products (category_id, name, url, description, product_code, base_price,is_active, created_at, updated_at)
+             VALUES (#{categoryId}, #{name}, #{slug}, #{description}, #{sku}, #{basePrice},#{isActive}, #{createdAt}, #{updatedAt})
+         </insert>
+
+         <!-- Update -->
+         <update id="update" parameterType="com.fpl.edu.shoeStore.product.entity.Product">
+             UPDATE products
+             SET category_id  = #{categoryId},
+                 name         = #{name},
+                 url          = #{slug},
+                 description  = #{description},
+                 product_code = #{sku},
+                 base_price   = #{basePrice},
+                 is_active    = #{isActive},
+                 updated_at   = #{updatedAt}
+             WHERE product_id = #{productId}
+         </update>
+
+         <!-- Delete -->
+         <delete id="deleteById" parameterType="long">
+             DELETE FROM products
+             WHERE product_id = #{productId}
+         </delete>
+
+         <!-- Paged select with filters -->
+         <select id="findAllPaged" parameterType="map" resultMap="ProductResultMap">
+             SELECT product_id,
+                    category_id,
+                    name,
+                    url,
+                    description,
+                    product_code,
+                    base_price,
+                    is_active,
+                    created_at,
+                    updated_at
+             FROM products
+             <where>
+                 <if test="categoryId != null">
+                     AND category_id = #{categoryId}
+                 </if>
+                 <if test="name != null and name != ''">
+                     AND LOWER(name) LIKE CONCAT('%', LOWER(#{name}), '%')
+                 </if>
+                 <if test="slug != null and slug != ''">
+                     AND LOWER(url) LIKE CONCAT('%', LOWER(#{slug}), '%')
+                 </if>
+                 <if test="isActive != null">
+                     AND is_active = #{isActive}
+                 </if>
+             </where>
+             ORDER BY product_id DESC
+             OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+         </select>
+
+         <!-- Count with filters -->
+         <select id="countAll" parameterType="map" resultType="long">
+             SELECT COUNT(product_id)
+             FROM products
+             <where>
+                 <if test="categoryId != null">
+                     AND category_id = #{categoryId}
+                 </if>
+                 <if test="name != null and name != ''">
+                     AND LOWER(name) LIKE CONCAT('%', LOWER(#{name}), '%')
+                 </if>
+                 <if test="slug != null and slug != ''">
+                     AND LOWER(url) LIKE CONCAT('%', LOWER(#{slug}), '%')
+                 </if>
+                 <if test="isActive != null">
+                     AND is_active = #{isActive}
+                 </if>
+             </where>
+         </select>
+
+     </mapper>

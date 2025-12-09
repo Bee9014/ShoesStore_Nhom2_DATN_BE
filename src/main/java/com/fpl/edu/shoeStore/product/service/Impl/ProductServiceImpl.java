@@ -1,4 +1,4 @@
-package com.fpl.edu.shoeStore.product.service.impl;
+package com.fpl.edu.shoeStore.product.service.Impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fpl.edu.shoeStore.common.PageResponse;
+import com.fpl.edu.shoeStore.common.handler.PageResponse;
 import com.fpl.edu.shoeStore.product.convert.ProductConverter;
 import com.fpl.edu.shoeStore.product.dto.request.ProductDtoRequest;
 import com.fpl.edu.shoeStore.product.dto.response.ProductDtoResponse;
@@ -22,16 +22,16 @@ import lombok.RequiredArgsConstructor;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductMapper productMapper;
-    private final ProductConverter productConverter;
+    
 
     @Override
     @Transactional
     public ProductDtoResponse createProduct(ProductDtoRequest request) {
-        Product product = productConverter.toEntity(request);
+        Product product = ProductConverter.toEntity(request);
         product.setCreatedAt(LocalDateTime.now());
         product.setUpdatedAt(LocalDateTime.now());
         productMapper.insert(product);
-        return productConverter.toResponse(product);
+        return ProductConverter.toResponse(product);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class ProductServiceImpl implements ProductService {
         existing.setUpdatedAt(LocalDateTime.now());
         productMapper.update(existing);
 
-        return productConverter.toResponse(existing);
+        return ProductConverter.toResponse(existing);
     }
 
     @Override
@@ -69,8 +69,14 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDtoResponse findById(Long id) {
         Product product = productMapper.findById(id);
-        return product == null ? null : productConverter.toResponse(product);
+        return product == null ? null : ProductConverter.toResponse(product);
     }
+
+    @Override
+         public ProductDtoResponse findByName(String name) {
+             Product product = productMapper.findByName(name);
+             return product == null ? null : ProductConverter.toResponse(product);
+         }
 
     @Override
     public PageResponse<ProductDtoResponse> findAllPaged(
@@ -92,7 +98,7 @@ public class ProductServiceImpl implements ProductService {
         );
 
         List<ProductDtoResponse> content = products.stream()
-                .map(productConverter::toResponse)
+                .map(ProductConverter::toResponse)
                 .collect(Collectors.toList());
 
         int totalPages = (int) Math.ceil((double) totalElements / size);
