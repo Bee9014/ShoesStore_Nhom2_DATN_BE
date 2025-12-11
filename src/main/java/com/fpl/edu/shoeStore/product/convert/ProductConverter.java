@@ -9,26 +9,37 @@ import com.fpl.edu.shoeStore.product.entity.ProductVariant;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Product Converter - Convert giữa Entity và DTO
+ */
 public class ProductConverter {
+    
+    /**
+     * Convert ProductDtoRequest → Product entity
+     */
     public static Product toEntity(ProductDtoRequest dto) {
         return Product.builder()
                 .categoryId(dto.getCategoryId())
                 .name(dto.getName())
-                .slug(dto.getSlug())
+                .url(dto.getUrl())                      // Updated: slug → url
                 .description(dto.getDescription())
-                .sku(dto.getSku())
+                .productCode(dto.getProductCode())      // Updated: sku → productCode
                 .basePrice(dto.getBasePrice())
                 .isActive(dto.getIsActive())
                 .build();
     }
+    
+    /**
+     * Convert Product entity → ProductDtoResponse
+     */
     public static ProductDtoResponse toResponse(Product entity) {
         return ProductDtoResponse.builder()
                 .productId(entity.getProductId())
                 .categoryId(entity.getCategoryId())
                 .name(entity.getName())
-                .slug(entity.getSlug())
+                .url(entity.getUrl())                   // Updated: slug → url
                 .description(entity.getDescription())
-                .sku(entity.getSku())
+                .productCode(entity.getProductCode())   // Updated: sku → productCode
                 .basePrice(entity.getBasePrice())
                 .isActive(entity.getIsActive())
                 .createdAt(entity.getCreatedAt())
@@ -36,22 +47,25 @@ public class ProductConverter {
                 .build();
     }
 
-     public static ProductDetailDtoResponse toDetailResponse(Product product,
-     List<ProductVariant> variants) {
-         return ProductDetailDtoResponse.builder()
-                 .productId(product.getProductId())
-                 .categoryId(product.getCategoryId())
-                 .name(product.getName())
-                 .slug(product.getSlug())
-                 .description(product.getDescription())
-                 .sku(product.getSku())
-                 .basePrice(product.getBasePrice())
-                 .isActive(product.getIsActive())
-                 .createdAt(product.getCreatedAt())
-                 .updatedAt(product.getUpdatedAt())
-                 .variants(variants.stream()
-                         .map(ProductVariantConverter::toResponse)
-                         .collect(Collectors.toList()))
-                 .build();
-     }
+    /**
+     * Convert Product + Variants → ProductDetailDtoResponse
+     */
+    public static ProductDetailDtoResponse toDetailResponse(Product product,
+                                                           List<ProductVariant> variants) {
+        return ProductDetailDtoResponse.builder()
+                .productId(product.getProductId())
+                .categoryId(product.getCategoryId())
+                .name(product.getName())
+                .url(product.getUrl())                  // Updated: slug → url
+                .description(product.getDescription())
+                .productCode(product.getProductCode())  // Updated: sku → productCode
+                .basePrice(product.getBasePrice())
+                .isActive(product.getIsActive())
+                .createdAt(product.getCreatedAt())
+                .updatedAt(product.getUpdatedAt())
+                .variants(variants.stream()
+                        .map(ProductVariantConverter::toResponse)
+                        .collect(Collectors.toList()))
+                .build();
+    }
 }

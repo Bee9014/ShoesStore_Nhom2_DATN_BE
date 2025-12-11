@@ -1,12 +1,13 @@
 package com.fpl.edu.shoeStore.auth.security;
 
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtUtil {
@@ -14,8 +15,8 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-    private final long ACCESS_EXP = 24 * 60 * 60 * 1000; // 1 Day
-    private final long REFRESH_EXP = 7 * 24 * 60 * 60 * 1000; // 7 Days
+    private final long ACCESS_EXP = 15 * 60 * 1000; // 15 pphuts
+    private final long REFRESH_EXP = 7 * 24 * 60 * 60 * 1000; // 7 ngày
 
     public String generateToken(String userName, int roleId, long expiration) {
         return Jwts.builder()

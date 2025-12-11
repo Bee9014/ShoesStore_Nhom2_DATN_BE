@@ -31,8 +31,7 @@ public class AdminController {
     public String productList(Model model, HttpServletRequest request) {
         model.addAttribute("pageTitle", "Quản lý sản phẩm");
         model.addAttribute("currentPath", request.getRequestURI());
-        // TODO: Load products from database
-        return "admin/pages/product-list";
+        return "admin/pages/product";
     }
 
     @GetMapping("/products/add")

@@ -58,6 +58,7 @@ const App = {
       ROOT: () => `/categories`,
       BY_ID: (id) => `/categories/${id}`,
       WITH_PRODUCTS: (id) => `/categories/${id}/products`,
+      GET_ALL: () => App.API.CATEGORIES.ROOT(),
     },
     
     // ==================== DASHBOARD ====================
