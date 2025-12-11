@@ -1,62 +1,32 @@
-// Toast Component JS
+export class Toast {
+  static _toastEl = document.getElementById("globalToast");
+  static _toastBody = document.getElementById("globalToastMessage");
+  static _bsToast = new bootstrap.Toast(Toast._toastEl, { delay: 3000 });
 
-const Toast = {
-    show: function(message, type = 'success', duration = 3000) {
-        const toastEl = document.getElementById('globalToast');
-        const toastBody = document.getElementById('globalToastMessage');
-        
-        if (!toastEl || !toastBody) {
-            console.error('Toast elements not found');
-            return;
-        }
+  static show(message, type = "primary") {
+    // Reset class
+    Toast._toastEl.className = `toast align-items-center text-bg-${type} border-0`;
 
-        // Set message
-        toastBody.textContent = message;
+    // Set message
+    Toast._toastBody.innerHTML = message;
 
-        // Set color based on type
-        toastEl.className = 'toast align-items-center border-0';
-        
-        switch(type) {
-            case 'success':
-                toastEl.classList.add('text-bg-success');
-                break;
-            case 'error':
-            case 'danger':
-                toastEl.classList.add('text-bg-danger');
-                break;
-            case 'warning':
-                toastEl.classList.add('text-bg-warning');
-                break;
-            case 'info':
-                toastEl.classList.add('text-bg-info');
-                break;
-            default:
-                toastEl.classList.add('text-bg-primary');
-        }
+    // Show
+    Toast._bsToast.show();
+  }
 
-        // Show toast
-        const toast = new bootstrap.Toast(toastEl, {
-            delay: duration
-        });
-        toast.show();
-    },
+  static success(msg) {
+    Toast.show(msg, "success");
+  }
 
-    success: function(message, duration = 3000) {
-        this.show(message, 'success', duration);
-    },
+  static error(msg) {
+    Toast.show(msg, "danger");
+  }
 
-    error: function(message, duration = 3000) {
-        this.show(message, 'error', duration);
-    },
+  static info(msg) {
+    Toast.show(msg, "info");
+  }
 
-    warning: function(message, duration = 3000) {
-        this.show(message, 'warning', duration);
-    },
-
-    info: function(message, duration = 3000) {
-        this.show(message, 'info', duration);
-    }
-};
-
-// Make Toast globally available
-window.Toast = Toast;
+  static warning(msg) {
+    Toast.show(msg, "warning");
+  }
+}

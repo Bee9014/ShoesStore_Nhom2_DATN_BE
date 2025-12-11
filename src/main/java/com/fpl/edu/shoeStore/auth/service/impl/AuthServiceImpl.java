@@ -1,24 +1,26 @@
 package com.fpl.edu.shoeStore.auth.service.impl;
 
-import com.fpl.edu.shoeStore.auth.dto.request.LoginRequestDto;
-import com.fpl.edu.shoeStore.auth.dto.request.RegisterRequestDto;
-import com.fpl.edu.shoeStore.auth.dto.response.AuthResult;
-import com.fpl.edu.shoeStore.auth.dto.response.LoginResponseDto;
-import com.fpl.edu.shoeStore.auth.dto.response.UserAuthResponseDto;
-import com.fpl.edu.shoeStore.auth.security.JwtUtil;
-import com.fpl.edu.shoeStore.auth.service.AuthService;
-import com.fpl.edu.shoeStore.auth.service.UserAuthService;
-import com.fpl.edu.shoeStore.common.enums.ErrorCode;
-import com.fpl.edu.shoeStore.user.entity.User;
-import lombok.RequiredArgsConstructor;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.util.Map;
+import com.fpl.edu.shoeStore.auth.dto.request.LoginRequestDto;
+import com.fpl.edu.shoeStore.auth.dto.request.RegisterRequestDto;
+import com.fpl.edu.shoeStore.auth.dto.response.UserAuthResponseDto;
+import com.fpl.edu.shoeStore.auth.security.JwtUtil;
+import com.fpl.edu.shoeStore.auth.service.AuthService;
+import com.fpl.edu.shoeStore.auth.service.UserAuthService;
+import com.fpl.edu.shoeStore.common.enums.ErrorCode;
+import com.fpl.edu.shoeStore.common.handler.ApiResponse;
+import com.fpl.edu.shoeStore.user.entity.User;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -44,15 +46,25 @@ public class AuthServiceImpl implements AuthService {
         String refreshToken = jwtUtil.generateRefreshToken(username, roleId);
         UserAuthResponseDto loggedUser = userAuthService.findUserByUserName(username);
 
-        LoginResponseDto token = new LoginResponseDto();
-        token.setAccessToken(accessToken);
-        token.setRefreshToken(refreshToken);
+        //trả về dữ liệu với accessToken, refreshToken, user info
+        Map<String, Object> data = new HashMap<>();
+        data.put("accessToken", accessToken);
+        data.put("refreshToken", refreshToken);
+        data.put("user", loggedUser);
+
+        // xài chung apiresponse để vue nhận chung format
+        ApiResponse<Map<String, Object>> apiResponse = ApiResponse.<Map<String, Object>>builder()
+                .success(true)
+                .statusCode(HttpStatus.OK.value())
+                .message("Đăng nhập thành công")
+                .data(data)
+                .build();
 
         ResponseCookie cookie = createRefreshTokenCookie(refreshToken);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new AuthResult(token, loggedUser));
+                .body(apiResponse);
     }
 
     @Override
@@ -71,11 +83,15 @@ public class AuthServiceImpl implements AuthService {
 
         try {
             User newUser = userAuthService.registerUser(registerRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-                    "success", true,
-                    "message", ErrorCode.REGISTER_SUCCESS.getMessage(),
-                    "data", newUser
-            ));
+            
+            ApiResponse<User> apiResponse = ApiResponse.<User>builder()
+                    .success(true)
+                    .statusCode(HttpStatus.CREATED.value())
+                    .message(ErrorCode.REGISTER_SUCCESS.getMessage())
+                    .data(newUser)
+                    .build();
+            
+            return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
         } catch (Exception e) {
             return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FAILED_TO_CREATE_ACCOUNT);
         }
@@ -91,10 +107,17 @@ public class AuthServiceImpl implements AuthService {
         int roleId = jwtUtil.getRoleIdFromToken(token);
         String newAccessToken = jwtUtil.generateAccessToken(username, roleId);
 
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "accessToken", newAccessToken
-        ));
+        Map<String, String> data = new HashMap<>();
+        data.put("accessToken", newAccessToken);
+        
+        ApiResponse<Map<String, String>> apiResponse = ApiResponse.<Map<String, String>>builder()
+                .success(true)
+                .statusCode(HttpStatus.OK.value())
+                .message("Token đã được làm mới")
+                .data(data)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
     }
 
     @Override
@@ -105,12 +128,16 @@ public class AuthServiceImpl implements AuthService {
                 .maxAge(0)
                 .build();
 
+        ApiResponse<Object> apiResponse = ApiResponse.builder()
+                .success(true)
+                .statusCode(HttpStatus.OK.value())
+                .message(ErrorCode.LOGOUT_SUCCESS.getMessage())
+                .data(null)
+                .build();
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(Map.of(
-                        "success", true,
-                        "message", ErrorCode.LOGOUT_SUCCESS.getMessage()
-                ));
+                .body(apiResponse);
     }
 
     @Override
@@ -119,12 +146,14 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private ResponseEntity<?> buildErrorResponse(HttpStatus status, ErrorCode errorCode) {
-        return ResponseEntity.status(status)
-                .body(Map.of(
-                        "success", false,
-                        "message", errorCode.getMessage(),
-                        "code", errorCode.getCode()
-                ));
+        ApiResponse<Object> apiResponse = ApiResponse.builder()
+                .success(false)
+                .statusCode(status.value())
+                .message(errorCode.getMessage())
+                .data(null)
+                .build();
+        
+        return ResponseEntity.status(status).body(apiResponse);
     }
 
     private ResponseCookie createRefreshTokenCookie(String refreshToken) {

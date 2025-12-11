@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/main-layout}">
+<head>
+    <title layout:title-content="Quản lý sản phẩm">Quản lý sản phẩm</title>
+    <th:block layout:fragment="page-css">
+        <link rel="stylesheet" th:href="@{/admin/css/components/table.css}" />
+        <link rel="stylesheet" th:href="@{/admin/css/components/detail.cards.css}" />
+    </th:block>
+</head>
+<body>
+    <!-- Page Actions -->
+    <div layout:fragment="page-actions">
+        <button id="btnCreateProduct" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>
+            Thêm sản phẩm
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <section layout:fragment="content">
+        <div>
+            <!-- Search Container -->
+            <div id="search-container" class="mb-4"></div>
+
+            <!-- Master-Detail Layout -->
+            <div id="master-detail-wrapper" class="d-flex w-100" style="position: relative;">
+                <div id="masterPanel" class="flex-grow-1">
+                    <div id="productTableContainer"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Page Scripts -->
+    <th:block layout:fragment="page-scripts">
+        <script type="module" th:src="@{/admin/js/pages/product/product.page.js}"></script>
+    </th:block>
+</body>
+</html>

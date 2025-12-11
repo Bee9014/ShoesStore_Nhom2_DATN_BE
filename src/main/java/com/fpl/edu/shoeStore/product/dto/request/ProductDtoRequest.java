@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Product DTO Request - Tạo/Cập nhật sản phẩm
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,9 +15,9 @@ import lombok.NoArgsConstructor;
 public class ProductDtoRequest {
     private Long categoryId;
     private String name;
-    private String slug;
+    private String url;            // URL-friendly (was: slug)
     private String description;
-    private String sku;
+    private String productCode;    // Mã sản phẩm (was: sku)
     private Double basePrice;
     private Boolean isActive;
 }

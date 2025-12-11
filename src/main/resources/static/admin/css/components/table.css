@@ -1,0 +1,732 @@
+/* ==================== CSS Variables ==================== */
+:root {
+  /* Primary Colors */
+  --primary-color: #d49a6a;
+  --primary-dark: #b87449;
+  --primary-light: #e0a978;
+  --primary-lighter: #c38f6d;
+
+  /* Background Colors */
+  --bg-light: #fffdf9;
+  --bg-warm: #fff7ef;
+  --bg-cream: #f9eee3;
+  --bg-peach: #ffe6d0;
+  --bg-sand: #fff3e0;
+  --bg-pale: #fff9f5;
+  --bg-soft: #fff4e7;
+  --bg-amber: #ffedd7;
+  --bg-golden: #fff9f3;
+
+  /* Text Colors */
+  --text-dark: #5a4633;
+  --text-primary: #2b2b2b;
+  --text-muted: #666;
+  --text-placeholder: #a88f7a;
+  --text-gray: #8c7b6b;
+  --text-faded: #a68a72;
+
+  /* Border Colors */
+  --border-light: #e0c9a8;
+  --border-tan: #d7b899;
+  --border-warm: #e6c4a8;
+
+  /* Green Colors */
+  --green-primary: #4ca26b;
+  --green-dark: #3b7a57;
+  --green-darker: #2e593f;
+  --green-light: #6dcf77;
+  --green-bright: #6dbf4b;
+  --green-success: #4caf50;
+  --green-success-dark: #388e3c;
+
+  /* Action Button Colors */
+  --btn-edit-bg: rgba(184, 116, 73, 0.1);
+  --btn-edit-bg-hover: rgba(184, 116, 73, 0.2);
+  --btn-edit-bg-active: rgba(184, 116, 73, 0.3);
+  --btn-edit-color: #b87449;
+
+  --btn-detail-bg: rgba(76, 175, 80, 0.1);
+  --btn-detail-bg-hover: rgba(76, 175, 80, 0.2);
+  --btn-detail-bg-active: rgba(76, 175, 80, 0.3);
+  --btn-detail-color: #4caf50;
+
+  --btn-delete-bg: rgba(212, 85, 57, 0.1);
+  --btn-delete-bg-hover: rgba(212, 85, 57, 0.2);
+  --btn-delete-bg-active: rgba(212, 85, 57, 0.3);
+  --btn-delete-color: #d45539;
+
+  /* Secondary Button Colors */
+  --btn-secondary-bg: #ebd2b0;
+  --btn-secondary-hover: #d6b087;
+
+  /* Blue Colors */
+  --blue-primary: #4ea1f2;
+  --blue-dark: #3b8cd8;
+
+  /* Box Shadow Colors */
+  --shadow-primary: rgba(90, 70, 51, 0.15);
+  --shadow-edit: rgba(184, 116, 73, 0.3);
+  --shadow-detail: rgba(76, 175, 80, 0.3);
+  --shadow-delete: rgba(212, 85, 57, 0.3);
+  --shadow-active: rgba(212, 154, 106, 0.6);
+  --shadow-green: rgba(59, 122, 87, 0.2);
+  --shadow-focus: rgba(76, 162, 107, 0.25);
+}
+
+/* ==================== Pagination ==================== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.pagination button {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: var(--bg-amber);
+  color: var(--text-dark);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: var(--border-warm);
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination .active-page {
+  background: var(--primary-color);
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 0 6px var(--shadow-active);
+}
+
+/* ==================== Table ==================== */
+.custom-table {
+  width: 100%;
+  max-height: 80vh;
+  min-width: 300px;
+  overflow-x: hidden;
+  border-collapse: collapse;
+  margin-top: 12px;
+  background: var(--bg-light);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px var(--shadow-primary);
+  font-size: 14px;
+}
+
+/* Table header */
+.custom-table thead {
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+  color: white;
+  text-align: left;
+}
+
+.custom-table th {
+  padding: 12px 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+/* Table body */
+.custom-table td {
+  padding: 12px 16px;
+}
+
+/* Zebra striping */
+.custom-table tbody tr:nth-child(even) {
+  background: var(--bg-soft);
+}
+
+/* Hover row */
+.custom-table tbody tr:hover {
+  background: #ffe5cc;
+}
+
+/* Empty cell */
+.custom-table .empty-cell {
+  text-align: center;
+  font-style: italic;
+  color: var(--text-faded);
+}
+
+/* Wrapper */
+.table-wrapper {
+  max-height: 70vh;
+  overflow-y: auto;
+  border-radius: 8px;
+}
+
+.table-wrapper table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+  color: white;
+}
+
+/* Action cell styling */
+.td-action {
+  text-align: left;
+  white-space: nowrap;
+  padding: 8px;
+}
+
+/* Edit button in table */
+.btn-edit {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--btn-edit-bg);
+  color: var(--btn-edit-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+.btn-edit:hover {
+  background-color: var(--btn-edit-bg-hover);
+  color: var(--btn-edit-color);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px var(--shadow-edit);
+}
+
+.btn-edit:active {
+  transform: translateY(0);
+  background-color: var(--btn-edit-bg-active);
+  box-shadow: 0 1px 4px var(--shadow-edit);
+}
+
+/* Detail button in table */
+.btn-detail {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--btn-detail-bg);
+  color: var(--btn-detail-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+.btn-detail:hover {
+  background-color: var(--btn-detail-bg-hover);
+  color: var(--btn-detail-color);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px var(--shadow-detail);
+}
+
+.btn-detail:active {
+  transform: translateY(0);
+  background-color: var(--btn-detail-bg-active);
+  box-shadow: 0 1px 4px var(--shadow-detail);
+}
+
+/* Button delete table */
+.btn-delete {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--btn-delete-bg);
+  color: var(--btn-delete-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.btn-delete:hover {
+  background-color: var(--btn-delete-bg-hover);
+  color: var(--btn-delete-color);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px var(--shadow-delete);
+}
+
+.btn-delete:active {
+  transform: translateY(0);
+  background-color: var(--btn-delete-bg-active);
+  box-shadow: 0 1px 4px var(--shadow-delete);
+}
+
+.btn-info-circle {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--green-dark);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 16px;
+}
+
+.btn-info-circle:hover {
+  background-color: var(--green-bright);
+  transform: scale(1.1);
+}
+
+.btn-info-circle:active {
+  background-color: var(--green-darker);
+  transform: scale(1);
+}
+
+/* ==================== PANEL ==================== */
+
+/* Master detail panel */
+.master-detail-wrapper {
+  display: flex;
+  gap: 16px;
+  height: 100%;
+}
+
+/* Master table panel */
+.master-panel {
+  flex: 1;
+  transition: flex 0.4s ease;
+  border-radius: 12px;
+}
+
+/* Khi detail panel mở, master thu nhỏ */
+.master-panel.shrink {
+  flex: 0.6; /* table chiếm 60% */
+}
+
+/* Detail panel */
+.detail-panel {
+  flex: 0;
+  overflow: auto;
+  background: var(--bg-light);
+  border-left: 3px solid var(--primary-color);
+  border-radius: 12px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
+  padding: 16px;
+
+  /* ẩn ban đầu */
+  opacity: 0;
+  transform: translateX(20px);
+  transition: flex 0.4s ease, opacity 0.3s ease, transform 0.4s ease;
+
+  position: relative; /*Dùng cho nút close*/
+
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.detail-panel .close-panel-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-weight: bold;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.detail-panel .close-panel-btn:hover {
+  color: #333;
+}
+
+/* Khi mở */
+.detail-panel.open {
+  flex: 1;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.open-2-panel {
+  min-height: 75vh;
+}
+
+/* Sử dụng khi collapse master panel */
+
+/* Khi master bị collapse, biến panel thành 1 cột hẹp */
+.master-panel.collapsed {
+  flex: 0 0 60px; /* chỉ chiếm 60px ngang */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* Ẩn bảng + Pagination */
+.master-panel.collapsed .table-wrapper,
+.master-panel.collapsed .pagination {
+  display: none;
+}
+
+/* Nút collapse dọc */
+.master-panel .collapse-btn {
+  /*display: none;*/
+  writing-mode: vertical-rl;
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: 12px;
+  white-space: nowrap;
+  font-weight: 500;
+
+  background-color: var(--blue-primary);
+  color: #fff;
+  border: 1px solid var(--blue-primary);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.master-panel .collapse-btn:hover {
+  background-color: var(--blue-dark);
+  border-color: var(--blue-dark);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Khi master panel collapsed thì hiện nút */
+.master-panel.collapsed .collapse-btn {
+  display: flex;
+  width: 75px;
+  height: 100px;
+}
+
+/* ==================== CUSTOM MODAL ==================== */
+
+/* Modal background overlay */
+#myModal.modal.fade .modal-dialog {
+  transition: transform 0.3s ease-out;
+  transform: translateY(-20px);
+}
+
+/* Modal overall */
+.modal-content {
+  border-radius: 12px;
+  border: none;
+  background: var(--bg-warm);
+  color: var(--text-dark);
+  overflow: hidden;
+}
+
+/* Modal header */
+.modal-header {
+  background-color: var(--primary-light);
+  color: #fff;
+  border-bottom: none;
+  padding: 16px 24px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+/* Close button */
+.modal-header .btn-close {
+  filter: brightness(0.95);
+  transition: all 0.2s ease;
+}
+
+.modal-header .btn-close:hover {
+  filter: brightness(1.2);
+}
+
+/* Modal body */
+.modal-body {
+  padding: 20px 24px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-dark);
+  background: var(--bg-cream);
+}
+
+/* Modal footer */
+.modal-footer {
+  padding: 12px 24px;
+  background: var(--bg-peach);
+  border-top: 1px solid var(--border-warm);
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Buttons */
+.modal-footer .btn-primary {
+  background-color: var(--primary-lighter);
+  border: none;
+  color: #fff;
+  transition: all 0.2s ease;
+}
+
+.modal-footer .btn-primary:hover {
+  background-color: var(--primary-color);
+}
+
+.modal-footer .btn-secondary {
+  background-color: var(--btn-secondary-bg);
+  border: none;
+  color: var(--text-dark);
+}
+
+.modal-footer .btn-secondary:hover {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+/* ==================== FORM CUSTOM ==================== */
+
+/* Label */
+.form-label {
+  font-weight: 600;
+  color: var(--green-primary);
+}
+
+/* Input & Select */
+.form-control,
+.form-select {
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  background-color: var(--bg-sand);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+/* Khi focus */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--green-primary);
+  box-shadow: 0 0 0 0.2rem var(--shadow-focus);
+  background-color: var(--bg-pale);
+  outline: none;
+}
+
+/* Placeholder */
+.form-control::placeholder {
+  color: var(--text-placeholder);
+  font-style: italic;
+}
+
+/* Nút submit chính */
+.btn-primary {
+  background-color: var(--green-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 6px 18px;
+}
+
+.btn-primary:hover {
+  background-color: var(--green-light);
+}
+
+/* Nút secondary */
+.btn-secondary {
+  background-color: var(--border-light);
+  border: none;
+  border-radius: 8px;
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--btn-secondary-hover);
+}
+
+/* ==================== FORM INPUTS ==================== */
+
+/* Label */
+.search-label {
+  font-weight: 600;
+  color: var(--green-dark);
+  margin-bottom: 4px;
+  display: block;
+  font-size: 13px;
+}
+
+/* Text input */
+.search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-tan);
+  background-color: var(--bg-amber);
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: var(--green-dark);
+  box-shadow: 0 0 0 0.2rem var(--shadow-green);
+  background-color: var(--bg-golden);
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: var(--text-gray);
+  font-style: italic;
+}
+
+/* Select input */
+.search-select {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-tan);
+  background-color: var(--bg-amber);
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: all 0.2s ease;
+  appearance: none; /* remove default arrow */
+}
+
+.search-select:focus {
+  border-color: var(--green-dark);
+  box-shadow: 0 0 0 0.2rem var(--shadow-green);
+  background-color: var(--bg-golden);
+  outline: none;
+}
+
+/* Radio & Checkbox wrapper */
+.search-option-group {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin: 4px 0;
+}
+
+.search-option-group input[type="radio"],
+.search-option-group input[type="checkbox"] {
+  accent-color: var(--green-dark);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.search-option-label {
+  display: flex;
+  gap: 8px;
+  align-content: center;
+  justify-items: center;
+}
+
+/* Label cho radio & checkbox */
+.search-option-group label {
+  font-size: 14px;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Button cho search/call API */
+.search-btn {
+  background-color: var(--green-dark);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.search-btn:hover {
+  background-color: var(--green-bright);
+}
+
+/* Search wrapper: layout flex */
+.search-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: flex-end;
+}
+
+/* Wrapper cho select để dễ thêm icon */
+.search-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Select */
+.search-select-wrapper select.search-select {
+  width: 100%;
+  padding: 8px 36px 8px 12px; /* padding-right đủ để icon */
+  border-radius: 8px;
+  border: 1px solid var(--border-tan);
+  background-color: var(--bg-amber);
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: all 0.2s ease;
+  appearance: none; /* remove default arrow */
+}
+
+/* Icon mũi tên */
+.search-select-wrapper::after {
+  content: "▼"; /* ký tự arrow */
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--text-primary);
+  font-size: 12px;
+}
+
+/* ==================== Button see chart ==================== */
+
+.btn-chart {
+  background-color: var(--green-success);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 20px;
+  border: none;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+.btn-chart:hover {
+  background-color: var(--green-success-dark);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.btn-chart i {
+  font-size: 1rem;
+}

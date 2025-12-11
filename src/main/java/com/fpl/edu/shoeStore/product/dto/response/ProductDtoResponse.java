@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
+/**
+ * Product DTO Response - Response sản phẩm
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,9 +17,9 @@ public class ProductDtoResponse {
     private Long productId;
     private Long categoryId;
     private String name;
-    private String slug;
+    private String url;            // URL-friendly (was: slug)
     private String description;
-    private String sku;
+    private String productCode;    // Mã sản phẩm (was: sku)
     private Double basePrice;
     private Boolean isActive;
     private LocalDateTime createdAt;

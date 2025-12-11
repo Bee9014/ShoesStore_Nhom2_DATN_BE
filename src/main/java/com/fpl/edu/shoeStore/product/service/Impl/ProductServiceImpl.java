@@ -1,4 +1,4 @@
-package com.fpl.edu.shoeStore.product.service.Impl;
+package com.fpl.edu.shoeStore.product.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,9 +44,9 @@ public class ProductServiceImpl implements ProductService {
 
         if (request.getCategoryId() != null) existing.setCategoryId(request.getCategoryId());
         if (request.getName() != null) existing.setName(request.getName());
-        if (request.getSlug() != null) existing.setSlug(request.getSlug());
+        if (request.getUrl() != null) existing.setUrl(request.getUrl());
         if (request.getDescription() != null) existing.setDescription(request.getDescription());
-        if (request.getSku() != null) existing.setSku(request.getSku());
+        if (request.getProductCode() != null) existing.setProductCode(request.getProductCode());
         if (request.getBasePrice() != null) existing.setBasePrice(request.getBasePrice());
         if (request.getIsActive() != null) existing.setIsActive(request.getIsActive());
 
@@ -82,7 +82,7 @@ public class ProductServiceImpl implements ProductService {
     public PageResponse<ProductDtoResponse> findAllPaged(
             Long categoryId,
             String name,
-            String slug,
+            String url,              // Updated: slug → url
             Boolean isActive,
             int page,
             int size
@@ -90,11 +90,11 @@ public class ProductServiceImpl implements ProductService {
         int offset = (page - 1) * size;
 
         List<Product> products = productMapper.findAllPaged(
-                categoryId, name, slug, isActive, offset, size
+                categoryId, name, url, isActive, offset, size
         );
 
         long totalElements = productMapper.countAll(
-                categoryId, name, slug, isActive
+                categoryId, name, url, isActive
         );
 
         List<ProductDtoResponse> content = products.stream()

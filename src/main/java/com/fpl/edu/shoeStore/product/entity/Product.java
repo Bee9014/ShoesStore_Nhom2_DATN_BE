@@ -7,6 +7,10 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * Product Entity - Sản phẩm chính
+ * Maps to: products table
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,11 +19,11 @@ public class Product {
     private Long productId;
     private Long categoryId;
     private String name;
-    private String slug;
+    private String url;              // URL-friendly (was: slug)
     private String description;
-    private String sku;
-    private Double basePrice;
-    private Boolean isActive;
+    private String productCode;      // Mã sản phẩm (was: sku)
+    private Double basePrice;        // Giá tham chiếu
+    private Boolean isActive;        // 1=Đang bán, 0=Ngừng bán
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

@@ -7,7 +7,10 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 
-@Data @Builder @NoArgsConstructor @AllArgsConstructor
+@Data
+@Builder 
+@NoArgsConstructor 
+@AllArgsConstructor
 public class ProductVariant {
     private Long variantId;              // variant_id
     private Long productId;              // product_id
