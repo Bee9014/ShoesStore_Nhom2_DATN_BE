@@ -1,29 +1,29 @@
-package com.fpl.edu.shoeStore.product.entity;
+ package com.fpl.edu.shoeStore.product.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+     import lombok.AllArgsConstructor;
+     import lombok.Builder;
+     import lombok.Data;
+     import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+     import java.time.LocalDate;
 
-/**
- * Product Entity - Sản phẩm chính
- * Maps to: products table
- */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Product {
-    private Long productId;
-    private Long categoryId;
-    private String name;
-    private String url;              // URL-friendly (was: slug)
-    private String description;
-    private String productCode;      // Mã sản phẩm (was: sku)
-    private Double basePrice;        // Giá tham chiếu
-    private Boolean isActive;        // 1=Đang bán, 0=Ngừng bán
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-}
+     @Data
+     @NoArgsConstructor
+     @AllArgsConstructor
+     @Builder
+     public class Product {
+         private Integer productId;       // INT trong DB
+         private Integer categoryId;      // INT trong DB
+         private String title;            // Đổi từ "name" → "title"
+         private String description;
+         private String brand;            // THÊM MỚI
+         private String condition;        // THÊM MỚI
+         private String defaultImage;     // THÊM MỚI (default_image)
+         private String status;           // Đổi từ Boolean isActive → String status
+         private LocalDate createAt;      // Đổi từ createdAt, kiểu DATE
+         private LocalDate updateAt;      // Đổi từ updatedAt, kiểu DATE
+         private Integer createBy;        // THÊM MỚI
+         private Integer updateBy;        // THÊM MỚI
+
+         // XÓA: url, productCode, basePrice
+     }

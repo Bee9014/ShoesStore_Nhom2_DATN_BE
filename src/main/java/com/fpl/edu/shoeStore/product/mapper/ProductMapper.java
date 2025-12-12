@@ -1,67 +1,36 @@
-package com.fpl.edu.shoeStore.product.mapper;
+ package com.fpl.edu.shoeStore.product.mapper;
 
-import java.util.List;
+     import com.fpl.edu.shoeStore.product.entity.Product;
+     import org.apache.ibatis.annotations.Mapper;
+     import org.apache.ibatis.annotations.Param;
 
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
+     import java.util.List;
 
-import com.fpl.edu.shoeStore.product.entity.Product;
+     @Mapper
+     public interface ProductMapper {
+         List<Product> findAll();
 
-/**
- * Product Mapper Interface
- * MyBatis mapper for products table
- */
-@Mapper
-public interface ProductMapper {
-    /**
-     * Find all active products
-     */
-    List<Product> findAll();
-    
-    /**
-     * Find product by ID
-     */
-    Product findById(@Param("productId") Long productId);
-    
-    /**
-     * Find product by name
-     */
-    Product findByName(@Param("name") String name);
-    
-    /**
-     * Insert new product
-     */
-    int insert(Product product);
-    
-    /**
-     * Update product
-     */
-    int update(Product product);
-    
-    /**
-     * Soft delete product (set is_active = 0)
-     */
-    int deleteById(@Param("productId") Long productId);
+         Product findById(@Param("productId") Integer productId);           // Đổi Long → Integer
 
-    /**
-     * Find products with pagination and filters
-     */
-    List<Product> findAllPaged(
-            @Param("categoryId") Long categoryId,
-            @Param("name") String name,
-            @Param("url") String url,                    // Updated: slug → url
-            @Param("isActive") Boolean isActive,
-            @Param("offset") int offset,
-            @Param("size") int size
-    );
-    
-    /**
-     * Count products with filters (for pagination)
-     */
-    long countAll(
-            @Param("categoryId") Long categoryId,
-            @Param("name") String name,
-            @Param("url") String url,                    // Updated: slug → url
-            @Param("isActive") Boolean isActive
-    );
-}
+         Product findByTitle(@Param("title") String title);                 // Đổi từ findByName
+
+         int insert(Product product);
+
+         int update(Product product);
+
+         int deleteById(@Param("productId") Integer productId);             // Đổi Long → Integer
+
+         List<Product> findAllPaged(
+             @Param("categoryId") Integer categoryId,                       // Đổi Long → Integer
+             @Param("title") String title,                                  // Đổi từ name → title
+             @Param("status") String status,                                // Đổi từ Boolean isActive → String status
+             @Param("offset") int offset,
+             @Param("size") int size
+         );
+
+         long countAll(
+             @Param("categoryId") Integer categoryId,                       // Đổi Long → Integer
+             @Param("title") String title,                                  // Đổi từ name → title
+             @Param("status") String status                                 // Đổi từ Boolean isActive → String status
+         );
+     }

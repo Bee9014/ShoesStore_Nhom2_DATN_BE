@@ -1,156 +1,114 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+     <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+          "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.fpl.edu.shoeStore.product.mapper.ProductMapper">
+     <mapper namespace="com.fpl.edu.shoeStore.product.mapper.ProductMapper">
 
-    <!-- ===================================== -->
-    <!-- RESULT MAP -->
-    <!-- ===================================== -->
-    <resultMap id="ProductResultMap" type="com.fpl.edu.shoeStore.product.entity.Product">
-        <id property="productId" column="product_id"/>
-        <result property="categoryId" column="category_id"/>
-        <result property="name" column="name"/>
-        <result property="url" column="url"/>                    <!-- Updated: slug → url -->
-        <result property="description" column="description"/>
-        <result property="productCode" column="product_code"/>   <!-- Updated: sku → productCode -->
-        <result property="basePrice" column="base_price"/>
-        <result property="isActive" column="is_active"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
-    </resultMap>
+         <!-- Result Map -->
+         <resultMap id="ProductResultMap" type="com.fpl.edu.shoeStore.product.entity.Product">
+             <id property="productId" column="product_id"/>
+             <result property="categoryId" column="category_id"/>
+             <result property="title" column="title"/>                      <!-- Đổi từ name → title -->
+             <result property="description" column="description"/>
+             <result property="brand" column="brand"/>                      <!-- THÊM MỚI -->
+             <result property="condition" column="condition"/>              <!-- THÊM MỚI -->
+             <result property="defaultImage" column="default_image"/>       <!-- THÊM MỚI -->
+             <result property="status" column="status"/>                    <!-- Đổi từ is_active → status -->
+             <result property="createAt" column="create_at"/>               <!-- Đổi từ created_at -->
+             <result property="updateAt" column="update_at"/>               <!-- Đổi từ updated_at -->
+             <result property="createBy" column="create_by"/>               <!-- THÊM MỚI -->
+             <result property="updateBy" column="update_by"/>               <!-- THÊM MỚI -->
+         </resultMap>
 
          <!-- Select All -->
          <select id="findAll" resultMap="ProductResultMap">
-             SELECT product_id,
-                    category_id,
-                    name,
-                    url,
-                    description,
-                    product_code,
-                    base_price,
-                    is_active,
-                    created_at,
-                    updated_at
-             FROM products
+             SELECT product_id, category_id, title, description, brand, [condition],
+                    default_image, [status], create_at, update_at, create_by, update_by
+             FROM product                                                   <!-- Đổi từ products → product -->
          </select>
 
          <!-- Select by ID -->
-         <select id="findById" parameterType="long" resultMap="ProductResultMap">
-             SELECT product_id,
-                    category_id,
-                    name,
-                    url,
-                    description,
-                    product_code,
-                    base_price,
-                    is_active,
-                    created_at,
-                    updated_at
-             FROM products
+         <select id="findById" parameterType="int" resultMap="ProductResultMap">
+             SELECT product_id, category_id, title, description, brand, [condition],
+                    default_image, [status], create_at, update_at, create_by, update_by
+             FROM product                                                   <!-- Đổi từ products → product -->
              WHERE product_id = #{productId}
          </select>
 
-         <!-- Select by Name (exact match) -->
-         <select id="findByName" parameterType="string" resultMap="ProductResultMap">
-             SELECT product_id,
-                    category_id,
-                    name,
-                    url,
-                    description,
-                    product_code,
-                    base_price,
-                    is_active,
-                    created_at,
-                    updated_at
-             FROM products
-             WHERE name = #{name}
+         <!-- Select by Title -->
+         <select id="findByTitle" parameterType="string" resultMap="ProductResultMap">  <!-- Đổi từ findByName -->
+             SELECT product_id, category_id, title, description, brand, [condition],
+                    default_image, [status], create_at, update_at, create_by, update_by
+             FROM product                                                   <!-- Đổi từ products → product -->
+             WHERE title = #{title}                                         <!-- Đổi từ name → title -->
          </select>
 
-    <!-- ===================================== -->
-    <!-- INSERT -->
-    <!-- ===================================== -->
-    <insert id="insert" parameterType="com.fpl.edu.shoeStore.product.entity.Product"
-            useGeneratedKeys="true" 
-            keyProperty="productId">
-        INSERT INTO products (category_id, name, url, description, product_code, base_price, is_active)
-        VALUES (#{categoryId}, #{name}, #{url}, #{description}, #{productCode}, #{basePrice}, #{isActive})
-    </insert>
+         <!-- INSERT -->
+         <insert id="insert" parameterType="com.fpl.edu.shoeStore.product.entity.Product"
+                 useGeneratedKeys="true"
+                 keyProperty="productId">
+             INSERT INTO product (category_id, title, description, brand, [condition],
+                                 default_image, [status], create_at, update_at, create_by, update_by)
+             VALUES (#{categoryId}, #{title}, #{description}, #{brand}, #{condition},
+                     #{defaultImage}, #{status}, #{createAt}, #{updateAt}, #{createBy}, #{updateBy})
+         </insert>
 
-    <!-- ===================================== -->
-    <!-- UPDATE -->
-    <!-- ===================================== -->
-    <update id="update" parameterType="com.fpl.edu.shoeStore.product.entity.Product">
-        UPDATE products
-        SET category_id  = #{categoryId},
-            name         = #{name},
-            url          = #{url},
-            description  = #{description},
-            product_code = #{productCode},
-            base_price   = #{basePrice},
-            is_active    = #{isActive}
-        WHERE product_id = #{productId}
-    </update>
+         <!-- UPDATE -->
+         <update id="update" parameterType="com.fpl.edu.shoeStore.product.entity.Product">
+             UPDATE product                                                 <!-- Đổi từ products → product -->
+             SET category_id = #{categoryId},
+                 title = #{title},                                          <!-- Đổi từ name → title -->
+                 description = #{description},
+                 brand = #{brand},                                          <!-- THÊM MỚI -->
+                 [condition] = #{condition},                                <!-- THÊM MỚI -->
+                 default_image = #{defaultImage},                           <!-- THÊM MỚI -->
+                 [status] = #{status},                                      <!-- Đổi từ is_active → status -->
+                 update_at = #{updateAt},                                   <!-- Đổi từ updated_at -->
+                 update_by = #{updateBy}                                    <!-- THÊM MỚI -->
+             WHERE product_id = #{productId}
+         </update>
 
          <!-- Delete -->
-         <delete id="deleteById" parameterType="long">
-             DELETE FROM products
+         <delete id="deleteById" parameterType="int">                      <!-- Đổi từ long → int -->
+             DELETE FROM product                                            <!-- Đổi từ products → product -->
              WHERE product_id = #{productId}
          </delete>
 
-    <!-- ===================================== -->
-    <!-- PAGINATION WITH FILTERS -->
-    <!-- ===================================== -->
-    <select id="findAllPaged" parameterType="map" resultMap="ProductResultMap">
-        SELECT product_id,
-               category_id,
-               name,
-               url,
-               description,
-               product_code,
-               base_price,
-               is_active,
-               created_at,
-               updated_at
-        FROM products
-        <where>
-            <if test="categoryId != null">
-                AND category_id = #{categoryId}
-            </if>
-            <if test="name != null and name != ''">
-                AND name LIKE CONCAT('%', #{name}, '%')
-            </if>
-            <if test="url != null and url != ''">
-                AND url LIKE CONCAT('%', #{url}, '%')
-            </if>
-            <if test="isActive != null">
-                AND is_active = #{isActive}
-            </if>
-        </where>
-        ORDER BY created_at DESC
-        LIMIT #{size} OFFSET #{offset}
-    </select>
+         <!-- Pagination with Filters -->
+         <select id="findAllPaged" parameterType="map" resultMap="ProductResultMap">
+             SELECT product_id, category_id, title, description, brand, [condition],
+                    default_image, [status], create_at, update_at, create_by, update_by
+             FROM product                                                   <!-- Đổi từ products → product -->
+             <where>
+                 <if test="categoryId != null">
+                     AND category_id = #{categoryId}
+                 </if>
+                 <if test="title != null and title != ''">                  <!-- Đổi từ name → title -->
+                     AND title LIKE CONCAT('%', #{title}, '%')              <!-- Đổi từ name → title -->
+                 </if>
+                 <if test="status != null and status != ''">                <!-- Đổi từ isActive → status -->
+                     AND [status] = #{status}                               <!-- Đổi từ is_active → status -->
+                 </if>
+             </where>
+             ORDER BY create_at DESC                                        <!-- Đổi từ created_at -->
+             OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY            <!-- SQL Server syntax thay vì LIMIT -->
+         </select>
 
-    <!-- ===================================== -->
-    <!-- COUNT FOR PAGINATION -->
-    <!-- ===================================== -->
-    <select id="countAll" parameterType="map" resultType="long">
-        SELECT COUNT(*)
-        FROM products
-        <where>
-            <if test="categoryId != null">
-                AND category_id = #{categoryId}
-            </if>
-            <if test="name != null and name != ''">
-                AND name LIKE CONCAT('%', #{name}, '%')
-            </if>
-            <if test="url != null and url != ''">
-                AND url LIKE CONCAT('%', #{url}, '%')
-            </if>
-            <if test="isActive != null">
-                AND is_active = #{isActive}
-            </if>
-        </where>
-    </select>
+         <!-- Count for Pagination -->
+         <select id="countAll" parameterType="map" resultType="long">
+             SELECT COUNT(*)
+             FROM product                                                   <!-- Đổi từ products → product -->
+             <where>
+                 <if test="categoryId != null">
+                     AND category_id = #{categoryId}
+                 </if>
+                 <if test="title != null and title != ''">                  <!-- Đổi từ name → title -->
+                     AND title LIKE CONCAT('%', #{title}, '%')              <!-- Đổi từ name → title -->
+                 </if>
+                 <if test="status != null and status != ''">                <!-- Đổi từ isActive → status -->
+                     AND [status] = #{status}                               <!-- Đổi từ is_active → status -->
+                 </if>
+             </where>
+         </select>
 
-</mapper>
+     </mapper>
