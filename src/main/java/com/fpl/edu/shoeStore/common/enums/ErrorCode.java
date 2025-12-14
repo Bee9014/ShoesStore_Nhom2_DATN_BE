@@ -41,8 +41,18 @@ public enum ErrorCode {
     LOGOUT_SUCCESS("AUTH_101", "Đăng xuất thành công"),
     REGISTER_SUCCESS("AUTH_102", "Đăng ký thành công"),
     
-    // ===== USER INFO =====
+     // product 
+     UPDATE_PRODUCT_FAILD("PRODUCT_100","CAP NHAT KO THANH CONG"),
+     CREATE_PRODUCT_FAILD("PRODUCT_101","TAO MOI SAN PHAM KO THANH CONG"),
+
+
+
     USER_NOT_FOUND("USER_404", "Không tìm thấy thông tin người dùng");
+
+
+   
+    
+
 
     private final String code;
     private final String message;

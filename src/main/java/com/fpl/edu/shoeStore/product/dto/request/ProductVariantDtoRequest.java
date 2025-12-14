@@ -1,20 +1,22 @@
-package com.fpl.edu.shoeStore.product.dto.request;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+ package com.fpl.edu.shoeStore.product.dto.request;
 
+     import lombok.AllArgsConstructor;
+     import lombok.Builder;
+     import lombok.Data;
+     import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class ProductVariantDtoRequest {
-    private Long productId;
-    private String variantName;          // VD: "Size 41", "Màu Xanh - Size 42"
-    private String productVariantCode;   // SKU code
-    private Double price;
-    private Integer stockQty;
-    private Boolean isActive;
-}
-
+     @Data
+     @NoArgsConstructor
+     @AllArgsConstructor
+     @Builder
+     public class ProductVariantDtoRequest {
+         private Integer productId;
+         private String productVariantCode;
+         private Double price;
+         private Integer stockQty;
+         private Integer weightGrams;
+         private String attribute;
+         private String image;
+         private Integer createBy;
+         private Integer updateBy;
+     }
