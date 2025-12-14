@@ -24,10 +24,9 @@
       * Base URL: /api/v1/products
       *
       * Cập nhật theo database schema mới:
-      * - title (thay vì name)
-      * - brand, condition, defaultImage (trường mới)
-      * - status (String thay vì Boolean isActive)
-      * - Integer categoryId (thay vì Long)
+      * - title, url, productCode, brand, condition, defaultImage
+      * - status (String)
+      * - Integer IDs
       */
      @RestController
      @RequestMapping("/api/v1/products")
@@ -155,6 +154,8 @@
           * {
           *   "categoryId": 101,
           *   "title": "Giày Nike Air Max 2024",
+          *   "url": "giay-nike-air-max-2024",
+          *   "productCode": "NIKE-AM-2024",
           *   "description": "Giày thể thao cao cấp...",
           *   "brand": "Nike",
           *   "condition": "New",
@@ -194,6 +195,8 @@
           * Request body example:
           * {
           *   "title": "Giày Nike Air Max 2024 - Updated",
+          *   "url": "giay-nike-air-max-2024-updated",
+          *   "productCode": "NIKE-AM-2024-V2",
           *   "description": "Mô tả cập nhật...",
           *   "brand": "Nike",
           *   "condition": "New",

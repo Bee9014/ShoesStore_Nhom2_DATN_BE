@@ -22,7 +22,7 @@
 
          int updateStock(@Param("variantId") Integer variantId, @Param("quantity") Integer quantity);  // Đổi Long → Integer
 
-         ProductVariant findBySkuCode(@Param("skuCode") String skuCode);                // Đổi từ findByCode
+         ProductVariant findByCode(@Param("productVariantCode") String productVariantCode);
 
          // XÓA: findActiveByProductId (vì DB không có is_active)
      }

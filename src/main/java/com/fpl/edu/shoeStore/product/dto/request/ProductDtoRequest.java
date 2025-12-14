@@ -11,14 +11,14 @@ package com.fpl.edu.shoeStore.product.dto.request;
      @Builder
      public class ProductDtoRequest {
          private Integer categoryId;
-         private String title;          // Đổi từ name → title
+         private String title;
+         private String url;
+         private String productCode;
          private String description;
-         private String brand;          // THÊM MỚI
-         private String condition;      // THÊM MỚI
-         private String defaultImage;   // THÊM MỚI
-         private String status;         // Đổi từ Boolean isActive → String status
-         private Integer createBy;      // THÊM MỚI (cho create/update)
-         private Integer updateBy;      // THÊM MỚI
-
-         // XÓA: url, productCode, basePrice
+         private String brand;
+         private String condition;
+         private String defaultImage;
+         private String status;
+         private Integer createBy;
+         private Integer updateBy;
      }

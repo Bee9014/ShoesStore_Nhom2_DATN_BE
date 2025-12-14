@@ -13,16 +13,14 @@
      public class ProductVariantDtoResponse {
          private Integer variantId;
          private Integer productId;
-         private String skuCode;        // Đổi từ productVariantCode → skuCode
+         private String productVariantCode;
          private Double price;
-         private Integer qtyAvailable;  // Đổi từ stockQty → qtyAvailable
-         private Integer weightGrams;   // THÊM MỚI
-         private String attribute;      // THÊM MỚI
-         private String image;          // THÊM MỚI
-         private LocalDate createAt;    // Đổi từ createdAt
-         private LocalDate updateAt;    // Đổi từ updatedAt
-         private Integer createBy;      // THÊM MỚI
-         private Integer updateBy;      // THÊM MỚI
-
-         // XÓA: variantName, isActive
+         private Integer stockQty;
+         private Integer weightGrams;
+         private String attribute;
+         private String image;
+         private LocalDate createAt;
+         private LocalDate updateAt;
+         private Integer createBy;
+         private Integer updateBy;
      }

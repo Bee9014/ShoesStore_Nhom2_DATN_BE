@@ -15,17 +15,17 @@
      public class ProductDetailDtoResponse {
          private Integer productId;
          private Integer categoryId;
-         private String title;                          // Đổi từ name → title
+         private String title;
+         private String url;
+         private String productCode;
          private String description;
-         private String brand;                          // THÊM MỚI
-         private String condition;                      // THÊM MỚI
-         private String defaultImage;                   // THÊM MỚI
-         private String status;                         // Đổi từ isActive → status
-         private LocalDate createAt;                    // Đổi từ createdAt
-         private LocalDate updateAt;                    // Đổi từ updatedAt
-         private Integer createBy;                      // THÊM MỚI
-         private Integer updateBy;                      // THÊM MỚI
+         private String brand;
+         private String condition;
+         private String defaultImage;
+         private String status;
+         private LocalDate createAt;
+         private LocalDate updateAt;
+         private Integer createBy;
+         private Integer updateBy;
          private List<ProductVariantDtoResponse> variants;
-
-         // XÓA: url, productCode, basePrice
      }

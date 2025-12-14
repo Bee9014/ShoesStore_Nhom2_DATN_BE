@@ -11,14 +11,12 @@
      @Builder
      public class ProductVariantDtoRequest {
          private Integer productId;
-         private String skuCode;        // Đổi từ productVariantCode → skuCode
+         private String productVariantCode;
          private Double price;
-         private Integer qtyAvailable;  // Đổi từ stockQty → qtyAvailable
-         private Integer weightGrams;   // THÊM MỚI
-         private String attribute;      // THÊM MỚI (JSON format: {"Size": 40, "Color": "Black"})
-         private String image;          // THÊM MỚI (JSON array: ["/images/1/v1.jpg"])
-         private Integer createBy;      // THÊM MỚI
-         private Integer updateBy;      // THÊM MỚI
-
-         // XÓA: variantName, isActive
+         private Integer stockQty;
+         private Integer weightGrams;
+         private String attribute;
+         private String image;
+         private Integer createBy;
+         private Integer updateBy;
      }

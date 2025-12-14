@@ -3,18 +3,18 @@ package com.fpl.edu.shoeStore.product.controller;
      import java.util.List;
 
      import org.springframework.http.HttpStatus;
-     import org.springframework.http.ResponseEntity;
-     import org.springframework.web.bind.annotation.DeleteMapping;
-     import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
      import org.springframework.web.bind.annotation.PatchMapping;
      import org.springframework.web.bind.annotation.PathVariable;
-     import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PostMapping;
      import org.springframework.web.bind.annotation.PutMapping;
      import org.springframework.web.bind.annotation.RequestBody;
      import org.springframework.web.bind.annotation.RequestMapping;
      import org.springframework.web.bind.annotation.RequestParam;
      import org.springframework.web.bind.annotation.RestController;
 
+     import com.fpl.edu.shoeStore.common.handler.ApiResponse;
      import com.fpl.edu.shoeStore.product.dto.request.ProductVariantDtoRequest;
      import com.fpl.edu.shoeStore.product.dto.response.ProductVariantDtoResponse;
      import com.fpl.edu.shoeStore.product.service.ProductVariantService;
@@ -26,11 +26,10 @@ package com.fpl.edu.shoeStore.product.controller;
       * Base URL: /api/product-variants
       *
       * Cập nhật theo database schema mới:
-      * - skuCode (thay vì productVariantCode)
-      * - qtyAvailable (thay vì stockQty)
-      * - weightGrams, attribute, image (trường mới)
-      * - Integer cho tất cả IDs (thay vì Long)
-      * - Xóa isActive và các active-related methods
+      * - productVariantCode (VARCHAR 100)
+      * - stockQty (INT)
+      * - weightGrams, attribute, image (JSON fields)
+      * - Integer cho tất cả IDs
       */
      @RestController
      @RequestMapping("/api/product-variants")
@@ -38,16 +37,15 @@ package com.fpl.edu.shoeStore.product.controller;
      public class ProductVariantController {
 
          private final ProductVariantService productVariantService;
-
          /**
           * POST /api/product-variants - Create new product variant
           *
           * Request body example:
           * {
           *   "productId": 1,
-          *   "skuCode": "NIKE-AM-BLK-40",
+          *   "productVariantCode": "NIKE-AM-BLK-40",
           *   "price": 2500000.00,
-          *   "qtyAvailable": 50,
+          *   "stockQty": 50,
           *   "weightGrams": 850,
           *   "attribute": "{\"Size\": 40, \"Color\": \"Black\"}",
           *   "image": "[\"/images/1/black-40.jpg\", \"/images/1/black-40-2.jpg\"]",
@@ -58,11 +56,28 @@ package com.fpl.edu.shoeStore.product.controller;
           * @param request Product variant data
           * @return Created product variant
           */
-         @PostMapping
-         public ResponseEntity<ProductVariantDtoResponse> createVariant(@RequestBody ProductVariantDtoRequest request) {
+       @PostMapping
+     public ApiResponse<ProductVariantDtoResponse>
+     createVariant(@RequestBody ProductVariantDtoRequest request) {
+         try {
              ProductVariantDtoResponse response = productVariantService.createVariant(request);
-             return new ResponseEntity<>(response, HttpStatus.CREATED);
+             return
+     ApiResponse.<ProductVariantDtoResponse>builder()
+                     .success(true)
+                     .statusCode(HttpStatus.CREATED.value())
+                     .message("Tạo product variant thành công")
+                     .data(response)
+                     .build();
+         } catch (Exception e) {
+             return
+     ApiResponse.<ProductVariantDtoResponse>builder()
+                     .success(false)
+                     .statusCode(HttpStatus.BAD_REQUEST.value())        
+                     .message("Lỗi khi tạo product variant: " + e.getMessage())
+                     .data(null)
+                     .build();
          }
+     }
 
          /**
           * PUT /api/product-variants/{variantId} - Update product variant
@@ -72,12 +87,36 @@ package com.fpl.edu.shoeStore.product.controller;
           * @return Updated product variant
           */
          @PutMapping("/{variantId}")
-         public ResponseEntity<ProductVariantDtoResponse> updateVariant(
-                 @PathVariable Integer variantId,                            // Đổi Long → Integer
-                 @RequestBody ProductVariantDtoRequest request) {
+     public ApiResponse<ProductVariantDtoResponse>updateVariant(
+             @PathVariable Integer variantId,
+             @RequestBody ProductVariantDtoRequest request) {
+         try {
              ProductVariantDtoResponse response = productVariantService.updateVariant(variantId, request);
-             return ResponseEntity.ok(response);
+             return
+     ApiResponse.<ProductVariantDtoResponse>builder()
+                     .success(true)
+                     .statusCode(HttpStatus.OK.value())
+                     .message("Cập nhật product variant thành công")
+                     .data(response)
+                     .build();
+         } catch (RuntimeException e) {
+             return
+     ApiResponse.<ProductVariantDtoResponse>builder()
+                     .success(false)
+                     .statusCode(HttpStatus.NOT_FOUND.value())
+                     .message(e.getMessage())
+                     .data(null)
+                     .build();
+         } catch (Exception e) {
+             return
+     ApiResponse.<ProductVariantDtoResponse>builder()
+                     .success(false)
+                     .statusCode(HttpStatus.BAD_REQUEST.value())        
+                     .message("Lỗi khi cập nhật product variant:" + e.getMessage())
+                     .data(null)
+                     .build();
          }
+     }
 
          /**
           * DELETE /api/product-variants/{variantId} - Delete product variant
@@ -86,10 +125,31 @@ package com.fpl.edu.shoeStore.product.controller;
           * @return 204 No Content
           */
          @DeleteMapping("/{variantId}")
-         public ResponseEntity<Void> deleteVariant(@PathVariable Integer variantId) {  // Đổi Long → Integer
+     public ApiResponse<Void> deleteVariant(@PathVariable  Integer variantId) {
+         try {
              productVariantService.deleteVariant(variantId);
-             return ResponseEntity.noContent().build();
+             return ApiResponse.<Void>builder()
+                     .success(true)
+                     .statusCode(HttpStatus.OK.value())
+                     .message("Xóa product variant thành công")
+                     .data(null)
+                     .build();
+         } catch (RuntimeException e) {
+             return ApiResponse.<Void>builder()
+                     .success(false)
+                     .statusCode(HttpStatus.NOT_FOUND.value())
+                     .message(e.getMessage())
+                     .data(null)
+                     .build();
+         } catch (Exception e) {
+             return ApiResponse.<Void>builder()
+                     .success(false)
+                     .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                     .message("Lỗi khi xóa product variant: " + e.getMessage())
+                     .data(null)
+                     .build();
          }
+     }
 
          /**
           * GET /api/product-variants/{variantId} - Get product variant by ID
@@ -97,11 +157,39 @@ package com.fpl.edu.shoeStore.product.controller;
           * @param variantId Variant ID (Integer)
           * @return Product variant data
           */
-         @GetMapping("/{variantId}")
-         public ResponseEntity<ProductVariantDtoResponse> getVariantById(@PathVariable Integer variantId) {  // Đổi Long →Integer
+          @GetMapping("/{variantId}")
+     public ApiResponse<ProductVariantDtoResponse> getVariantById(@PathVariable Integer variantId) {
+         try {
              ProductVariantDtoResponse response = productVariantService.getVariantById(variantId);
-             return ResponseEntity.ok(response);
+
+             if (response == null) {
+                 return
+     ApiResponse.<ProductVariantDtoResponse>builder()
+                         .success(false)
+                         .statusCode(HttpStatus.NOT_FOUND.value())
+                         .message("Không tìm thấy product variant với ID: " + variantId)
+                         .data(null)
+                         .build();
+             }
+   return
+     ApiResponse.<ProductVariantDtoResponse>builder()
+                     .success(true)
+                     .statusCode(HttpStatus.OK.value())
+                     .message("Lấy thông tin product variant thành công")
+                     .data(response)
+                     .build();
+         } catch (Exception e) {
+             return
+     ApiResponse.<ProductVariantDtoResponse>builder()
+                     .success(false)
+
+     .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                     .message("Lỗi khi lấy thông tin product variant: " + e.getMessage())
+                     .data(null)
+                     .build();
          }
+     }
+
 
          /**
           * GET /api/product-variants/product/{productId} - Get all variants of a product
@@ -109,12 +197,27 @@ package com.fpl.edu.shoeStore.product.controller;
           * @param productId Product ID (Integer)
           * @return List of product variants
           */
-         @GetMapping("/product/{productId}")
-         public ResponseEntity<List<ProductVariantDtoResponse>> getVariantsByProductId(
-                 @PathVariable Integer productId) {                          // Đổi Long → Integer
+          @GetMapping("/product/{productId}")
+     public ApiResponse<List<ProductVariantDtoResponse>>
+     getVariantsByProductId(
+             @PathVariable Integer productId) {
+         try {
              List<ProductVariantDtoResponse> responses = productVariantService.getVariantsByProductId(productId);
-             return ResponseEntity.ok(responses);
+             return ApiResponse.<List<ProductVariantDtoResponse>>builder()
+                     .success(true)
+                     .statusCode(HttpStatus.OK.value())
+                     .message("Lấy danh sách variants theo product thành công")
+                     .data(responses)
+                     .build();
+         } catch (Exception e) {
+             return ApiResponse.<List<ProductVariantDtoResponse>>builder()
+                     .success(false)
+                     .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                     .message("Lỗi khi lấy danh sách variants: " + e.getMessage())
+                     .data(null)
+                     .build();
          }
+     }
 
          /**
           * GET /api/product-variants - Get all product variants
@@ -122,25 +225,65 @@ package com.fpl.edu.shoeStore.product.controller;
           * @return List of all product variants
           */
          @GetMapping
-         public ResponseEntity<List<ProductVariantDtoResponse>> getAllVariants() {
-             List<ProductVariantDtoResponse> responses = productVariantService.getAllVariants();
-             return ResponseEntity.ok(responses);
+     public ApiResponse<List<ProductVariantDtoResponse>> getAllVariants() {
+         try {
+             List<ProductVariantDtoResponse> responses =
+     productVariantService.getAllVariants();
+             return ApiResponse.<List<ProductVariantDtoResponse>>builder()
+                     .success(true)
+                     .statusCode(HttpStatus.OK.value())
+                     .message("Lấy danh sách tất cả variants thành công")
+                     .data(responses)
+                     .build();
+         } catch (Exception e) {
+             return ApiResponse.<List<ProductVariantDtoResponse>>builder()
+                     .success(false)
+                     .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                     .message("Lỗi khi lấy danh sách variants: " + e.getMessage())
+                     .data(null)
+                     .build();
          }
+     }
 
          /**
-          * GET /api/product-variants/sku/{skuCode} - Get variant by SKU code
+          * GET /api/product-variants/code/{productVariantCode} - Get variant by code
           *
-          * Example: GET /api/product-variants/sku/NIKE-AM-BLK-40
+          * Example: GET /api/product-variants/code/NIKE-AM-BLK-40
           *
-          * @param skuCode SKU code (unique identifier)
+          * @param productVariantCode Product variant code (unique identifier)
           * @return Product variant data
           */
-         @GetMapping("/sku/{skuCode}")                                       // Đổi từ /code/{code} → /sku/{skuCode}
-         public ResponseEntity<ProductVariantDtoResponse> getVariantBySkuCode(@PathVariable String skuCode) {  // Đổi từ code →skuCode
-             ProductVariantDtoResponse response = productVariantService.getVariantBySkuCode(skuCode);  // Đổi từ getVariantByCode
-             return ResponseEntity.ok(response);
-         }
+        @GetMapping("/code/{productVariantCode}")
+     public ApiResponse<ProductVariantDtoResponse>
+     getVariantByCode(@PathVariable String productVariantCode) {
+         try {
+             ProductVariantDtoResponse response =
+     productVariantService.getVariantByCode(productVariantCode);
 
+             if (response == null) {
+                 return ApiResponse.<ProductVariantDtoResponse>builder()
+                         .success(false)
+                         .statusCode(HttpStatus.NOT_FOUND.value())
+                         .message("Không tìm thấy product variant với code: "+ productVariantCode)
+                         .data(null)
+                         .build();
+             }
+
+             return ApiResponse.<ProductVariantDtoResponse>builder()
+                     .success(true)
+                     .statusCode(HttpStatus.OK.value())
+                     .message("Tìm kiếm variant theo code thành công")
+                     .data(response)
+                     .build();
+         } catch (Exception e) {
+             return ApiResponse.<ProductVariantDtoResponse>builder()
+                     .success(false)
+                     .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                     .message("Lỗi khi tìm kiếm variant: " + e.getMessage())
+                     .data(null)
+                     .build();
+         }
+     }
          /**
           * PATCH /api/product-variants/{variantId}/stock - Update stock quantity
           *
@@ -154,13 +297,28 @@ package com.fpl.edu.shoeStore.product.controller;
           * @param quantity  Quantity to add (positive) or subtract (negative)
           * @return 200 OK
           */
-         @PatchMapping("/{variantId}/stock")
-         public ResponseEntity<Void> updateStock(
-                 @PathVariable Integer variantId,                            // Đổi Long → Integer
-                 @RequestParam Integer quantity) {
+          @PatchMapping("/{variantId}/stock")
+     public ApiResponse<Void> updateStock(
+             @PathVariable Integer variantId,
+             @RequestParam Integer quantity) {
+         try {
              productVariantService.updateStock(variantId, quantity);
-             return ResponseEntity.ok().build();
+             return ApiResponse.<Void>builder()
+                     .success(true)
+                     .statusCode(HttpStatus.OK.value())
+                     .message("Cập nhật stock thành công")
+                     .data(null)
+                     .build();
+         } catch (Exception e) {
+             return ApiResponse.<Void>builder()
+                     .success(false)
+                     .statusCode(HttpStatus.BAD_REQUEST.value())
+                     .message("Lỗi khi cập nhật stock: " + e.getMessage())
+                     .data(null)
+                     .build();
          }
+     }
+
 
          // ====================================================================
          // XÓA METHOD: getActiveVariantsByProductId

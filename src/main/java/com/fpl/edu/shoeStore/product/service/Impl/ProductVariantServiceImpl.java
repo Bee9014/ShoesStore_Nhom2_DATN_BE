@@ -80,10 +80,10 @@
          }
 
          @Override
-         public ProductVariantDtoResponse getVariantBySkuCode(String skuCode) {  // Đổi từ getVariantByCode
-             ProductVariant variant = productVariantMapper.findBySkuCode(skuCode);  // Đổi từ findByCode
+         public ProductVariantDtoResponse getVariantByCode(String productVariantCode) {
+             ProductVariant variant = productVariantMapper.findByCode(productVariantCode);
              if (variant == null) {
-                 throw new RuntimeException("Product variant not found with sku code: " + skuCode);
+                 throw new RuntimeException("Product variant not found with code: " + productVariantCode);
              }
              return ProductVariantConverter.toResponse(variant);
          }

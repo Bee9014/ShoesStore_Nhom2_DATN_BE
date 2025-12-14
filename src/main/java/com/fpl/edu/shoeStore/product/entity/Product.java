@@ -12,18 +12,18 @@
      @AllArgsConstructor
      @Builder
      public class Product {
-         private Integer productId;       // INT trong DB
-         private Integer categoryId;      // INT trong DB
-         private String title;            // Đổi từ "name" → "title"
+         private Integer productId;
+         private Integer categoryId;
+         private String title;
+         private String url;
+         private String productCode;
          private String description;
-         private String brand;            // THÊM MỚI
-         private String condition;        // THÊM MỚI
-         private String defaultImage;     // THÊM MỚI (default_image)
-         private String status;           // Đổi từ Boolean isActive → String status
-         private LocalDate createAt;      // Đổi từ createdAt, kiểu DATE
-         private LocalDate updateAt;      // Đổi từ updatedAt, kiểu DATE
-         private Integer createBy;        // THÊM MỚI
-         private Integer updateBy;        // THÊM MỚI
-
-         // XÓA: url, productCode, basePrice
+         private String brand;
+         private String condition;
+         private String defaultImage;
+         private String status;
+         private LocalDate createAt;
+         private LocalDate updateAt;
+         private Integer createBy;
+         private Integer updateBy;
      }

@@ -18,7 +18,7 @@ package com.fpl.edu.shoeStore.product.service;
 
          List<ProductVariantDtoResponse> getAllVariants();
 
-         ProductVariantDtoResponse getVariantBySkuCode(String skuCode);                                 // Đổi từ getVariantByCode
+         ProductVariantDtoResponse getVariantByCode(String productVariantCode);
 
          void updateStock(Integer variantId, Integer quantity);                                         // Đổi Long → Integer
 

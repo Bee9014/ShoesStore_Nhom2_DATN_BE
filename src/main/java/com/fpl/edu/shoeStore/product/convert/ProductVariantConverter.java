@@ -9,14 +9,14 @@
          public static ProductVariant toEntity(ProductVariantDtoRequest dto) {
              return ProductVariant.builder()
                      .productId(dto.getProductId())
-                     .skuCode(dto.getSkuCode())              // Đổi từ productVariantCode → skuCode
+                     .productVariantCode(dto.getProductVariantCode())
                      .price(dto.getPrice())
-                     .qtyAvailable(dto.getQtyAvailable())    // Đổi từ stockQty → qtyAvailable
-                     .weightGrams(dto.getWeightGrams())      // THÊM MỚI
-                     .attribute(dto.getAttribute())          // THÊM MỚI
-                     .image(dto.getImage())                  // THÊM MỚI
-                     .createBy(dto.getCreateBy())            // THÊM MỚI
-                     .updateBy(dto.getUpdateBy())            // THÊM MỚI
+                     .stockQty(dto.getStockQty())
+                     .weightGrams(dto.getWeightGrams())
+                     .attribute(dto.getAttribute())
+                     .image(dto.getImage())
+                     .createBy(dto.getCreateBy())
+                     .updateBy(dto.getUpdateBy())
                      .build();
          }
 
@@ -24,16 +24,16 @@
              return ProductVariantDtoResponse.builder()
                      .variantId(entity.getVariantId())
                      .productId(entity.getProductId())
-                     .skuCode(entity.getSkuCode())           // Đổi từ productVariantCode → skuCode
+                     .productVariantCode(entity.getProductVariantCode())
                      .price(entity.getPrice())
-                     .qtyAvailable(entity.getQtyAvailable()) // Đổi từ stockQty → qtyAvailable
-                     .weightGrams(entity.getWeightGrams())   // THÊM MỚI
-                     .attribute(entity.getAttribute())       // THÊM MỚI
-                     .image(entity.getImage())               // THÊM MỚI
-                     .createAt(entity.getCreateAt())         // Đổi từ createdAt
-                     .updateAt(entity.getUpdateAt())         // Đổi từ updatedAt
-                     .createBy(entity.getCreateBy())         // THÊM MỚI
-                     .updateBy(entity.getUpdateBy())         // THÊM MỚI
+                     .stockQty(entity.getStockQty())
+                     .weightGrams(entity.getWeightGrams())
+                     .attribute(entity.getAttribute())
+                     .image(entity.getImage())
+                     .createAt(entity.getCreateAt())
+                     .updateAt(entity.getUpdateAt())
+                     .createBy(entity.getCreateBy())
+                     .updateBy(entity.getUpdateBy())
                      .build();
          }
      }
