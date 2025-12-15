@@ -1,4 +1,4 @@
-package com.fpl.edu.shoeStore.promotion.model;
+package com.fpl.edu.shoeStore.voucher.entity;
 
 import lombok.Data;
 import java.math.BigDecimal;
@@ -6,15 +6,15 @@ import java.time.LocalDateTime;
 
 @Data
 public class Voucher {
-    private int voucherId;
+    private Integer voucherId;
     private String code;
     private String description;
-    private String discountType;
+    private String type;
     private BigDecimal discountValue;
-    private int maxUses;
-    private int usedCount;
+    private BigDecimal minSpend;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private boolean isActive;
+    private Integer usageLimit;
     private LocalDateTime createdAt;
+    private LocalDateTime updateAt;
 }
