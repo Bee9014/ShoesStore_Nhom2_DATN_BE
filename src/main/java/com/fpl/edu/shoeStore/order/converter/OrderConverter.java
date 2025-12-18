@@ -1,9 +1,9 @@
 package com.fpl.edu.shoeStore.order.converter;
 
-import com.fpl.edu.shoeStore.order.dto.OrderCreateRequest;
-import com.fpl.edu.shoeStore.order.dto.OrderItemRequest;
-import com.fpl.edu.shoeStore.order.dto.OrderItemResponse;
-import com.fpl.edu.shoeStore.order.dto.OrderResponse;
+import com.fpl.edu.shoeStore.order.dto.request.OrderCreateRequest;
+import com.fpl.edu.shoeStore.order.dto.request.OrderItemRequest;
+import com.fpl.edu.shoeStore.order.dto.response.OrderItemResponse;
+import com.fpl.edu.shoeStore.order.dto.response.OrderResponse;
 import com.fpl.edu.shoeStore.order.model.Order;
 import com.fpl.edu.shoeStore.order.model.OrderItem;
 import org.springframework.stereotype.Component;
@@ -39,7 +39,6 @@ public class OrderConverter {
         if (items != null) {
             response.setItems(items.stream().map(this::toItemResponse).collect(Collectors.toList()));
         }
-
         return response;
     }
 

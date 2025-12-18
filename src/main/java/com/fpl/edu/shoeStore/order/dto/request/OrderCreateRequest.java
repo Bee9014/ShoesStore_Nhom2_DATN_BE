@@ -1,27 +1,28 @@
-package com.fpl.edu.shoeStore.order.dto;
+package com.fpl.edu.shoeStore.order.dto.request;
 
-import lombok.Data;
-import java.math.BigDecimal;
-import java.util.List;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 public class OrderCreateRequest {
-    @NotNull(message = "Buyer ID must not be null")
+    @NotNull(message = "Mã người mua không được để trống.")
     private Integer buyerId;
 
     private Integer voucherId; // Có thể null
 
     // Thông tin vận chuyển
-    @NotBlank(message = "Shipping Fullname is required")
+    @NotBlank(message = "Cần cung cấp đầy đủ thông tin người nhận hàng.")
     private String shippingFullname;
 
-    @NotBlank(message = "Shipping Phone is required")
+    @NotBlank(message = "Cần có số điện thoại để giao hàng.")
     private String shippingPhone;
 
-    @NotBlank(message = "Shipping Address is required")
+    @NotBlank(message = "Địa chỉ giao hàng là bắt buộc")
     private String shippingAddress;
 
     private String shippingCity;

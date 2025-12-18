@@ -1,7 +1,7 @@
-package com.fpl.edu.shoeStore.order.servicei_nterface;
+package com.fpl.edu.shoeStore.order.service;
 
-import com.fpl.edu.shoeStore.order.dto.OrderCreateRequest;
-import com.fpl.edu.shoeStore.order.dto.OrderResponse;
+import com.fpl.edu.shoeStore.order.dto.request.OrderCreateRequest;
+import com.fpl.edu.shoeStore.order.dto.response.OrderResponse;
 import com.fpl.edu.shoeStore.order.exception.OrderException;
 
 public interface OrderService {

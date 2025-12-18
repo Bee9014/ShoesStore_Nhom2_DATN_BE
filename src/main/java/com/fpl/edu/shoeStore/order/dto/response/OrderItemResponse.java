@@ -1,6 +1,7 @@
-package com.fpl.edu.shoeStore.order.dto;
+package com.fpl.edu.shoeStore.order.dto.response;
 
 import lombok.Data;
+
 import java.math.BigDecimal;
 
 @Data

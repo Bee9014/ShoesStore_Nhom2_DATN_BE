@@ -1,6 +1,7 @@
-package com.fpl.edu.shoeStore.order.dto;
+package com.fpl.edu.shoeStore.order.dto.response;
 
 import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,5 +25,5 @@ public class OrderResponse {
     private String shippingCountry;
     private String note;
 
-    private List<OrderItemRequest> items;
+    private List<OrderItemResponse> items;
 }

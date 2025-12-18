@@ -2,6 +2,122 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.fpl.edu.shoeStore.order.mapper.OrderMapper">
-    <!-- SQL statements for Order -->
+
+    <insert id="insertOrder"
+            parameterType="com.fpl.edu.shoeStore.order.model.Order"
+            useGeneratedKeys="true"
+            keyProperty="orderId">
+        INSERT INTO orders (
+        buyer_id,
+        voucher_id,
+        placed_at,        order_status,     total_amount,
+        discount_amount,
+        final_amount,
+        shipping_fee,
+        shipping_fullname,
+        shipping_phone,
+        shipping_address,
+        shipping_city,
+        shipping_country,
+        note,
+        create_at,        update_at,
+        create_by,        update_by
+        )
+        VALUES (
+        #{buyerId},
+        #{voucherId},
+        #{orderDate},
+        #{status},
+        #{totalAmount},
+        #{discountAmount},
+        #{finalAmount},
+        #{shippingFee},
+        #{shippingFullname},
+        #{shippingPhone},
+        #{shippingAddress},
+        #{shippingCity},
+        #{shippingCountry},
+        #{note},
+        NOW(),            NOW(),
+        #{buyerId},       #{buyerId}
+        )
+    </insert>
+
+    <insert id="insertOrderItem"
+            parameterType="com.fpl.edu.shoeStore.order.model.OrderItem">
+        INSERT INTO order_item (
+        order_id,
+        variant_id,
+        product_name_snapshot,
+        qty,              unit_price,
+        total_price,
+        create_at,
+        update_at,
+        create_by,
+        update_by,
+        refund_status,
+        seller_commission
+        )
+        VALUES (
+        #{orderId},
+        #{variantId},
+        #{productNameSnapshot},
+        #{quantity},
+        #{unitPrice},
+        #{totalPrice},
+        NOW(),
+        NOW(),
+        #{orderId},       #{orderId},
+        'none',           0                 )
+    </insert>
+
+    <select id="findById"
+            parameterType="int"
+            resultType="com.fpl.edu.shoeStore.order.model.Order">
+        SELECT
+        order_id        AS orderId,
+        buyer_id        AS buyerId,
+        voucher_id      AS voucherId,
+        placed_at       AS orderDate,
+        order_status    AS status,
+        total_amount    AS totalAmount,
+        discount_amount AS discountAmount,
+        final_amount    AS finalAmount,
+        shipping_fee    AS shippingFee,
+        shipping_fullname AS shippingFullname,
+        shipping_phone  AS shippingPhone,
+        shipping_address AS shippingAddress,
+        shipping_city   AS shippingCity,
+        shipping_country AS shippingCountry,
+        note,
+        create_at       AS createdAt,
+        update_at       AS updatedAt
+        FROM orders
+        WHERE order_id = #{orderId}
+    </select>
+
+    <select id="findItemsByOrderId"
+            parameterType="int"
+            resultType="com.fpl.edu.shoeStore.order.model.OrderItem">
+        SELECT
+        order_item_id AS orderItemId,
+        order_id      AS orderId,
+        variant_id    AS variantId,
+        product_name_snapshot AS productNameSnapshot,
+        qty           AS quantity,
+        unit_price    AS unitPrice,
+        total_price   AS totalPrice
+        FROM order_item
+        WHERE order_id = #{orderId}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE orders
+        SET order_status = #{status},
+        update_at = NOW()
+        WHERE order_id = #{orderId}
+    </update>
+
 </mapper>
