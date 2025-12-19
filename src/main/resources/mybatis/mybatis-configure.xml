@@ -18,7 +18,7 @@
         <package name="com.fpl.edu.shoeStore.product.entity"/>
         <package name="com.fpl.edu.shoeStore.order.entity"/>
         <package name="com.fpl.edu.shoeStore.payment.entity"/>
-        <package name="com.fpl.edu.shoeStore.promotion.entity"/>
+        <package name="com.fpl.edu.shoeStore.voucher.entity"/>
         <package name="com.fpl.edu.shoeStore.shipment.entity"/>
     </typeAliases>
 
@@ -37,7 +37,7 @@
         <package name="com.fpl.edu.shoeStore.product.mapper"/>
         <package name="com.fpl.edu.shoeStore.order.mapper"/>
         <package name="com.fpl.edu.shoeStore.payment.mapper"/>
-        <package name="com.fpl.edu.shoeStore.promotion.mapper"/>
+        <package name="com.fpl.edu.shoeStore.voucher.mapper"/>
         <package name="com.fpl.edu.shoeStore.shipment.mapper"/>
     </mappers>
 </configuration>
