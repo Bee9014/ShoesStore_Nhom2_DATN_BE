@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fpl.edu.shoeStore.voucher.mapper.VoucherMapper">
+
+    <!-- SQL statements for Voucher -->
+<!--    Result Map-->
+    <resultMap id="VoucherResultMap" type="com.fpl.edu.shoeStore.voucher.entity.Voucher">
+        <id property="voucherId" column="voucher_id"/>
+        <result property="code" column="code"/>
+        <result property="description" column="description"/>
+        <result property="type" column="type"/>
+        <result property="discountValue" column="value"/>
+        <result property="minSpend" column="min_spend"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="usageLimit" column="usage_limit"/>
+        <result property="createdAt" column="create_at"/>
+        <result property="updateAt" column="update_at"/>
+    </resultMap>
+
+<!--    Select All-->
+    <select id="findAll" resultMap="VoucherResultMap">
+        SELECT  voucher_id,
+                code,
+                description,
+                type, value,
+                min_spend,
+                start_date,
+                end_date,
+                usage_limit,
+                create_at,
+                update_at
+        FROM voucher
+    </select>
+
+    <!--    Select by ID-->
+    <select id="findById" parameterType="int" resultMap="VoucherResultMap">
+        SELECT  voucher_id,
+                code,
+                description,
+                type,
+                value,
+                min_spend,
+                start_date,
+                end_date,
+                usage_limit,
+                create_at,
+                update_at
+        FROM voucher
+        WHERE voucher_id = #{id}
+    </select>
+
+    <!--    Select by CODE-->
+    <select id="findByCode" parameterType="String" resultMap="VoucherResultMap">
+        SELECT  voucher_id,
+                code,
+                description,
+                type, value,
+                min_spend,
+                start_date,
+                end_date,
+                usage_limit,
+                create_at,
+                update_at
+        FROM voucher
+        WHERE LOWER(code) LIKE CONCAT('%', LOWER(#{code}), '%')
+    </select>
+
+    <!--    INSERT-->
+    <insert id="insert" parameterType="com.fpl.edu.shoeStore.voucher.entity.Voucher" useGeneratedKeys="true" keyProperty="voucherId">
+        INSERT INTO voucher (voucher_id, code, type, value, min_spend, start_date, end_date, usage_limit, create_at, description)
+        VALUES (#{voucherId}, #{code}, #{type}, #{discountValue}, #{minSpend}, #{startDate}, #{endDate}, #{usageLimit}, NOW(), #{description})
+    </insert>
+
+    <!-- UPDATE -->
+    <update id="update" parameterType="com.fpl.edu.shoeStore.voucher.entity.Voucher">
+        UPDATE voucher
+        SET voucher_id = #{voucherId},
+            code = #{code},
+            type = #{type},
+            value = #{discountValue},
+            min_spend = #{minSpend},
+            start_date = #{startDate},
+            end_date = #{endDate},
+            usage_limit = #{usageLimit},
+            update_at = NOW(),
+            description = #{description}
+        WHERE voucher_id = #{voucherId}
+    </update>
+
+    <!-- DELETE -->
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM voucher
+        where voucher_id = #{id}
+    </delete>
+
+
+    <!-- PAGED SELECT WITH FILTERS-->
+    <select id="findAllPaged" parameterType="map" resultMap="VoucherResultMap">
+        SELECT  voucher_id,
+                code,
+                type,
+                value,
+                min_spend,
+                start_date,
+                end_date,
+                usage_limit,
+                create_at,
+                update_at
+        FROM voucher
+        <where>
+            <!-- SEARCH BY VOUCHER ID -->
+            <if test="voucherId != null">
+                AND voucher_id = #{voucherId}
+            </if>
+            <!-- SEARCH BY CODE -->
+            <if test="code != null">
+                AND LOWER(code) LIKE CONCAT('%', LOWER(#{code}), '%')
+            </if>
+            <!-- SEARCH BY TYPE -->
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <!-- SEARCH BY VALUE -->
+            <if test="value != null">
+                AND value = #{discountValue}
+            </if>
+            <!-- SEARCH BY MIN SPEND -->
+            <if test="minSpend != null">
+                AND min_spend = #{minSpend}
+            </if>
+            <!-- SEARCH BY START DATE -->
+            <if test="startDate != null">
+                AND start_date = #{startDate}
+            </if>
+            <!-- SEARCH BY END DATE -->
+            <if test="endDate != null">
+                AND end_date = #{endDate}
+            </if>
+            <!-- SEARCH BY USAGE LIMIT -->
+            <if test="usageLimit != null">
+                AND usage_limit = #{usageLimit}
+            </if>
+        </where>
+        ORDER BY voucher_id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- COUNT WITH FILTERS -->
+    <select id="countAll" parameterType="map" resultType="long">
+        SELECT COUNT(voucher_id)
+        FROM voucher
+        <where>
+            <!-- SEARCH BY VOUCHER ID -->
+            <if test="voucherId != null">
+                AND voucher_id = #{voucherId}
+            </if>
+            <!-- SEARCH BY CODE -->
+            <if test="code != null">
+                AND LOWER(code) LIKE CONCAT('%', LOWER(#{code}), '%')
+            </if>
+            <!-- SEARCH BY TYPE -->
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <!-- SEARCH BY VALUE -->
+            <if test="value != null">
+                AND value = #{discountValue}
+            </if>
+            <!-- SEARCH BY MIN SPEND -->
+            <if test="minSpend != null">
+                AND min_spend = #{minSpend}
+            </if>
+            <!-- SEARCH BY START DATE -->
+            <if test="startDate != null">
+                AND start_date = #{startDate}
+            </if>
+            <!-- SEARCH BY END DATE -->
+            <if test="endDate != null">
+                AND end_date = #{endDate}
+            </if>
+            <!-- SEARCH BY USAGE LIMIT -->
+            <if test="usageLimit != null">
+                AND usage_limit = #{usageLimit}
+            </if>
+        </where>
+    </select>
+
+</mapper>

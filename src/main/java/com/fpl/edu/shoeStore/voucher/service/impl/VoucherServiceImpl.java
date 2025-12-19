@@ -9,7 +9,6 @@ import com.fpl.edu.shoeStore.voucher.entity.Voucher;
 import com.fpl.edu.shoeStore.voucher.mapper.VoucherMapper;
 import com.fpl.edu.shoeStore.voucher.service.VoucherService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -133,12 +132,12 @@ public class VoucherServiceImpl implements VoucherService {
     }
 
     @Override
-    public VoucherDTOResponse findByCode(String code) {
-        Voucher voucher = voucherMapper.findByCode(code);
-        if (voucher == null) {
+    public List<VoucherDTOResponse> findByCode(String code) {
+        List<Voucher> vouchers = voucherMapper.findByCode(code);
+        if (vouchers == null) {
             throw new RuntimeException("Không tìm thấy Voucher có Code: " + code);
         }
-        return VoucherConverter.toDTO(voucher);
+        return VoucherConverter.toDTOList(vouchers);
     }
 
     private void validateDay (LocalDateTime start, LocalDateTime end){

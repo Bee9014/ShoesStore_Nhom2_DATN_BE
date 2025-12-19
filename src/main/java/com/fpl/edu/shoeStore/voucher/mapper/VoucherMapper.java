@@ -1,5 +1,6 @@
 package com.fpl.edu.shoeStore.voucher.mapper;
 
+import com.fpl.edu.shoeStore.voucher.dto.response.VoucherDTOResponse;
 import com.fpl.edu.shoeStore.voucher.entity.Voucher;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -15,7 +16,7 @@ public interface VoucherMapper {
 
     Voucher findById(Integer id);
 
-    Voucher findByCode(String code);
+    List<Voucher> findByCode(String code);
 
     int insert(Voucher voucher);
 

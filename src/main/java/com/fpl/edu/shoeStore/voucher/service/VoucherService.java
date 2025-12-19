@@ -6,6 +6,7 @@ import com.fpl.edu.shoeStore.voucher.dto.response.VoucherDTOResponse;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface VoucherService {
 
@@ -31,5 +32,5 @@ public interface VoucherService {
 
     VoucherDTOResponse findById(Integer id);
 
-    VoucherDTOResponse findByCode(String code);
+    List<VoucherDTOResponse> findByCode(String code);
 }
