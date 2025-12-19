@@ -1,4 +1,4 @@
-  package com.fpl.edu.shoeStore.product.service.Impl;
+  package com.fpl.edu.shoeStore.product.service.impl;
 
      import java.util.List;
      import java.util.stream.Collectors;
