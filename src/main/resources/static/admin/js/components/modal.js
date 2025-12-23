@@ -26,6 +26,24 @@ export class CustomModal {
     }
   }
 
+// 👇 1. BỔ SUNG HÀM setTitle
+  setTitle(title) {
+    if (this.titleEl) {
+      this.titleEl.textContent = title;
+    }
+  }
+
+  // 👇 2. BỔ SUNG HÀM show (để gọi bsModal.show)
+  show() {
+    this.bsModal.show();
+  }
+
+  // 👇 3. BỔ SUNG HÀM hide (để đồng bộ với logic ẩn)
+  hide() {
+    this.bsModal.hide();
+  }
+
+
   open({ title = "Thông tin", body = "" } = {}) {
     if (title) this.titleEl.textContent = title;
     if (body) this.setContent(body);

@@ -9,14 +9,16 @@
      type="com.fpl.edu.shoeStore.product.entity.ProductVariant">
              <id property="variantId" column="variant_id"/>
              <result property="productId" column="product_id"/>
+             <result property="variantName" column="variant_name"/>
              <result property="productVariantCode" column="product_variant_code"/>
              <result property="price" column="price"/>
              <result property="stockQty" column="stock_qty"/>
+             <result property="isActive" column="is_active"/>
+             <result property="createdAt" column="created_at"/>
+             <result property="updatedAt" column="updated_at"/>
              <result property="weightGrams" column="weight_grams"/>
              <result property="attribute" column="attribute"/>
              <result property="image" column="image"/>
-             <result property="createAt" column="create_at"/>
-             <result property="updateAt" column="update_at"/>
              <result property="createBy" column="create_by"/>
              <result property="updateBy" column="update_by"/>
          </resultMap>
@@ -26,17 +28,19 @@
      resultMap="ProductVariantResultMap">
              SELECT variant_id,
                     product_id,
+                    variant_name,
                     product_variant_code,
                     price,
                     stock_qty,
+                    is_active,
+                    created_at,
+                    updated_at,
                     weight_grams,
                     attribute,
                     image,
-                    create_at,
-                    update_at,
                     create_by,
                     update_by
-             FROM product_variant
+             FROM product_variants
              WHERE product_id = #{productId}
              ORDER BY variant_id ASC
          </select>
@@ -45,17 +49,19 @@
          <select id="findById" parameterType="int" resultMap="ProductVariantResultMap">
              SELECT variant_id,
                     product_id,
+                    variant_name,
                     product_variant_code,
                     price,
                     stock_qty,
+                    is_active,
+                    created_at,
+                    updated_at,
                     weight_grams,
                     attribute,
                     image,
-                    create_at,
-                    update_at,
                     create_by,
                     update_by
-             FROM product_variant
+             FROM product_variants
              WHERE variant_id = #{variantId}
          </select>
 
@@ -64,29 +70,29 @@
      parameterType="com.fpl.edu.shoeStore.product.entity.ProductVariant"
                  useGeneratedKeys="true"
                  keyProperty="variantId">
-             INSERT INTO product_variant (
+             INSERT INTO product_variants (
                  product_id,
+                 variant_name,
                  product_variant_code,
                  price,
                  stock_qty,
+                 is_active,
                  weight_grams,
                  attribute,
                  image,
-                 create_at,
-                 update_at,
                  create_by,
                  update_by
              )
              VALUES (
                  #{productId},
+                 #{variantName},
                  #{productVariantCode},
                  #{price},
                  #{stockQty},
+                 #{isActive},
                  #{weightGrams},
                  #{attribute},
                  #{image},
-                 GETDATE(),
-                 GETDATE(),
                  #{createBy},
                  #{updateBy}
              )
@@ -95,22 +101,23 @@
          <!-- Update -->
          <update id="update"
      parameterType="com.fpl.edu.shoeStore.product.entity.ProductVariant">
-             UPDATE product_variant
+             UPDATE product_variants
              SET product_id = #{productId},
+                 variant_name = #{variantName},
                  product_variant_code = #{productVariantCode},
                  price = #{price},
                  stock_qty = #{stockQty},
+                 is_active = #{isActive},
                  weight_grams = #{weightGrams},
                  attribute = #{attribute},
                  image = #{image},
-                 update_at = GETDATE(),
                  update_by = #{updateBy}
              WHERE variant_id = #{variantId}
          </update>
 
          <!-- Delete by ID -->
          <delete id="deleteById" parameterType="int">
-             DELETE FROM product_variant
+             DELETE FROM product_variants
              WHERE variant_id = #{variantId}
          </delete>
 
@@ -118,25 +125,26 @@
          <select id="findAll" resultMap="ProductVariantResultMap">
              SELECT variant_id,
                     product_id,
+                    variant_name,
                     product_variant_code,
                     price,
                     stock_qty,
+                    is_active,
+                    created_at,
+                    updated_at,
                     weight_grams,
                     attribute,
                     image,
-                    create_at,
-                    update_at,
                     create_by,
                     update_by
-             FROM product_variant
+             FROM product_variants
              ORDER BY variant_id DESC
          </select>
 
          <!-- Update Stock Quantity -->
          <update id="updateStock" parameterType="map">
-             UPDATE product_variant
-             SET stock_qty = stock_qty + #{quantity},
-                 update_at = GETDATE()
+             UPDATE product_variants
+             SET stock_qty = stock_qty + #{quantity}
              WHERE variant_id = #{variantId}
          </update>
 
@@ -144,17 +152,19 @@
          <select id="findByCode" parameterType="string" resultMap="ProductVariantResultMap">
              SELECT variant_id,
                     product_id,
+                    variant_name,
                     product_variant_code,
                     price,
                     stock_qty,
+                    is_active,
+                    created_at,
+                    updated_at,
                     weight_grams,
                     attribute,
                     image,
-                    create_at,
-                    update_at,
                     create_by,
                     update_by
-             FROM product_variant
+             FROM product_variants
              WHERE product_variant_code = #{productVariantCode}
          </select>
 

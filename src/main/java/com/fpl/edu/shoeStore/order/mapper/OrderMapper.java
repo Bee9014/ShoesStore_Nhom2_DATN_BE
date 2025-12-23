@@ -1,10 +1,11 @@
 package com.fpl.edu.shoeStore.order.mapper;
-import com.fpl.edu.shoeStore.order.model.Order;
-import com.fpl.edu.shoeStore.order.model.OrderItem;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import com.fpl.edu.shoeStore.order.entity.Order;
+import com.fpl.edu.shoeStore.order.entity.OrderItem;
 
 @Mapper
 public interface OrderMapper {
@@ -26,4 +27,21 @@ public interface OrderMapper {
 
     // Lấy danh sách Order theo Buyer ID
     List<Order> findByBuyerId(int buyerId);
+
+    // Lấy danh sách Order với filter (Admin)
+    List<Order> findAllPaged(
+        @Param("status") String status,
+        @Param("searchTerm") String searchTerm,
+        @Param("offset") int offset,
+        @Param("size") int size
+    );
+
+    // Đếm tổng số orders với filter
+    long countAll(
+        @Param("status") String status,
+        @Param("searchTerm") String searchTerm
+    );
+
+    // Đếm số order theo status
+    long countByStatus(@Param("status") String status);
 }

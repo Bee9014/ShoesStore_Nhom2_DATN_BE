@@ -16,6 +16,7 @@
         <package name="com.fpl.edu.shoeStore.auth.entity"/>
         <package name="com.fpl.edu.shoeStore.user.entity"/>
         <package name="com.fpl.edu.shoeStore.product.entity"/>
+        <package name="com.fpl.edu.shoeStore.category.entity"/>
         <package name="com.fpl.edu.shoeStore.order.entity"/>
         <package name="com.fpl.edu.shoeStore.payment.entity"/>
         <package name="com.fpl.edu.shoeStore.voucher.entity"/>
@@ -28,13 +29,16 @@
         <mapper resource="mybatis/mapper/auth/UserAuthMapper.xml"/>
         <mapper resource="mybatis/mapper/user/UserMapper.xml"/>
         <mapper resource="mybatis/mapper/order/OrderMapper.xml"/>
+        <mapper resource="mybatis/mapper/payment/PaymentMapper.xml"/>
         <mapper resource="mybatis/mapper/shipment/ShipmentMapper.xml"/>
         <mapper resource="mybatis/mapper/promotion/VoucherMapper.xml"/>
         <mapper resource="mybatis/mapper/product/ProductMapper.xml"/>
+        <mapper resource="mybatis/mapper/category/CategoryMapper.xml"/>
         <!-- Annotation-based mappers -->
         <package name="com.fpl.edu.shoeStore.auth.mapper"/>
         <package name="com.fpl.edu.shoeStore.user.mapper"/>
         <package name="com.fpl.edu.shoeStore.product.mapper"/>
+        <package name="com.fpl.edu.shoeStore.category.mapper"/>
         <package name="com.fpl.edu.shoeStore.order.mapper"/>
         <package name="com.fpl.edu.shoeStore.payment.mapper"/>
         <package name="com.fpl.edu.shoeStore.voucher.mapper"/>

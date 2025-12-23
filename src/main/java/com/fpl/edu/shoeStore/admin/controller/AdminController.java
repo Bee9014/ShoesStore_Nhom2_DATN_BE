@@ -1,12 +1,13 @@
 package com.fpl.edu.shoeStore.admin.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/admin")
@@ -57,29 +58,7 @@ public class AdminController {
         return "admin/product/detail";
     }
 
-    @GetMapping("/orders")
-    public String orderList(Model model, HttpServletRequest request) {
-        model.addAttribute("pageTitle", "Quản lý đơn hàng");
-        model.addAttribute("currentPath", request.getRequestURI());
-        // TODO: Load orders from database
-        return "admin/pages/order-list";
-    }
 
-    @GetMapping("/orders/{id}")
-    public String orderDetail(@PathVariable Long id, Model model) {
-        model.addAttribute("pageTitle", "Chi tiết đơn hàng");
-        model.addAttribute("currentPage", "order");
-        // TODO: Load order by id
-        return "admin/order/detail";
-    }
-
-    @GetMapping("/users")
-    public String userList(Model model, HttpServletRequest request) {
-        model.addAttribute("pageTitle", "Quản lý người dùng");
-        model.addAttribute("currentPath", request.getRequestURI());
-        // TODO: Load users from database
-        return "admin/pages/user-list";
-    }
 
     @GetMapping("/promotions")
     public String promotionList(Model model) {

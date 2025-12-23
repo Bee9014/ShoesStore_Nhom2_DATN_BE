@@ -1,0 +1,242 @@
+/* ===================================== */
+/* PAYMENT MANAGEMENT PAGE STYLES */
+/* ===================================== */
+
+/* Statistics Cards */
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card .stat-label {
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.stat-card .stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #212529;
+}
+
+.stat-card.stat-success {
+    border-left: 4px solid #198754;
+}
+
+.stat-card.stat-success .stat-value {
+    color: #198754;
+}
+
+.stat-card.stat-warning {
+    border-left: 4px solid #ffc107;
+}
+
+.stat-card.stat-warning .stat-value {
+    color: #ffc107;
+}
+
+.stat-card.stat-danger {
+    border-left: 4px solid #dc3545;
+}
+
+.stat-card.stat-danger .stat-value {
+    color: #dc3545;
+}
+
+.stat-card.stat-info {
+    border-left: 4px solid #0dcaf0;
+}
+
+.stat-card.stat-info .stat-value {
+    color: #0dcaf0;
+    font-size: 24px;
+}
+
+/* Payment Method Badges */
+.method-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.method-badge.cod {
+    background: #cff4fc;
+    color: #0dcaf0;
+}
+
+.method-badge.vnpay {
+    background: #d1e7dd;
+    color: #198754;
+}
+
+.method-badge.momo {
+    background: #ffe5d0;
+    color: #fd7e14;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-badge.paid {
+    background: #d1e7dd;
+    color: #198754;
+}
+
+.status-badge.pending {
+    background: #fff3cd;
+    color: #ffc107;
+}
+
+.status-badge.failed {
+    background: #f8d7da;
+    color: #dc3545;
+}
+
+/* Table Styling */
+.custom-table {
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.custom-table thead {
+    background: #f8f9fa;
+}
+
+.custom-table th {
+    padding: 14px 16px;
+    font-weight: 700;
+    font-size: 13px;
+    color: #495057;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.custom-table td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #212529;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+}
+
+.custom-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.custom-table code {
+    background: #f8f9fa;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #d63384;
+}
+
+.custom-table code.text-success {
+    color: #198754 !important;
+}
+
+.custom-table a {
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.custom-table a:hover {
+    text-decoration: underline;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background: #0b5ed7;
+    border-color: #0a58ca;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stat-card .stat-value {
+        font-size: 24px;
+    }
+    
+    .stat-card .stat-label {
+        font-size: 12px;
+    }
+    
+    .custom-table th,
+    .custom-table td {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stat-card {
+    animation: fadeIn 0.4s ease;
+}
+
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4) { animation-delay: 0.4s; }
+.stat-card:nth-child(5) { animation-delay: 0.5s; }
+
+/* VNPay Highlight */
+.vnpay-transaction {
+    background: #d1e7dd !important;
+}
+
+/* Empty State */
+.empty-cell {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+    font-size: 14px;
+}

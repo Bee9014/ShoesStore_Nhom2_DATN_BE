@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fpl.edu.shoeStore.category.mapper.CategoryMapper">
+
+    <!-- Result Map -->
+    <resultMap id="CategoryResultMap" type="com.fpl.edu.shoeStore.category.entity.Category">
+        <id property="categoryId" column="category_id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="name" column="name"/>
+        <result property="url" column="url"/>
+        <result property="description" column="description"/>
+        <result property="isActive" column="is_active"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="updatedBy" column="updated_by"/>
+    </resultMap>
+
+    <!-- ==================== BASIC CRUD ==================== -->
+
+    <select id="findAll" resultMap="CategoryResultMap">
+        SELECT category_id, parent_id, name, url, description, is_active,
+               sort_order, created_at, updated_at, created_by, updated_by
+        FROM categories
+        ORDER BY sort_order ASC, name ASC
+    </select>
+
+    <select id="findById" parameterType="int" resultMap="CategoryResultMap">
+        SELECT category_id, parent_id, name, url, description, is_active,
+               sort_order, created_at, updated_at, created_by, updated_by
+        FROM categories
+        WHERE category_id = #{categoryId}
+    </select>
+
+    <select id="findByName" parameterType="string" resultMap="CategoryResultMap">
+        SELECT category_id, parent_id, name, url, description, is_active,
+               sort_order, created_at, updated_at, created_by, updated_by
+        FROM categories
+        WHERE name = #{name}
+        LIMIT 1
+    </select>
+
+    <insert id="insert" parameterType="com.fpl.edu.shoeStore.category.entity.Category"
+            useGeneratedKeys="true" keyProperty="categoryId">
+        INSERT INTO categories (
+            parent_id, name, url, description, is_active, sort_order,
+            created_at, updated_at, created_by, updated_by
+        )
+        VALUES (
+            #{parentId}, #{name}, #{url}, #{description}, #{isActive}, #{sortOrder},
+            #{createdAt}, #{updatedAt}, #{createdBy}, #{updatedBy}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.fpl.edu.shoeStore.category.entity.Category">
+        UPDATE categories
+        SET parent_id = #{parentId},
+            name = #{name},
+            url = #{url},
+            description = #{description},
+            is_active = #{isActive},
+            sort_order = #{sortOrder},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE category_id = #{categoryId}
+    </update>
+
+    <update id="softDelete" parameterType="int">
+        UPDATE categories
+        SET is_active = 0,
+            updated_at = NOW()
+        WHERE category_id = #{categoryId}
+    </update>
+
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM categories
+        WHERE category_id = #{categoryId}
+    </delete>
+
+    <!-- ==================== PAGING & FILTERING ==================== -->
+
+    <select id="findAllPaged" parameterType="map" resultType="com.fpl.edu.shoeStore.category.dto.response.CategoryDtoResponse">
+        SELECT
+            c.category_id AS categoryId,
+            c.parent_id AS parentId,
+            p.name AS parentName,
+            c.name AS name,
+            c.url AS url,
+            c.description AS description,
+            c.is_active AS isActive,
+            c.sort_order AS sortOrder,
+            c.created_at AS createdAt,
+            c.updated_at AS updatedAt,
+            c.created_by AS createdBy,
+            c.updated_by AS updatedBy,
+            (SELECT COUNT(*) FROM products WHERE category_id = c.category_id) AS productCount,
+            (SELECT COUNT(*) FROM categories WHERE parent_id = c.category_id) AS childCount
+        FROM categories c
+        LEFT JOIN categories p ON c.parent_id = p.category_id
+        <where>
+            <if test="search != null and search != ''">
+                AND c.name LIKE CONCAT('%', #{search}, '%')
+            </if>
+            <if test="isActive != null">
+                AND c.is_active = #{isActive}
+            </if>
+        </where>
+        ORDER BY c.sort_order ASC, c.name ASC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countAll" parameterType="map" resultType="long">
+        SELECT COUNT(*)
+        FROM categories
+        <where>
+            <if test="search != null and search != ''">
+                AND name LIKE CONCAT('%', #{search}, '%')
+            </if>
+            <if test="isActive != null">
+                AND is_active = #{isActive}
+            </if>
+        </where>
+    </select>
+
+    <!-- ==================== SELECT OPTIONS ==================== -->
+
+    <select id="findAllActive" resultMap="CategoryResultMap">
+        SELECT category_id, parent_id, name, url, description, is_active,
+               sort_order, created_at, updated_at, created_by, updated_by
+        FROM categories
+        WHERE is_active = 1
+        ORDER BY name ASC
+    </select>
+
+    <!-- ==================== VALIDATION QUERIES ==================== -->
+
+    <select id="countProductsByCategory" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM products
+        WHERE category_id = #{categoryId}
+    </select>
+
+    <select id="countChildCategories" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM categories
+        WHERE parent_id = #{categoryId}
+    </select>
+
+    <select id="existsById" parameterType="int" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM categories
+        WHERE category_id = #{categoryId}
+    </select>
+
+    <select id="existsByName" parameterType="map" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM categories
+        WHERE name = #{name}
+        <if test="excludeId != null">
+            AND category_id != #{excludeId}
+        </if>
+    </select>
+
+</mapper>

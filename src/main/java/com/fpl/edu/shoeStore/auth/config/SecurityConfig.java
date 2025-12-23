@@ -2,6 +2,7 @@ package com.fpl.edu.shoeStore.auth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -62,6 +63,8 @@ public class SecurityConfig {
                         "/api/v1/auth/**",
                         "/admin/login/**", "/admin/css/**", "/admin/js/**", "/admin/images/**", "/admin/plugins/**"
                 ).permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
                 // Admin endpoints require ADMIN role
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 // All other requests need authentication

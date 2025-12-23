@@ -5,27 +5,64 @@
 
 <mapper namespace="com.fpl.edu.shoeStore.order.mapper.OrderMapper">
 
+    <!-- ===================================== -->
+    <!-- RESULT MAPS -->
+    <!-- ===================================== -->
+    <resultMap id="OrderResultMap" type="com.fpl.edu.shoeStore.order.entity.Order">
+        <id property="orderId" column="order_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="buyerId" column="buyer_id"/>
+        <result property="voucherId" column="voucher_id"/>
+        <result property="orderDate" column="order_date"/>
+        <result property="status" column="status"/>
+        <result property="totalAmount" column="total_amount"/>
+        <result property="discountAmount" column="discount_amount"/>
+        <result property="finalAmount" column="final_amount"/>
+        <result property="shippingFullname" column="shipping_fullname"/>
+        <result property="shippingPhone" column="shipping_phone"/>
+        <result property="shippingAddress" column="shipping_address"/>
+        <result property="shippingCity" column="shipping_city"/>
+        <result property="shippingCountry" column="shipping_country"/>
+        <result property="note" column="note"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <resultMap id="OrderItemResultMap" type="com.fpl.edu.shoeStore.order.entity.OrderItem">
+        <id property="orderItemId" column="order_item_id"/>
+        <result property="orderId" column="order_id"/>
+        <result property="variantId" column="variant_id"/>
+        <result property="productNameSnapshot" column="product_name_snapshot"/>
+        <result property="quantity" column="quantity"/>
+        <result property="unitPrice" column="unit_price"/>
+        <result property="totalPrice" column="total_price"/>
+    </resultMap>
+
+    <!-- ===================================== -->
+    <!-- INSERT STATEMENTS -->
+    <!-- ===================================== -->
     <insert id="insertOrder"
-            parameterType="com.fpl.edu.shoeStore.order.model.Order"
+            parameterType="com.fpl.edu.shoeStore.order.entity.Order"
             useGeneratedKeys="true"
             keyProperty="orderId">
         INSERT INTO orders (
+        user_id,
         buyer_id,
         voucher_id,
-        placed_at,        order_status,     total_amount,
+        order_date,
+        status,
+        total_amount,
         discount_amount,
         final_amount,
-        shipping_fee,
         shipping_fullname,
         shipping_phone,
         shipping_address,
         shipping_city,
         shipping_country,
-        note,
-        create_at,        update_at,
-        create_by,        update_by
+        note
         )
         VALUES (
+        #{userId},
         #{buyerId},
         #{voucherId},
         #{orderDate},
@@ -33,32 +70,24 @@
         #{totalAmount},
         #{discountAmount},
         #{finalAmount},
-        #{shippingFee},
         #{shippingFullname},
         #{shippingPhone},
         #{shippingAddress},
         #{shippingCity},
         #{shippingCountry},
-        #{note},
-        NOW(),            NOW(),
-        #{buyerId},       #{buyerId}
+        #{note}
         )
     </insert>
 
     <insert id="insertOrderItem"
-            parameterType="com.fpl.edu.shoeStore.order.model.OrderItem">
-        INSERT INTO order_item (
+            parameterType="com.fpl.edu.shoeStore.order.entity.OrderItem">
+        INSERT INTO order_items (
         order_id,
         variant_id,
         product_name_snapshot,
-        qty,              unit_price,
-        total_price,
-        create_at,
-        update_at,
-        create_by,
-        update_by,
-        refund_status,
-        seller_commission
+        quantity,
+        unit_price,
+        total_price
         )
         VALUES (
         #{orderId},
@@ -66,58 +95,136 @@
         #{productNameSnapshot},
         #{quantity},
         #{unitPrice},
-        #{totalPrice},
-        NOW(),
-        NOW(),
-        #{orderId},       #{orderId},
-        'none',           0                 )
+        #{totalPrice}
+        )
     </insert>
 
-    <select id="findById"
-            parameterType="int"
-            resultType="com.fpl.edu.shoeStore.order.model.Order">
+    <!-- ===================================== -->
+    <!-- SELECT STATEMENTS -->
+    <!-- ===================================== -->
+    <select id="findById" parameterType="int" resultMap="OrderResultMap">
         SELECT
-        order_id        AS orderId,
-        buyer_id        AS buyerId,
-        voucher_id      AS voucherId,
-        placed_at       AS orderDate,
-        order_status    AS status,
-        total_amount    AS totalAmount,
-        discount_amount AS discountAmount,
-        final_amount    AS finalAmount,
-        shipping_fee    AS shippingFee,
-        shipping_fullname AS shippingFullname,
-        shipping_phone  AS shippingPhone,
-        shipping_address AS shippingAddress,
-        shipping_city   AS shippingCity,
-        shipping_country AS shippingCountry,
-        note,
-        create_at       AS createdAt,
-        update_at       AS updatedAt
+            order_id,
+            user_id,
+            buyer_id,
+            voucher_id,
+            order_date,
+            status,
+            total_amount,
+            discount_amount,
+            final_amount,
+            shipping_fullname,
+            shipping_phone,
+            shipping_address,
+            shipping_city,
+            shipping_country,
+            note,
+            created_at,
+            updated_at
         FROM orders
         WHERE order_id = #{orderId}
     </select>
 
-    <select id="findItemsByOrderId"
-            parameterType="int"
-            resultType="com.fpl.edu.shoeStore.order.model.OrderItem">
+    <select id="findItemsByOrderId" parameterType="int" resultMap="OrderItemResultMap">
         SELECT
-        order_item_id AS orderItemId,
-        order_id      AS orderId,
-        variant_id    AS variantId,
-        product_name_snapshot AS productNameSnapshot,
-        qty           AS quantity,
-        unit_price    AS unitPrice,
-        total_price   AS totalPrice
-        FROM order_item
+            order_item_id,
+            order_id,
+            variant_id,
+            product_name_snapshot,
+            quantity,
+            unit_price,
+            total_price
+        FROM order_items
         WHERE order_id = #{orderId}
     </select>
 
+    <!-- ===================================== -->
+    <!-- UPDATE STATEMENTS -->
+    <!-- ===================================== -->
     <update id="updateStatus">
         UPDATE orders
-        SET order_status = #{status},
-        update_at = NOW()
+        SET status = #{status}
         WHERE order_id = #{orderId}
     </update>
+
+    <!-- ===================================== -->
+    <!-- QUERY WITH FILTERS -->
+    <!-- ===================================== -->
+    <select id="findByBuyerId" parameterType="int" resultMap="OrderResultMap">
+        SELECT
+            order_id,
+            user_id,
+            buyer_id,
+            voucher_id,
+            order_date,
+            status,
+            total_amount,
+            discount_amount,
+            final_amount,
+            shipping_fullname,
+            shipping_phone,
+            shipping_address,
+            shipping_city,
+            shipping_country,
+            note,
+            created_at,
+            updated_at
+        FROM orders
+        WHERE buyer_id = #{buyerId}
+        ORDER BY order_date DESC
+    </select>
+
+    <select id="findAllPaged" resultMap="OrderResultMap">
+        SELECT
+            order_id,
+            user_id,
+            buyer_id,
+            voucher_id,
+            order_date,
+            status,
+            total_amount,
+            discount_amount,
+            final_amount,
+            shipping_fullname,
+            shipping_phone,
+            shipping_address,
+            shipping_city,
+            shipping_country,
+            note,
+            created_at,
+            updated_at
+        FROM orders
+        WHERE 1=1
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        <if test="searchTerm != null and searchTerm != ''">
+            AND (shipping_fullname LIKE CONCAT('%', #{searchTerm}, '%')
+            OR shipping_phone LIKE CONCAT('%', #{searchTerm}, '%')
+            OR order_id = #{searchTerm})
+        </if>
+        ORDER BY order_date DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*)
+        FROM orders
+        WHERE 1=1
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        <if test="searchTerm != null and searchTerm != ''">
+            AND (shipping_fullname LIKE CONCAT('%', #{searchTerm}, '%')
+            OR shipping_phone LIKE CONCAT('%', #{searchTerm}, '%')
+            OR order_id = #{searchTerm})
+        </if>
+    </select>
+
+    <select id="countByStatus" resultType="long">
+        SELECT COUNT(*)
+        FROM orders
+        WHERE status = #{status}
+    </select>
 
 </mapper>

@@ -1,8 +1,15 @@
-package com.fpl.edu.shoeStore.order.model;
+package com.fpl.edu.shoeStore.order.entity;
 
-import lombok.Data;
 import java.math.BigDecimal;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Data
 public class OrderItem {
     private int orderItemId;

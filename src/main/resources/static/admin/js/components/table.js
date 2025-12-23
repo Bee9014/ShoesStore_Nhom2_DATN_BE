@@ -1,4 +1,4 @@
-import { ConfirmModal } from "/js/components/confirm.modal.js";
+import { ConfirmModal } from "/admin/js/components/confirm.modal.js";
 
 export class CustomTable {
   constructor({

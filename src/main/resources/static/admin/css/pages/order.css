@@ -1,0 +1,344 @@
+/**
+ * ORDER PAGE STYLES
+ * Admin Order Management - List & Detail
+ */
+
+/* ==================== STATISTICS CARDS ==================== */
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #6c757d;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 900;
+  color: #212529;
+  line-height: 1;
+}
+
+.stat-card.stat-warning .stat-value {
+  color: #ffc107;
+}
+
+.stat-card.stat-info .stat-value {
+  color: #0dcaf0;
+}
+
+.stat-card.stat-success .stat-value {
+  color: #198754;
+}
+
+.stat-card.stat-danger .stat-value {
+  color: #dc3545;
+}
+
+/* ==================== STATUS TABS ==================== */
+.status-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.status-tabs .btn {
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 16px;
+  transition: all 0.3s;
+}
+
+.status-tabs .btn-outline-primary:hover {
+  transform: translateY(-2px);
+}
+
+/* ==================== SEARCH WRAPPER ==================== */
+.search-wrapper {
+  flex: 1;
+  max-width: 500px;
+}
+
+.search-wrapper input {
+  border-radius: 8px;
+  border: 2px solid #dee2e6;
+  padding: 8px 16px;
+  transition: border-color 0.3s;
+}
+
+.search-wrapper input:focus {
+  border-color: #0d6efd;
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* ==================== MASTER DETAIL WRAPPER ==================== */
+.master-detail-wrapper {
+  min-height: 500px;
+}
+
+.master-panel {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+/* ==================== ORDER DETAIL PAGE ==================== */
+.order-timeline {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.timeline-container {
+  padding: 20px 0;
+}
+
+.timeline-container::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50px;
+  right: 50px;
+  height: 2px;
+  background: #dee2e6;
+  z-index: 0;
+}
+
+.timeline-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-step .step-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid #dee2e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #adb5bd;
+  margin-bottom: 12px;
+  transition: all 0.3s;
+}
+
+.timeline-step .step-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #6c757d;
+  margin-bottom: 5px;
+}
+
+.timeline-step .step-date {
+  font-size: 12px;
+  color: #adb5bd;
+}
+
+/* Active Step */
+.timeline-step.active .step-icon {
+  border-color: #0d6efd;
+  background: #e7f1ff;
+  color: #0d6efd;
+}
+
+.timeline-step.active .step-label {
+  color: #0d6efd;
+}
+
+/* Completed Step */
+.timeline-step.completed .step-icon {
+  border-color: #198754;
+  background: #d1e7dd;
+  color: #198754;
+}
+
+.timeline-step.completed .step-label {
+  color: #198754;
+}
+
+.timeline-step.completed .step-date {
+  color: #198754;
+}
+
+/* ==================== ORDER INFO CARDS ==================== */
+.card {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+.card-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 15px 20px;
+}
+
+.card-header h5 {
+  font-weight: 700;
+  color: #212529;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.card-body table tr td:first-child {
+  color: #6c757d;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .status-tabs {
+    flex-direction: column;
+  }
+
+  .status-tabs .btn {
+    width: 100%;
+  }
+
+  .search-wrapper {
+    max-width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .timeline-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .timeline-container::before {
+    left: 30px;
+    top: 50px;
+    bottom: 50px;
+    width: 2px;
+    height: auto;
+    right: auto;
+  }
+
+  .timeline-step {
+    flex-direction: row;
+    width: 100%;
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .timeline-step .step-icon {
+    margin-right: 15px;
+    margin-bottom: 0;
+  }
+
+  .timeline-step .step-label,
+  .timeline-step .step-date {
+    text-align: left;
+  }
+}
+
+/* ==================== ACTION BUTTONS ==================== */
+.btn-action {
+  padding: 5px 10px;
+  font-size: 13px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.btn-action:hover {
+  transform: scale(1.05);
+}
+
+/* ==================== TABLE CUSTOMIZATION ==================== */
+.custom-table tbody tr {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.custom-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.custom-table .text-primary {
+  font-weight: 700;
+}
+
+/* ==================== LOADING STATE ==================== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.loading-container .spinner-border {
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 20px;
+}
+
+/* ==================== EMPTY STATE ==================== */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+}
+
+.empty-state i {
+  font-size: 64px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.stat-card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Stagger animation for multiple cards */
+.stat-card:nth-child(1) { animation-delay: 0s; }
+.stat-card:nth-child(2) { animation-delay: 0.05s; }
+.stat-card:nth-child(3) { animation-delay: 0.1s; }
+.stat-card:nth-child(4) { animation-delay: 0.15s; }
+.stat-card:nth-child(5) { animation-delay: 0.2s; }

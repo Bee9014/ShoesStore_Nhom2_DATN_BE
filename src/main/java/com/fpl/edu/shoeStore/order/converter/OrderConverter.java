@@ -1,16 +1,17 @@
 package com.fpl.edu.shoeStore.order.converter;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
 import com.fpl.edu.shoeStore.order.dto.request.OrderCreateRequest;
 import com.fpl.edu.shoeStore.order.dto.request.OrderItemRequest;
 import com.fpl.edu.shoeStore.order.dto.response.OrderItemResponse;
 import com.fpl.edu.shoeStore.order.dto.response.OrderResponse;
-import com.fpl.edu.shoeStore.order.model.Order;
-import com.fpl.edu.shoeStore.order.model.OrderItem;
-import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.fpl.edu.shoeStore.order.entity.Order;
+import com.fpl.edu.shoeStore.order.entity.OrderItem;
 
 @Component
 public class OrderConverter {

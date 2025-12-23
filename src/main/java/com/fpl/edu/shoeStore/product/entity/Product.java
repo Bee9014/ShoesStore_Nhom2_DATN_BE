@@ -5,7 +5,8 @@
      import lombok.Data;
      import lombok.NoArgsConstructor;
 
-     import java.time.LocalDate;
+     import java.math.BigDecimal;
+     import java.time.LocalDateTime;
 
      @Data
      @NoArgsConstructor
@@ -18,12 +19,14 @@
          private String url;
          private String productCode;
          private String description;
+         private BigDecimal basePrice;
+         private Boolean isActive;
          private String brand;
          private String condition;
          private String defaultImage;
          private String status;
-         private LocalDate createAt;
-         private LocalDate updateAt;
+         private LocalDateTime createAt;
+         private LocalDateTime updateAt;
          private Integer createBy;
          private Integer updateBy;
      }

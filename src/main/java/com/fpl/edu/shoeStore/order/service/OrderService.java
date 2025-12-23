@@ -1,5 +1,6 @@
 package com.fpl.edu.shoeStore.order.service;
 
+import com.fpl.edu.shoeStore.common.handler.PageResponse;
 import com.fpl.edu.shoeStore.order.dto.request.OrderCreateRequest;
 import com.fpl.edu.shoeStore.order.dto.response.OrderResponse;
 import com.fpl.edu.shoeStore.order.exception.OrderException;
@@ -23,5 +24,33 @@ public interface OrderService {
      */
     void updateOrderStatus(int orderId, String newStatus) throws OrderException;
 
-    // Thêm các phương thức khác như getListOrders, cancelOrder...
+    /**
+     * Lấy danh sách đơn hàng của user (buyerId)
+     */
+    PageResponse<OrderResponse> getMyOrders(int userId, int page, int size);
+
+    /**
+     * Lấy tất cả đơn hàng (Admin) với filter và search
+     */
+    PageResponse<OrderResponse> getAllOrders(String status, String searchTerm, int page, int size);
+
+    /**
+     * Hủy đơn hàng (chỉ khi status = PENDING)
+     */
+    void cancelOrder(int orderId, int userId) throws OrderException;
+
+    /**
+     * ADMIN: Lấy tất cả đơn hàng với filter
+     */
+    PageResponse<OrderResponse> getAllOrdersForAdmin(String status, String searchTerm, int page, int size);
+
+    /**
+     * ADMIN: Đếm tổng số đơn hàng
+     */
+    long countAllOrders();
+
+    /**
+     * ADMIN: Đếm số đơn hàng theo status
+     */
+    long countOrdersByStatus(String status);
 }
