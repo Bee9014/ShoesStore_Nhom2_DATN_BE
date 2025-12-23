@@ -21,16 +21,18 @@
          int deleteById(@Param("productId") Integer productId);             // Đổi Long → Integer
 
          List<Product> findAllPaged(
-             @Param("categoryId") Integer categoryId,                       // Đổi Long → Integer
-             @Param("title") String title,                                  // Đổi từ name → title
-             @Param("status") String status,                                // Đổi từ Boolean isActive → String status
+             @Param("categoryId") Integer categoryId,
+             @Param("title") String title,
+             @Param("status") String status,
+             @Param("isActive") Boolean isActive,
              @Param("offset") int offset,
              @Param("size") int size
          );
 
          long countAll(
-             @Param("categoryId") Integer categoryId,                       // Đổi Long → Integer
-             @Param("title") String title,                                  // Đổi từ name → title
-             @Param("status") String status                                 // Đổi từ Boolean isActive → String status
+             @Param("categoryId") Integer categoryId,
+             @Param("title") String title,
+             @Param("status") String status,
+             @Param("isActive") Boolean isActive
          );
      }

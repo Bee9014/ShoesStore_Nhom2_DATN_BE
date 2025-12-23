@@ -1,113 +1,158 @@
- package com.fpl.edu.shoeStore.product.service.impl;
+package com.fpl.edu.shoeStore.product.service.impl;
 
-     import java.time.LocalDate;
-     import java.util.List;
-     import java.util.stream.Collectors;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
-     import org.springframework.stereotype.Service;
-     import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-     import com.fpl.edu.shoeStore.common.handler.PageResponse;
-     import com.fpl.edu.shoeStore.product.convert.ProductConverter;
-     import com.fpl.edu.shoeStore.product.dto.request.ProductDtoRequest;
-     import com.fpl.edu.shoeStore.product.dto.response.ProductDtoResponse;
-     import com.fpl.edu.shoeStore.product.entity.Product;
-     import com.fpl.edu.shoeStore.product.mapper.ProductMapper;
-     import com.fpl.edu.shoeStore.product.service.ProductService;
+import com.fpl.edu.shoeStore.common.handler.PageResponse;
+import com.fpl.edu.shoeStore.product.convert.ProductConverter;
+import com.fpl.edu.shoeStore.product.dto.request.ProductDtoRequest;
+import com.fpl.edu.shoeStore.product.dto.response.ProductDtoResponse;
+import com.fpl.edu.shoeStore.product.entity.Product;
+import com.fpl.edu.shoeStore.product.mapper.ProductMapper;
+import com.fpl.edu.shoeStore.product.service.ProductService;
+import com.fpl.edu.shoeStore.product.service.ProductVariantService; // 👈 1. Import Service con
 
-     import lombok.RequiredArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
-     @Service
-     @RequiredArgsConstructor
-     public class ProductServiceImpl implements ProductService {
+@Service
+@RequiredArgsConstructor
+public class ProductServiceImpl implements ProductService {
 
-         private final ProductMapper productMapper;
+    private final ProductMapper productMapper;
+    private final ProductVariantService productVariantService; // 👈 2. Inject Service con
 
-         @Override
-         @Transactional
-         public ProductDtoResponse createProduct(ProductDtoRequest request) {
-             Product product = ProductConverter.toEntity(request);
-             product.setCreateAt(LocalDate.now());           // Đổi từ LocalDateTime
-             product.setUpdateAt(LocalDate.now());           // Đổi từ LocalDateTime
-             productMapper.insert(product);
-             return ProductConverter.toResponse(product);
-         }
+    // Hàm saveFile giữ nguyên
+    private String saveFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+        try {
+            Path uploadDir = Paths.get("uploads");
+            if (!Files.exists(uploadDir)) {
+                Files.createDirectories(uploadDir);
+            }
+            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+            Path filePath = uploadDir.resolve(fileName);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            return "/uploads/" + fileName;
+        } catch (IOException e) {
+            throw new RuntimeException("Lỗi khi lưu file ảnh: " + e.getMessage());
+        }
+    }
 
-         @Override
-         @Transactional
-         public ProductDtoResponse updateProduct(Integer id, ProductDtoRequest request) {
-             Product existing = productMapper.findById(id);
-             if (existing == null) {
-                 throw new RuntimeException("Không tìm thấy Product id = " + id);
-             }
+    @Override
+    @Transactional
+    public ProductDtoResponse createProduct(ProductDtoRequest request, MultipartFile file) {
+        // 1. Tạo Product Entity (Cha)
+        Product product = ProductConverter.toEntity(request);
 
-             if (request.getCategoryId() != null) existing.setCategoryId(request.getCategoryId());
-             if (request.getTitle() != null) existing.setTitle(request.getTitle());                      // Đổi từ setName
-             if (request.getDescription() != null) existing.setDescription(request.getDescription());
-             if (request.getBrand() != null) existing.setBrand(request.getBrand());                      // THÊM MỚI
-             if (request.getCondition() != null) existing.setCondition(request.getCondition());          // THÊM MỚI
-             if (request.getDefaultImage() != null) existing.setDefaultImage(request.getDefaultImage()); // THÊM MỚI
-             if (request.getStatus() != null) existing.setStatus(request.getStatus());                   // Đổi từ setIsActive
-             if (request.getUpdateBy() != null) existing.setUpdateBy(request.getUpdateBy());             // THÊM MỚI
+        // 2. Xử lý ảnh
+        String imagePath = saveFile(file);
+        if (imagePath != null) {
+            product.setDefaultImage(imagePath);
+        }
+        product.setCreateAt(LocalDateTime.now());
+        product.setUpdateAt(LocalDateTime.now());
+        
+        // 3. Insert Product -> Có ID
+        productMapper.insert(product);
 
-             existing.setUpdateAt(LocalDate.now());          // Đổi từ LocalDateTime
-             productMapper.update(existing);
+        // 4. 👇 GỌI SERVICE CON ĐỂ TẠO VARIANTS (QUAN TRỌNG)
+        // Kiểm tra xem request có gửi kèm danh sách variants không
+        if (request.getVariants() != null && !request.getVariants().isEmpty()) {
+            // Truyền ID vừa tạo của cha sang cho con
+            productVariantService.createVariants(product.getProductId(), request.getVariants());
+        }
 
-             return ProductConverter.toResponse(existing);
-         }
+        return ProductConverter.toResponse(product);
+    }
 
-         @Override
-         @Transactional
-         public int deleteProduct(Integer id) {
-             Product existing = productMapper.findById(id);
-             if (existing == null) {
-                 throw new RuntimeException("Không tìm thấy Product để xóa");
-             }
-             return productMapper.deleteById(id);
-         }
+    @Override
+    @Transactional
+    public ProductDtoResponse updateProduct(Integer id, ProductDtoRequest request, MultipartFile file) {
+        Product existing = productMapper.findById(id);
+        if (existing == null) {
+            throw new RuntimeException("Không tìm thấy Product id = " + id);
+        }
 
-         @Override
-         public ProductDtoResponse findById(Integer id) {
-             Product product = productMapper.findById(id);
-             return product == null ? null : ProductConverter.toResponse(product);
-         }
+        if (request.getCategoryId() != null) existing.setCategoryId(request.getCategoryId());
+        if (request.getTitle() != null) existing.setTitle(request.getTitle());
+        if (request.getDescription() != null) existing.setDescription(request.getDescription());
+        if (request.getBrand() != null) existing.setBrand(request.getBrand());
+        if (request.getCondition() != null) existing.setCondition(request.getCondition());
+        if (request.getStatus() != null) existing.setStatus(request.getStatus());
+        if (request.getUpdateBy() != null) existing.setUpdateBy(request.getUpdateBy());
+        
+        // Chỉ update ảnh nếu người dùng chọn file mới
+        String newImagePath = saveFile(file);
+        if (newImagePath != null) {
+            existing.setDefaultImage(newImagePath);
+        }
 
-         @Override
-         public ProductDtoResponse findByTitle(String title) {   // Đổi từ findByName
-             Product product = productMapper.findByTitle(title); // Đổi từ findByName
-             return product == null ? null : ProductConverter.toResponse(product);
-         }
+        existing.setUpdateAt(LocalDateTime.now());
+        productMapper.update(existing);
 
-         @Override
-         public PageResponse<ProductDtoResponse> findAllPaged(
-                 Integer categoryId,              // Đổi từ Long → Integer
-                 String title,                    // Đổi từ name → title
-                 String status,                   // Đổi từ Boolean isActive → String status
-                 int page,
-                 int size
-         ) {
-             int offset = (page - 1) * size;
+        // (Tùy chọn) Nếu muốn update cả variants trong cùng API này thì gọi variantService ở đây
+        // Nhưng thường update variants sẽ làm ở API riêng hoặc logic phức tạp hơn.
 
-             List<Product> products = productMapper.findAllPaged(
-                     categoryId, title, status, offset, size  // Cập nhật tham số
-             );
+        return ProductConverter.toResponse(existing);
+    }
 
-             long totalElements = productMapper.countAll(
-                     categoryId, title, status                // Cập nhật tham số
-             );
+    @Override
+    @Transactional
+    public int deleteProduct(Integer id) {
+        Product existing = productMapper.findById(id);
+        if (existing == null) {
+            throw new RuntimeException("Không tìm thấy Product để xóa");
+        }
+        // Lưu ý: Nếu DB không có ON DELETE CASCADE, bạn cần xóa variants trước:
+        // productVariantService.deleteByProductId(id); (Cần thêm hàm này bên Service con nếu cần)
+        
+        return productMapper.deleteById(id);
+    }
 
-             List<ProductDtoResponse> content = products.stream()
-                     .map(ProductConverter::toResponse)
-                     .collect(Collectors.toList());
+    // Các hàm findById, findByTitle, findAllPaged giữ nguyên
+    @Override
+    public ProductDtoResponse findById(Integer id) {
+        Product product = productMapper.findById(id);
+        return product == null ? null : ProductConverter.toResponse(product);
+    }
 
-             int totalPages = (int) Math.ceil((double) totalElements / size);
+    @Override
+    public ProductDtoResponse findByTitle(String title) {
+        Product product = productMapper.findByTitle(title);
+        return product == null ? null : ProductConverter.toResponse(product);
+    }
 
-             return PageResponse.<ProductDtoResponse>builder()
-                     .content(content)
-                     .pageNumber(page)
-                     .pageSize(size)
-                     .totalElements(totalElements)
-                     .totalPages(totalPages)
-                     .build();
-         }
-     }
+    @Override
+    public PageResponse<ProductDtoResponse> findAllPaged(Integer categoryId, String title, String status, Boolean isActive, int page, int size) {
+        int offset = (page - 1) * size;
+        List<Product> products = productMapper.findAllPaged(categoryId, title, status, isActive, offset, size);
+        long totalElements = productMapper.countAll(categoryId, title, status, isActive);
+        
+        List<ProductDtoResponse> content = products.stream()
+                .map(ProductConverter::toResponse)
+                .collect(Collectors.toList());
+                
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        
+        return PageResponse.<ProductDtoResponse>builder()
+                .content(content)
+                .pageNumber(page)
+                .pageSize(size)
+                .totalElements(totalElements)
+                .totalPages(totalPages)
+                .build();
+    }
+}

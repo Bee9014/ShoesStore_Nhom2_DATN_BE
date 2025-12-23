@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/main-layout}">
+<head>
+    <title layout:title-content="Quản lý đơn hàng">Quản lý đơn hàng</title>
+    <link rel="stylesheet" th:href="@{/admin/css/pages/order.css}"/>
+    <link rel="stylesheet" th:href="@{/admin/css/components/table.css}"/>
+</head>
+<body>
+<!-- Page Actions -->
+<div layout:fragment="page-actions">
+    <button class="btn btn-primary" onclick="OrderPage.refreshOrders()">
+        <i class="bi bi-arrow-clockwise me-1"></i>
+        Làm mới
+    </button>
+</div>
+
+<!-- Main Content -->
+<section layout:fragment="content">
+    <div class="px-4 py-2">
+        <!-- Statistics Cards -->
+        <div class="row g-3 mb-4" id="statsCards">
+            <div class="col">
+                <div class="stat-card">
+                    <div class="stat-label">Tổng đơn hàng</div>
+                    <div class="stat-value" id="totalOrders">-</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="stat-card stat-warning">
+                    <div class="stat-label">Chờ xử lý</div>
+                    <div class="stat-value" id="pendingCount">-</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="stat-card stat-info">
+                    <div class="stat-label">Đang giao</div>
+                    <div class="stat-value" id="shippingCount">-</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="stat-card stat-success">
+                    <div class="stat-label">Đã giao</div>
+                    <div class="stat-value" id="deliveredCount">-</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="stat-card stat-danger">
+                    <div class="stat-label">Đã hủy</div>
+                    <div class="stat-value" id="cancelledCount">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="d-flex justify-content-between mb-3">
+            <div id="search-container" class="search-wrapper"></div>
+            <div class="status-tabs" id="statusTabs">
+                <!-- Status tabs will be rendered by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="d-flex master-detail-wrapper">
+            <div id="master-detail-wrapper" class="master-detail-wrapper w-100">
+                <div id="masterPanel" class="master-panel">
+                    <div id="orderTableContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Page Scripts -->
+<section layout:fragment="page-scripts">
+    <script type="module" th:src="@{/admin/js/pages/order/order.page.js}"></script>
+</section>
+</body>
+</html>

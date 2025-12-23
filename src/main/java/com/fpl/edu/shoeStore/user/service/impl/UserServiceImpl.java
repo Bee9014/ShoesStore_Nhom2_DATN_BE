@@ -3,7 +3,7 @@ package com.fpl.edu.shoeStore.user.service.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowire;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     // Nếu bạn chưa cấu hình BCryptPasswordEncoder bean thì có thể comment dòng này lại
-    // private final PasswordEncoder passwordEncoder; 
+    private final PasswordEncoder passwordEncoder; 
 
     @Override
     @Transactional
@@ -40,8 +40,8 @@ public class UserServiceImpl implements UserService {
         user.setUpdatedAt(LocalDateTime.now());
 
         // 3. Xử lý mật khẩu (Tạm thời để nguyên, sau này bạn mở comment để mã hóa)
-        // String rawPassword = request.getPassword();
-        // user.setPasswordHash(passwordEncoder.encode(rawPassword));
+        String rawPassword = request.getPasswordHash();
+        user.setPasswordHash(passwordEncoder.encode(rawPassword));
         
         // Lưu ý: Do Converter map "password" -> "passwordHash" rồi, nên ở đây user đã có pass.
 
@@ -71,9 +71,10 @@ public class UserServiceImpl implements UserService {
 
         // Xử lý password khi update (Nếu có gửi pass mới thì mới đổi)
         if (request.getPasswordHash() != null && !request.getPasswordHash().isBlank()) {
-            // Logic mã hóa password mới nên đặt ở đây
-             existingUser.setPasswordHash(request.getPasswordHash()); 
-        }
+         String rawPassword = request.getPasswordHash();
+         String encodedPassword = passwordEncoder.encode(rawPassword);
+         existingUser.setPasswordHash(encodedPassword);
+     }
 
         existingUser.setUpdatedAt(LocalDateTime.now());
 

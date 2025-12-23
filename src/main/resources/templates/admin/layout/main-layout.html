@@ -109,11 +109,10 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <!-- ⭐ App Config - MUST BE LOADED FIRST (after axios) -->
-    <script th:src="@{/admin/js/config/app.config.js}"></script>
+    <script th:src="@{/admin/js/config/app.config.js}" type="module"></script>
 
     <!-- Admin Components JS -->
-    <script th:src="@{/admin/js/components/toast.js}"></script>
-    <script th:src="@{/admin/js/components/modal.js}"></script>
+    <!-- Note: toast.js and modal.js are ES6 modules, loaded by page-level scripts -->
     <script th:src="@{/admin/js/components/sidebar.js}"></script>
     
     <!-- Admin Layout JS -->

@@ -62,6 +62,15 @@
 
                 <li class="nav-item">
                     <a class="nav-link d-flex align-items-center rounded"
+                       th:href="@{/admin/payments}"
+                       th:classappend="${#strings.startsWith(currentPath, '/admin/payments') ? ' active' : ''}">
+                        <i class="bi bi-credit-card nav-icon"></i>
+                        <span class="menu-text ms-2">Quản lý thanh toán</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center rounded"
                        th:href="@{/admin/users}"
                        th:classappend="${#strings.startsWith(currentPath, '/admin/users') ? ' active' : ''}">
                         <i class="bi bi-people nav-icon"></i>

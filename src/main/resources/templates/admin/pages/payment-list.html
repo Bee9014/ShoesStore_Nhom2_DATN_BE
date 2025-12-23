@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/main-layout}">
+<head>
+    <title layout:title-content="Quản lý thanh toán">Quản lý thanh toán</title>
+    <link rel="stylesheet" th:href="@{/admin/css/pages/payment.css}"/>
+    <link rel="stylesheet" th:href="@{/admin/css/components/table.css}"/>
+</head>
+<body>
+<!-- Page Actions -->
+<div layout:fragment="page-actions">
+    <button class="btn btn-primary" onclick="PaymentPage.refreshPayments()">
+        <i class="bi bi-arrow-clockwise me-1"></i>
+        Làm mới
+    </button>
+</div>
+
+<!-- Main Content -->
+<section layout:fragment="content">
+    <div class="px-4 py-2">
+        <!-- Statistics Cards -->
+        <div class="row g-3 mb-4" id="statsCards">
+            <div class="col">
+                <div class="stat-card">
+                    <div class="stat-label">Tổng thanh toán</div>
+                    <div class="stat-value" id="totalPayments">-</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="stat-card stat-success">
+                    <div class="stat-label">Thành công</div>
+                    <div class="stat-value" id="paidPayments">-</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="stat-card stat-warning">
+                    <div class="stat-label">Đang chờ</div>
+                    <div class="stat-value" id="pendingPayments">-</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="stat-card stat-danger">
+                    <div class="stat-label">Thất bại</div>
+                    <div class="stat-value" id="failedPayments">-</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="stat-card stat-info">
+                    <div class="stat-label">Tổng tiền</div>
+                    <div class="stat-value" id="totalRevenue">0₫</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search & Filters -->
+        <div id="search-container" class="mb-4"></div>
+
+        <!-- Payments Table -->
+        <div class="d-flex master-detail-wrapper">
+            <div id="master-detail-wrapper" class="master-detail-wrapper w-100">
+                <div id="masterPanel" class="master-panel">
+                    <div id="paymentTableContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Page Scripts -->
+<section layout:fragment="page-scripts">
+    <script type="module" th:src="@{/admin/js/pages/payment/payment.page.js}"></script>
+</section>
+</body>
+</html>

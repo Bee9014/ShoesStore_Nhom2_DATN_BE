@@ -15,13 +15,22 @@ public interface PaymentMapper {
 
     Payment findById(@Param("id") Integer id);
 
-    Payment findByCode(@Param("code") String transactionCode);
+    Payment findByTransactionRef(@Param("transactionRef") String transactionRef);
+    
+    Payment findByOrderId(@Param("orderId") Integer orderId);
 
     int insert(Payment payment);
 
     int update(Payment payment);
+    
+    int updatePaymentStatus(
+            @Param("transactionRef") String transactionRef,
+            @Param("status") String status,
+            @Param("gatewayTransactionId") String gatewayTransactionId,
+            @Param("bankCode") String bankCode
+    );
 
-    int deleteById(@Param("id")int id);
+    int deleteById(@Param("id") int id);
 
     List<Payment> findAllPaged(
             @Param("paymentId") Integer paymentId,
@@ -31,7 +40,7 @@ public interface PaymentMapper {
             @Param("paymentDate") LocalDateTime paymentDate,
             @Param("status") String status,
             @Param("amount") BigDecimal amount,
-            @Param("transactionCode")String transactionCode,
+            @Param("transactionRef") String transactionRef,
             @Param("offset") int offset,
             @Param("size") int size
     );
@@ -41,10 +50,10 @@ public interface PaymentMapper {
             @Param("orderId") Integer orderId,
             @Param("payerId") Integer payerId,
             @Param("paymentMethod") String paymentMethod,
-            @Param("paymentDate")LocalDateTime paymentDate,
+            @Param("paymentDate") LocalDateTime paymentDate,
             @Param("status") String status,
-            @Param("amount")BigDecimal amount,
-            @Param("transactionCode")String transactionCode
+            @Param("amount") BigDecimal amount,
+            @Param("transactionRef") String transactionRef
     );
 
 }

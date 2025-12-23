@@ -5,6 +5,9 @@ package com.fpl.edu.shoeStore.product.dto.request;
      import lombok.Data;
      import lombok.NoArgsConstructor;
 
+     import java.math.BigDecimal;
+     import java.util.List;
+
      @Data
      @NoArgsConstructor
      @AllArgsConstructor
@@ -15,10 +18,14 @@ package com.fpl.edu.shoeStore.product.dto.request;
          private String url;
          private String productCode;
          private String description;
+         private BigDecimal basePrice;
+         private Boolean isActive;
          private String brand;
          private String condition;
          private String defaultImage;
          private String status;
          private Integer createBy;
          private Integer updateBy;
+
+         private List<ProductVariantDtoRequest> variants;
      }

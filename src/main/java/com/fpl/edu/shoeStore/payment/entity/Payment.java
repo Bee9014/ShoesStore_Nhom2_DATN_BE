@@ -22,7 +22,13 @@ public class Payment {
     private LocalDateTime paymentDate;
     private BigDecimal amount;
     private String status;
-    private String transactionCode;
+    
+    // VNPay fields
+    private String transactionRef;          // Mã tham chiếu (vnp_TxnRef)
+    private String gatewayTransactionId;    // Mã giao dịch VNPay (vnp_TransactionNo)
+    private String bankCode;                // Mã ngân hàng (NCB, VCB...)
+    private String transactionDesc;         // Mô tả/lỗi giao dịch
+    
     private LocalDateTime createdAt;
 
 }

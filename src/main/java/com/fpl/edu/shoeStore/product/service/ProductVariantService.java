@@ -1,12 +1,13 @@
 package com.fpl.edu.shoeStore.product.service;
 
+     import java.util.List;
+
      import com.fpl.edu.shoeStore.product.dto.request.ProductVariantDtoRequest;
      import com.fpl.edu.shoeStore.product.dto.response.ProductVariantDtoResponse;
 
-     import java.util.List;
-
      public interface ProductVariantService {
          ProductVariantDtoResponse createVariant(ProductVariantDtoRequest request);
+         void createVariants(Integer productId, List<ProductVariantDtoRequest> requests);
 
          ProductVariantDtoResponse updateVariant(Integer variantId, ProductVariantDtoRequest request);  // Đổi Long → Integer
 

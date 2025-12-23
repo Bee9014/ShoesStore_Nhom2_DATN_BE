@@ -8,7 +8,7 @@
  *   App.api.put(App.API.PRODUCTS.BY_ID(123), productData)
  */
 
-const App = {
+export const App = {
   API: {
     BASE: "/api/v1", // Chỉ cần đổi version ở đây khi upgrade API
     
@@ -27,17 +27,12 @@ const App = {
       UPDATE_STOCK: (id) => `/products/${id}/stock`,
     },
     
-    // ==================== ORDERS ====================
+    // ==================== ORDERS (Admin) ====================
     ORDERS: {
-      ROOT: () => `/orders`,
-      BY_ID: (id) => `/orders/${id}`,
-      PAGED: (page = 0, size = 10) => `/orders?page=${page}&size=${size}`,
-      BY_STATUS: (status) => `/orders/status/${status}`,
-      BY_USER: (userId) => `/orders/user/${userId}`,
-      UPDATE_STATUS: (id) => `/orders/${id}/status`,
-      CANCEL: (id) => `/orders/${id}/cancel`,
-      RECENT: (limit = 5) => `/orders/recent?limit=${limit}`,
-      STATISTICS: () => `/orders/statistics`,
+      ROOT: () => `/admin/orders`,
+      BY_ID: (id) => `/admin/orders/${id}`,
+      UPDATE_STATUS: (id) => `/admin/orders/${id}/status`,
+      STATISTICS: () => `/admin/orders/statistics`,
     },
     
     // ==================== USERS ====================
@@ -49,14 +44,23 @@ const App = {
       BY_EMAIL: (email) => `/users/email/${email}`,
       BY_ROLE: (roleId) => `/users/role/${roleId}`,
       UPDATE_ROLE: (id) => `/users/${id}/role`,
-      TOGGLE_STATUS: (id) => `/users/${id}/toggle-status`,
+      TOGGLE_STATUS: (id) => `/users/${id}/status`,
       NEW_THIS_MONTH: () => `/users/new-this-month`,
+    },
+    
+    // ==================== PAYMENTS ====================
+    PAYMENTS: {
+      ROOT: () => `/payments`,
+      BY_ID: (id) => `/payments/${id}`,
+      VNPAY_CREATE: () => `/payments/vnpay/create-payment`,
+      VNPAY_CALLBACK: () => `/payments/vnpay/callback`,
     },
     
     // ==================== CATEGORIES ====================
     CATEGORIES: {
       ROOT: () => `/categories`,
       BY_ID: (id) => `/categories/${id}`,
+      SELECT: () => `/categories/select`,
       WITH_PRODUCTS: (id) => `/categories/${id}/products`,
       GET_ALL: () => App.API.CATEGORIES.ROOT(),
     },
@@ -169,6 +173,15 @@ App.api.interceptors.request.use(
     if (window.location.hostname === 'localhost') {
       console.log(`[API Request] ${config.method.toUpperCase()} ${config.url}`);
     }
+    if (config.data instanceof FormData) {
+            // Xóa Content-Type mặc định (application/json)
+            // Để trình duyệt tự động set là "multipart/form-data; boundary=..."
+            delete config.headers['Content-Type'];
+        }
+        else {
+            // Nếu không phải file thì mới dùng JSON
+            config.headers['Content-Type'] = 'application/json';
+        }
     
     return config;
   },
@@ -257,5 +270,7 @@ App.api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+ window.App = App;
 
 

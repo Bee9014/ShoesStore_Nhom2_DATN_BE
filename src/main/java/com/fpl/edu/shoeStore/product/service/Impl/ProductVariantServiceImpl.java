@@ -1,6 +1,7 @@
   package com.fpl.edu.shoeStore.product.service.impl;
 
      import java.util.List;
+import java.util.UUID;
      import java.util.stream.Collectors;
 
      import org.springframework.stereotype.Service;
@@ -30,6 +31,39 @@
          }
 
          @Override
+    @Transactional
+    public void createVariants(Integer productId, List<ProductVariantDtoRequest> requests) {
+        if (requests == null || requests.isEmpty()) {
+            return;
+        }
+
+        for (ProductVariantDtoRequest req : requests) {
+            ProductVariant variant = ProductVariantConverter.toEntity(req);
+            
+            // 1. Gán khóa ngoại (ID của Product cha)
+            variant.setProductId(productId);
+
+            // 2. Tự động sinh mã SKU nếu Frontend không gửi lên
+            if (variant.getProductVariantCode() == null || variant.getProductVariantCode().trim().isEmpty()) {
+                // Ví dụ: PVC-17150000-AB12
+                String autoCode = "PVC-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 4).toUpperCase();
+                variant.setProductVariantCode(autoCode);
+            }
+            
+            // 3. Set mặc định người tạo (nếu chưa có)
+            if (variant.getCreateBy() == null) {
+                variant.setCreateBy(1); // Mặc định admin ID 1 hoặc lấy từ context
+            }
+            if (variant.getUpdateBy() == null) {
+                variant.setUpdateBy(1);
+            }
+
+            // 4. Lưu vào DB
+            productVariantMapper.insert(variant);
+        }
+    }
+
+         @Override
          @Transactional
          public ProductVariantDtoResponse updateVariant(Integer variantId, ProductVariantDtoRequest request) {  // Đổi Long →Integer
              ProductVariant existingVariant = productVariantMapper.findById(variantId);
@@ -39,7 +73,11 @@
 
              ProductVariant variant = ProductVariantConverter.toEntity(request);
              variant.setVariantId(variantId);
+             variant.setProductId(existingVariant.getProductId());
              productVariantMapper.update(variant);
+             if (variant.getProductVariantCode() == null) {
+        variant.setProductVariantCode(existingVariant.getProductVariantCode());
+    }
 
              return ProductVariantConverter.toResponse(productVariantMapper.findById(variantId));
          }
