@@ -25,4 +25,9 @@
          ProductVariant findByCode(@Param("productVariantCode") String productVariantCode);
 
          // XÓA: findActiveByProductId (vì DB không có is_active)
+         
+         /**
+          * Count variants with stock below threshold
+          */
+         Long countLowStock(@Param("threshold") Integer threshold);
      }

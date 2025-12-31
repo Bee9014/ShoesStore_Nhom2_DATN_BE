@@ -17,7 +17,8 @@
              <result property="createdAt" column="created_at"/>
              <result property="updatedAt" column="updated_at"/>
              <result property="weightGrams" column="weight_grams"/>
-             <result property="attribute" column="attribute"/>
+             <result property="size" column="size"/>
+             <result property="color" column="color"/>
              <result property="image" column="image"/>
              <result property="createBy" column="create_by"/>
              <result property="updateBy" column="update_by"/>
@@ -36,7 +37,8 @@
                     created_at,
                     updated_at,
                     weight_grams,
-                    attribute,
+                    size,
+                    color,
                     image,
                     create_by,
                     update_by
@@ -57,7 +59,8 @@
                     created_at,
                     updated_at,
                     weight_grams,
-                    attribute,
+                    size,
+                    color,
                     image,
                     create_by,
                     update_by
@@ -78,7 +81,8 @@
                  stock_qty,
                  is_active,
                  weight_grams,
-                 attribute,
+                 size,
+                 color,
                  image,
                  create_by,
                  update_by
@@ -91,7 +95,8 @@
                  #{stockQty},
                  #{isActive},
                  #{weightGrams},
-                 #{attribute},
+                 #{size},
+                 #{color},
                  #{image},
                  #{createBy},
                  #{updateBy}
@@ -109,7 +114,8 @@
                  stock_qty = #{stockQty},
                  is_active = #{isActive},
                  weight_grams = #{weightGrams},
-                 attribute = #{attribute},
+                 size = #{size},
+                 color = #{color},
                  image = #{image},
                  update_by = #{updateBy}
              WHERE variant_id = #{variantId}
@@ -133,7 +139,8 @@
                     created_at,
                     updated_at,
                     weight_grams,
-                    attribute,
+                    size,
+                    color,
                     image,
                     create_by,
                     update_by
@@ -160,12 +167,19 @@
                     created_at,
                     updated_at,
                     weight_grams,
-                    attribute,
+                    size,
+                    color,
                     image,
                     create_by,
                     update_by
              FROM product_variants
              WHERE product_variant_code = #{productVariantCode}
+         </select>
+         
+         <select id="countLowStock" resultType="java.lang.Long">
+             SELECT COUNT(*)
+             FROM product_variants
+             WHERE stock_qty &lt; #{threshold}
          </select>
 
      </mapper>

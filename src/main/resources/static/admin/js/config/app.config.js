@@ -90,6 +90,19 @@ export const App = {
       BY_ORDER: (orderId) => `/shipments/order/${orderId}`,
       UPDATE_STATUS: (id) => `/shipments/${id}/status`,
     },
+
+    PRODUCT_VARIANTS: {
+  ROOT: () => `/product-variants`,
+  BY_ID: (id) => `/product-variants/${id}`,
+  BY_PRODUCT: (productId) => `/product-variants/product/${productId}`,
+  BY_CODE: (code) => `/product-variants/code/${code}`,
+  UPDATE_STOCK: (id) => `/product-variants/${id}/stock`,
+},
+
+// ==================== STOCK HISTORY ====================
+STOCK_HISTORY: {
+  BY_VARIANT: (variantId) => `/stock-history/${variantId}`,
+},
     
     // Template để thêm module mới:
     // MODULE_NAME: {

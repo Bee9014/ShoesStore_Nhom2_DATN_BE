@@ -34,6 +34,8 @@
         <mapper resource="mybatis/mapper/promotion/VoucherMapper.xml"/>
         <mapper resource="mybatis/mapper/product/ProductMapper.xml"/>
         <mapper resource="mybatis/mapper/category/CategoryMapper.xml"/>
+        <mapper resource="mybatis/mapper/product/ProductVariantMapper.xml"/>
+        <mapper resource="mybatis/mapper/product/StockHistoryMapper.xml"/>
         <!-- Annotation-based mappers -->
         <package name="com.fpl.edu.shoeStore.auth.mapper"/>
         <package name="com.fpl.edu.shoeStore.user.mapper"/>
@@ -43,5 +45,6 @@
         <package name="com.fpl.edu.shoeStore.payment.mapper"/>
         <package name="com.fpl.edu.shoeStore.voucher.mapper"/>
         <package name="com.fpl.edu.shoeStore.shipment.mapper"/>
+        
     </mappers>
 </configuration>

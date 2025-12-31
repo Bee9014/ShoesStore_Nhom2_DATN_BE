@@ -1,28 +1,49 @@
 package com.fpl.edu.shoeStore.product.service;
 
+import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
 
-     import com.fpl.edu.shoeStore.common.handler.PageResponse;
-     import com.fpl.edu.shoeStore.product.dto.request.ProductDtoRequest;
-     import com.fpl.edu.shoeStore.product.dto.response.ProductDtoResponse;
+import com.fpl.edu.shoeStore.common.handler.PageResponse;
+import com.fpl.edu.shoeStore.product.dto.request.ProductDtoRequest;
+import com.fpl.edu.shoeStore.product.dto.response.ProductDtoResponse;
 
-     public interface ProductService {
-         ProductDtoResponse createProduct(ProductDtoRequest request,  MultipartFile file);
+public interface ProductService {
+    ProductDtoResponse createProduct(ProductDtoRequest request, MultipartFile file);
 
-         ProductDtoResponse updateProduct(Integer id, ProductDtoRequest request, MultipartFile file);
+    ProductDtoResponse updateProduct(Integer id, ProductDtoRequest request, MultipartFile file);
 
-         int deleteProduct(Integer id);
+    int deleteProduct(Integer id);
 
-         ProductDtoResponse findById(Integer id);
+    ProductDtoResponse findById(Integer id);
 
-         ProductDtoResponse findByTitle(String title);                      // Đổi từ findByName
+    ProductDtoResponse findByTitle(String title); // Đổi từ findByName
 
-         PageResponse<ProductDtoResponse> findAllPaged(
-             Integer categoryId,
-             String title,
-             String status,
-             Boolean isActive,
-             int page,
-             int size
-         );
-     }
+    PageResponse<ProductDtoResponse> findAllPaged(
+            Integer categoryId,
+            String title,
+            String status,
+            Boolean isActive,
+            int page,
+            int size);
+
+    List<ProductDtoResponse> getFeaturedProducts();
+    List<ProductDtoResponse> getBestSellers();
+    
+    /**
+     * Get best selling products with pagination (max 50)
+     * @param page Page number (0-indexed)
+     * @param size Page size (max 50)
+     * @return PageResponse with best selling products
+     */
+    PageResponse<ProductDtoResponse> getBestSellersPaged(int page, int size);
+    
+    /**
+     * Search products by brand or name
+     * @param keyword Search keyword
+     * @param page Page number (0-indexed)
+     * @param size Page size
+     * @return PageResponse with search results
+     */
+    PageResponse<ProductDtoResponse> searchProducts(String keyword, int page, int size);
+}

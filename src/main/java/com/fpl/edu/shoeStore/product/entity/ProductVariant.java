@@ -23,7 +23,8 @@
          private LocalDateTime createdAt;     // ✅ CHANGED - LocalDate → LocalDateTime
          private LocalDateTime updatedAt;     // ✅ CHANGED - LocalDate → LocalDateTime
          private Integer weightGrams;
-         private String attribute;
+         private String size;                 // Kích cỡ (40, 41, XL...)
+         private String color;                // Màu sắc (Red, Blue, #FFFFFF...)
          private String image;
          private Integer createBy;
          private Integer updateBy;

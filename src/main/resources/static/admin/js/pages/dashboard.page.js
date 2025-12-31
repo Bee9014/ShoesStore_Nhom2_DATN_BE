@@ -66,7 +66,17 @@ function loadDashboardSummary() {
     // ===== REAL API CALL =====
     App.api.get(App.API.DASHBOARD.SUMMARY())
         .then(response => {
-            const data = response.data;
+            console.log('[Dashboard] Summary API Response:', response);
+            
+            let data = null;
+            // Backend returns ApiResponse wrapper
+            if (response.data && response.data.success) {
+                data = response.data.data;
+            } else if (response.data) {
+                // Direct data
+                data = response.data;
+            }
+            
             updateSummaryCards(data);
         })
         .catch(error => {
@@ -127,11 +137,58 @@ function useMockSummaryData() {
     }, 500);
 }
 
-function loadRevenueChart() {
+function loadRevenueChart(year) {
+    if (!year) {
+        year = new Date().getFullYear();
+    }
+    
+    // ===== REAL API CALL =====
+    App.api.get(App.API.DASHBOARD.REVENUE(year))
+        .then(response => {
+            console.log('[Dashboard] Revenue API Response:', response);
+            
+            // Backend returns ApiResponse wrapper
+            if (response.data && response.data.success) {
+                renderRevenueChart(response.data.data);
+            } else if (response.data) {
+                // Direct data (no wrapper)
+                renderRevenueChart(response.data);
+            } else {
+                throw new Error('Invalid response format');
+            }
+        })
+        .catch(error => {
+            console.error('[Dashboard] Error loading revenue:', error);
+            // Fallback to mock data (in millions)
+            renderRevenueChart({
+                year: year,
+                monthlyRevenue: [30000000, 40000000, 35000000, 50000000, 49000000, 60000000, 
+                                70000000, 91000000, 125000000, 110000000, 95000000, 85000000],
+                totalYearRevenue: 750000000
+            });
+        });
+}
+
+function renderRevenueChart(data) {
+    console.log('[Dashboard] Rendering revenue chart with data:', data);
+    
+    // Validate data
+    if (!data || !data.monthlyRevenue || !Array.isArray(data.monthlyRevenue)) {
+        console.error('[Dashboard] Invalid data format:', data);
+        document.querySelector("#revenueChart").innerHTML = 
+            '<p class="text-center text-muted py-4">Không có dữ liệu doanh thu</p>';
+        return;
+    }
+    
+    // Convert BigDecimal to millions VND
+    const monthlyData = data.monthlyRevenue.map(val => {
+        return (parseFloat(val || 0) / 1000000).toFixed(1); // Convert to millions
+    });
+    
     const options = {
         series: [{
             name: 'Doanh thu',
-            data: [30, 40, 35, 50, 49, 60, 70, 91, 125, 110, 95, 85]
+            data: monthlyData
         }],
         chart: {
             type: 'area',
@@ -168,24 +225,68 @@ function loadRevenueChart() {
         tooltip: {
             y: {
                 formatter: function(val) {
-                    return val.toFixed(1) + ' triệu VNĐ';
+                    return parseFloat(val).toFixed(1) + ' triệu VNĐ';
                 }
             }
         }
     };
 
-    const chart = new ApexCharts(document.querySelector("#revenueChart"), options);
-    chart.render();
+    // Destroy existing chart if any
+    const chartEl = document.querySelector("#revenueChart");
+    if (chartEl) {
+        chartEl.innerHTML = '';
+        const chart = new ApexCharts(chartEl, options);
+        chart.render();
+    }
 }
 
 function loadTopProductsChart() {
+    // ===== REAL API CALL =====
+    App.api.get(App.API.DASHBOARD.TOP_PRODUCTS(5))
+        .then(response => {
+            console.log('[Dashboard] Top Products API Response:', response);
+            
+            let products = null;
+            // Backend returns ApiResponse wrapper
+            if (response.data && response.data.success) {
+                products = response.data.data;
+            } else if (Array.isArray(response.data)) {
+                // Direct array
+                products = response.data;
+            }
+            
+            renderTopProductsChart(products);
+        })
+        .catch(error => {
+            console.error('[Dashboard] Error loading top products:', error);
+            // Fallback to mock data
+            renderTopProductsChart([
+                { productName: 'Giày thể thao', percentage: 35 },
+                { productName: 'Giày da', percentage: 25 },
+                { productName: 'Giày sandal', percentage: 20 },
+                { productName: 'Giày boot', percentage: 12 },
+                { productName: 'Khác', percentage: 8 }
+            ]);
+        });
+}
+
+function renderTopProductsChart(products) {
+    if (!products || products.length === 0) {
+        document.querySelector("#topProductsChart").innerHTML = 
+            '<p class="text-center text-muted py-4">Chưa có dữ liệu</p>';
+        return;
+    }
+    
+    const labels = products.map(p => p.productName);
+    const data = products.map(p => p.percentage);
+    
     const options = {
-        series: [35, 25, 20, 12, 8],
+        series: data,
         chart: {
             type: 'donut',
             height: 300
         },
-        labels: ['Giày thể thao', 'Giày da', 'Giày sandal', 'Giày boot', 'Khác'],
+        labels: labels,
         colors: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#64748b'],
         legend: {
             position: 'bottom'
@@ -199,14 +300,18 @@ function loadTopProductsChart() {
         tooltip: {
             y: {
                 formatter: function(val) {
-                    return val + '%';
+                    return val.toFixed(1) + '%';
                 }
             }
         }
     };
 
-    const chart = new ApexCharts(document.querySelector("#topProductsChart"), options);
-    chart.render();
+    const chartEl = document.querySelector("#topProductsChart");
+    if (chartEl) {
+        chartEl.innerHTML = '';
+        const chart = new ApexCharts(chartEl, options);
+        chart.render();
+    }
 }
 
 /**
@@ -218,7 +323,17 @@ function loadRecentOrders() {
     // ===== REAL API CALL =====
     App.api.get(App.API.DASHBOARD.RECENT_ORDERS(5))
         .then(response => {
-            const orders = response.data;
+            console.log('[Dashboard] Recent Orders API Response:', response);
+            
+            let orders = null;
+            // Backend returns ApiResponse wrapper
+            if (response.data && response.data.success) {
+                orders = response.data.data;
+            } else if (Array.isArray(response.data)) {
+                // Direct array
+                orders = response.data;
+            }
+            
             renderRecentOrders(orders);
         })
         .catch(error => {
@@ -241,13 +356,13 @@ function renderRecentOrders(orders) {
     
     tbody.innerHTML = orders.map(order => `
         <tr>
-            <td><strong>${order.id || order.orderId}</strong></td>
-            <td>${order.customerName || order.customer}</td>
-            <td>${formatDate(order.createdAt || order.date)}</td>
-            <td><strong>${formatCurrency(order.totalAmount || order.total)}</strong></td>
+            <td><strong>#${order.orderId}</strong></td>
+            <td>${order.shippingFullname || 'N/A'}</td>
+            <td>${formatDate(order.orderDate)}</td>
+            <td><strong>${formatCurrency(order.finalAmount)}</strong></td>
             <td>${getStatusBadge(order.status)}</td>
             <td>
-                <button class="btn btn-sm btn-info" onclick="viewOrder('${order.id || order.orderId}')">
+                <button class="btn btn-sm btn-info" onclick="viewOrder(${order.orderId})">
                     <i class="bi bi-eye"></i>
                 </button>
             </td>
@@ -274,14 +389,36 @@ function useMockRecentOrders() {
 
 function getStatusBadge(status) {
     const badges = {
-        'pending': '<span class="badge bg-warning">Chờ xử lý</span>',
-        'processing': '<span class="badge bg-info">Đang xử lý</span>',
-        'completed': '<span class="badge bg-success">Hoàn thành</span>',
-        'cancelled': '<span class="badge bg-danger">Đã hủy</span>'
+        'PENDING': '<span class="badge bg-warning">Chờ xử lý</span>',
+        'PROCESSING': '<span class="badge bg-info">Đang xử lý</span>',
+        'SHIPPING': '<span class="badge bg-primary">Đang giao</span>',
+        'DELIVERED': '<span class="badge bg-success">Đã giao</span>',
+        'CANCELLED': '<span class="badge bg-danger">Đã hủy</span>'
     };
     return badges[status] || '<span class="badge bg-secondary">Không xác định</span>';
 }
 
 function viewOrder(orderId) {
     window.location.href = `/admin/orders/${orderId}`;
+}
+
+// ==================== HELPER FUNCTIONS ====================
+
+function formatNumber(num) {
+    if (!num) return '0';
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function formatCurrency(amount) {
+    if (!amount) return '0 ₫';
+    return formatNumber(amount) + ' ₫';
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
 }

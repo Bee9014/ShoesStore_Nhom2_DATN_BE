@@ -14,8 +14,10 @@
          private String productVariantCode;
          private Double price;
          private Integer stockQty;
+         private Boolean isActive;
          private Integer weightGrams;
-         private String attribute;
+         private String size;
+         private String color;
          private String image;
          private Integer createBy;
          private Integer updateBy;

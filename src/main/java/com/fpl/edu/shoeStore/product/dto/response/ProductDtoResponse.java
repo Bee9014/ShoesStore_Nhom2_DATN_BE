@@ -7,6 +7,7 @@ package com.fpl.edu.shoeStore.product.dto.response;
      
      import java.math.BigDecimal;
      import java.time.LocalDateTime;
+     import java.util.List;
 
      @Data
      @NoArgsConstructor
@@ -29,4 +30,6 @@ package com.fpl.edu.shoeStore.product.dto.response;
          private LocalDateTime updateAt;
          private Integer createBy;
          private Integer updateBy;
+         private Long viewCount;
+         private List<ProductVariantDtoResponse> variants;
      }

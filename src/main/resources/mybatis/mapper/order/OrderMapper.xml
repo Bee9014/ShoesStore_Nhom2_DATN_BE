@@ -5,9 +5,6 @@
 
 <mapper namespace="com.fpl.edu.shoeStore.order.mapper.OrderMapper">
 
-    <!-- ===================================== -->
-    <!-- RESULT MAPS -->
-    <!-- ===================================== -->
     <resultMap id="OrderResultMap" type="com.fpl.edu.shoeStore.order.entity.Order">
         <id property="orderId" column="order_id"/>
         <result property="userId" column="user_id"/>
@@ -38,70 +35,64 @@
         <result property="totalPrice" column="total_price"/>
     </resultMap>
 
-    <!-- ===================================== -->
-    <!-- INSERT STATEMENTS -->
-    <!-- ===================================== -->
     <insert id="insertOrder"
             parameterType="com.fpl.edu.shoeStore.order.entity.Order"
             useGeneratedKeys="true"
             keyProperty="orderId">
         INSERT INTO orders (
-        user_id,
-        buyer_id,
-        voucher_id,
-        order_date,
-        status,
-        total_amount,
-        discount_amount,
-        final_amount,
-        shipping_fullname,
-        shipping_phone,
-        shipping_address,
-        shipping_city,
-        shipping_country,
-        note
+            user_id,
+            buyer_id,
+            voucher_id,
+            order_date,
+            status,
+            total_amount,
+            discount_amount,
+            final_amount,
+            shipping_fullname,
+            shipping_phone,
+            shipping_address,
+            shipping_city,
+            shipping_country,
+            note
         )
         VALUES (
-        #{userId},
-        #{buyerId},
-        #{voucherId},
-        #{orderDate},
-        #{status},
-        #{totalAmount},
-        #{discountAmount},
-        #{finalAmount},
-        #{shippingFullname},
-        #{shippingPhone},
-        #{shippingAddress},
-        #{shippingCity},
-        #{shippingCountry},
-        #{note}
+            #{userId},
+            #{buyerId},
+            #{voucherId},
+            #{orderDate},
+            #{status},
+            #{totalAmount},
+            #{discountAmount},
+            #{finalAmount},
+            #{shippingFullname},
+            #{shippingPhone},
+            #{shippingAddress},
+            #{shippingCity},
+            #{shippingCountry},
+            #{note}
         )
     </insert>
 
     <insert id="insertOrderItem"
             parameterType="com.fpl.edu.shoeStore.order.entity.OrderItem">
         INSERT INTO order_items (
-        order_id,
-        variant_id,
-        product_name_snapshot,
-        quantity,
-        unit_price,
-        total_price
+            order_id,
+            variant_id,
+            product_name_snapshot,
+            quantity,
+            unit_price,
+            total_price
         )
         VALUES (
-        #{orderId},
-        #{variantId},
-        #{productNameSnapshot},
-        #{quantity},
-        #{unitPrice},
-        #{totalPrice}
+            #{orderId},
+            #{variantId},
+            #{productNameSnapshot},
+            #{quantity},
+            #{unitPrice},
+            #{totalPrice}
         )
     </insert>
 
-    <!-- ===================================== -->
-    <!-- SELECT STATEMENTS -->
-    <!-- ===================================== -->
     <select id="findById" parameterType="int" resultMap="OrderResultMap">
         SELECT
             order_id,
@@ -138,19 +129,13 @@
         WHERE order_id = #{orderId}
     </select>
 
-    <!-- ===================================== -->
-    <!-- UPDATE STATEMENTS -->
-    <!-- ===================================== -->
     <update id="updateStatus">
         UPDATE orders
         SET status = #{status}
         WHERE order_id = #{orderId}
     </update>
 
-    <!-- ===================================== -->
-    <!-- QUERY WITH FILTERS -->
-    <!-- ===================================== -->
-    <select id="findByBuyerId" parameterType="int" resultMap="OrderResultMap">
+    <select id="findByBuyerId" resultMap="OrderResultMap">
         SELECT
             order_id,
             user_id,
@@ -170,8 +155,21 @@
             created_at,
             updated_at
         FROM orders
-        WHERE buyer_id = #{buyerId}
+        WHERE buyer_id = #{userId}
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
         ORDER BY order_date DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+    
+    <select id="countByBuyerId" resultType="long">
+        SELECT COUNT(*)
+        FROM orders
+        WHERE buyer_id = #{userId}
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
     </select>
 
     <select id="findAllPaged" resultMap="OrderResultMap">
@@ -225,6 +223,40 @@
         SELECT COUNT(*)
         FROM orders
         WHERE status = #{status}
+    </select>
+
+    <!-- ==================== DASHBOARD STATISTICS ==================== -->
+    
+    <select id="countAllOrders" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM orders
+    </select>
+    
+    <select id="calculateTotalRevenue" resultType="java.math.BigDecimal">
+        SELECT COALESCE(SUM(final_amount), 0)
+        FROM orders
+        WHERE status = 'DELIVERED'
+    </select>
+    
+    <select id="calculateRevenueByMonth" resultType="java.math.BigDecimal">
+        SELECT COALESCE(SUM(final_amount), 0)
+        FROM orders
+        WHERE status = 'DELIVERED'
+          AND YEAR(order_date) = #{year}
+          AND MONTH(order_date) = #{month}
+    </select>
+    
+    <select id="findTopSellingProducts" resultType="java.util.HashMap">
+        SELECT 
+            p.product_id,
+            p.title as product_name,
+            SUM(oi.quantity) as total_sold
+        FROM order_items oi
+        INNER JOIN orders o ON oi.order_id = o.order_id
+        INNER JOIN products p ON oi.product_id = p.product_id
+        WHERE o.status IN ('SHIPPING', 'DELIVERED')
+        GROUP BY p.product_id, p.title
+        ORDER BY total_sold DESC
+        LIMIT #{limit}
     </select>
 
 </mapper>

@@ -87,4 +87,13 @@ public class AdminController {
         model.addAttribute("pageTitle", "Cài đặt");
         return "admin/settings";
     }
+
+ @GetMapping("/inventory")
+public String inventoryPage(Model model, HttpServletRequest request) {
+    model.addAttribute("pageTitle", "Quản lý kho hàng");
+    
+    model.addAttribute("currentPath", request.getRequestURI()); 
+    
+    return "admin/pages/inventory"; 
+}
 }

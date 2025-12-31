@@ -1,5 +1,15 @@
 package com.fpl.edu.shoeStore.order.service.impl;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.fpl.edu.shoeStore.common.handler.PageResponse;
 import com.fpl.edu.shoeStore.order.converter.OrderConverter;
 import com.fpl.edu.shoeStore.order.dto.request.OrderCreateRequest;
@@ -13,15 +23,6 @@ import com.fpl.edu.shoeStore.product.entity.Product;
 import com.fpl.edu.shoeStore.product.entity.ProductVariant;
 import com.fpl.edu.shoeStore.product.mapper.ProductMapper;
 import com.fpl.edu.shoeStore.product.mapper.ProductVariantMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -87,11 +88,26 @@ public class OrderServiceImpl implements OrderService {
             item.setUnitPrice(unitPrice);
             item.setTotalPrice(unitPrice.multiply(BigDecimal.valueOf(itemReq.getQuantity())));
             
-            // Snapshot tên sản phẩm + attribute (size, color)
+            // 👇 SỬA ĐOẠN NÀY: Snapshot tên sản phẩm + Size + Color
             String productName = product.getTitle();
-            if (variant.getAttribute() != null && !variant.getAttribute().isEmpty()) {
-                productName += " - " + variant.getAttribute();
+            String variantInfo = "";
+            
+            // Nếu có size
+            if (variant.getSize() != null && !variant.getSize().isEmpty()) {
+                variantInfo += variant.getSize();
             }
+            
+            // Nếu có color
+            if (variant.getColor() != null && !variant.getColor().isEmpty()) {
+                if (!variantInfo.isEmpty()) variantInfo += " - ";
+                variantInfo += variant.getColor();
+            }
+            
+            if (!variantInfo.isEmpty()) {
+                productName += " (" + variantInfo + ")";
+            }
+            // 👆 HẾT SỬA
+            
             item.setProductNameSnapshot(productName);
             
             items.add(item);
@@ -103,11 +119,7 @@ public class OrderServiceImpl implements OrderService {
         // 3. KIỂM TRA VOUCHER TỪ DB (TODO: Implement voucher logic)
         BigDecimal discount = BigDecimal.ZERO;
         if (request.getVoucherId() != null) {
-            // TODO: Implement voucher validation and discount calculation
-            // var voucher = voucherMapper.findById(request.getVoucherId());
-            // if (voucher != null && voucher.isValid() && totalGoodsValue.compareTo(voucher.getMinSpend()) >= 0) {
-            //     discount = calculateDiscount(voucher, totalGoodsValue);
-            // }
+            // Logic voucher...
         }
         order.setDiscountAmount(discount);
 
@@ -116,39 +128,38 @@ public class OrderServiceImpl implements OrderService {
         order.setFinalAmount(totalGoodsValue.subtract(discount).add(shippingFee));
 
         // 5. LƯU THỰC TẾ XUỐNG DB
-        orderMapper.insertOrder(order); // MyBatis trả về orderId sau khi insert
+        orderMapper.insertOrder(order); 
 
         for (OrderItem item : items) {
             item.setOrderId(order.getOrderId());
             orderMapper.insertOrderItem(item);
         }
         
-        // 6. TODO: Trừ số lượng tồn kho (Optional - có thể làm sau)
-        // for (var itemReq : request.getItems()) {
-        //     variantMapper.updateStock(itemReq.getVariantId(), -itemReq.getQuantity());
-        // }
+        // 6. Trừ tồn kho (Nên bật cái này lên nhé)
+        for (var itemReq : request.getItems()) {
+             // Logic updateStock đã có trong ProductVariantService, nên inject service đó vào đây để dùng
+             // productVariantService.updateStock(itemReq.getVariantId(), -itemReq.getQuantity());
+             // Hoặc dùng tạm variantMapper như cũ:
+             variantMapper.updateStock(itemReq.getVariantId(), -itemReq.getQuantity());
+        }
 
         return orderConverter.toResponse(order, items);
     }
 
+    // ... (Giữ nguyên các method khác bên dưới) ...
     @Override
     public OrderResponse getOrderDetails(int orderId) throws OrderException {
-        // LẤY DỮ LIỆU THỰC TẾ TỪ DB
         Order order = orderMapper.findById(orderId);
         if (order == null) {
             throw new OrderException("Không tìm thấy đơn hàng ID: " + orderId);
         }
-
-        // LẤY CHI TIẾT SẢN PHẨM TỪ DB
         List<OrderItem> items = orderMapper.findItemsByOrderId(orderId);
-
         return orderConverter.toResponse(order, items);
     }
 
     @Override
     @Transactional
     public void updateOrderStatus(int orderId, String newStatus) throws OrderException {
-        // CẬP NHẬT TRẠNG THÁI TRỰC TIẾP TRÊN DB
         int affectedRows = orderMapper.updateStatus(orderId, newStatus);
         if (affectedRows == 0) {
             throw new OrderException("Cập nhật thất bại, không tìm thấy đơn hàng.");
@@ -156,66 +167,30 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public PageResponse<OrderResponse> getMyOrders(int userId, int page, int size) {
-        // Validate page and size
+    public PageResponse<OrderResponse> getMyOrders(int userId, String status, int page, int size) {
         if (page < 1) page = 1;
         if (size < 1) size = 10;
-
-        // Lấy danh sách orders của user
-        List<Order> orders = orderMapper.findByBuyerId(userId);
         
-        // Pagination logic
-        int fromIndex = (page - 1) * size;
-        int toIndex = Math.min(fromIndex + size, orders.size());
-        
-        List<Order> pagedOrders = orders.subList(fromIndex, toIndex);
-        
-        // Convert to Response DTOs
-        List<OrderResponse> orderResponses = pagedOrders.stream()
-                .map(order -> {
-                    List<OrderItem> items = orderMapper.findItemsByOrderId(order.getOrderId());
-                    return orderConverter.toResponse(order, items);
-                })
-                .collect(Collectors.toList());
-        
-        // Calculate total pages
-        int totalPages = (int) Math.ceil((double) orders.size() / size);
-        
-        return PageResponse.<OrderResponse>builder()
-                .content(orderResponses)
-                .pageNumber(page)
-                .pageSize(size)
-                .totalElements((long) orders.size())
-                .totalPages(totalPages)
-                .build();
-    }
-
-    @Override
-    public PageResponse<OrderResponse> getAllOrders(String status, String searchTerm, int page, int size) {
-        // Validate page and size
-        if (page < 1) page = 1;
-        if (size < 1) size = 20;
-        
-        // Calculate offset
+        // Tính offset cho SQL
         int offset = (page - 1) * size;
+
+        // 1. Gọi Mapper lấy danh sách (có phân trang DB và lọc status)
+        // ⚠️ Lưu ý: Bạn cần chắc chắn Interface OrderMapper đã có hàm findByBuyerId(userId, status, offset, size)
+        List<Order> orders = orderMapper.findByBuyerId(userId, status, offset, size);
         
-        // Get orders from database with filter
-        List<Order> orders = orderMapper.findAllPaged(status, searchTerm, offset, size);
-        
-        // Get total count
-        long totalElements = orderMapper.countAll(status, searchTerm);
-        
-        // Convert to Response DTOs
+        // 2. Gọi Mapper đếm tổng số bản ghi (có lọc status)
+        long totalElements = orderMapper.countByBuyerId(userId, status);
+
+        // 3. Convert sang DTO
         List<OrderResponse> orderResponses = orders.stream()
                 .map(order -> {
                     List<OrderItem> items = orderMapper.findItemsByOrderId(order.getOrderId());
                     return orderConverter.toResponse(order, items);
                 })
                 .collect(Collectors.toList());
-        
-        // Calculate total pages
+
         int totalPages = (int) Math.ceil((double) totalElements / size);
-        
+
         return PageResponse.<OrderResponse>builder()
                 .content(orderResponses)
                 .pageNumber(page)
@@ -226,35 +201,41 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public PageResponse<OrderResponse> getAllOrders(String status, String searchTerm, int page, int size) {
+        if (page < 1) page = 1;
+        if (size < 1) size = 20;
+        int offset = (page - 1) * size;
+        List<Order> orders = orderMapper.findAllPaged(status, searchTerm, offset, size);
+        long totalElements = orderMapper.countAll(status, searchTerm);
+        List<OrderResponse> orderResponses = orders.stream()
+                .map(order -> {
+                    List<OrderItem> items = orderMapper.findItemsByOrderId(order.getOrderId());
+                    return orderConverter.toResponse(order, items);
+                })
+                .collect(Collectors.toList());
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        return PageResponse.<OrderResponse>builder()
+                .content(orderResponses).pageNumber(page).pageSize(size)
+                .totalElements(totalElements).totalPages(totalPages).build();
+    }
+
+    @Override
     @Transactional
     public void cancelOrder(int orderId, int userId) throws OrderException {
-        // Lấy order
         Order order = orderMapper.findById(orderId);
-        
-        if (order == null) {
-            throw new OrderException("Không tìm thấy đơn hàng #" + orderId);
-        }
-        
-        // Kiểm tra ownership
+        if (order == null) throw new OrderException("Không tìm thấy đơn hàng #" + orderId);
         if (order.getBuyerId() != userId && order.getUserId() != userId) {
             throw new OrderException("Bạn không có quyền hủy đơn hàng này");
         }
-        
-        // Chỉ cho phép hủy khi status = PENDING
         if (!"PENDING".equals(order.getStatus())) {
             throw new OrderException("Chỉ có thể hủy đơn hàng đang chờ xác nhận");
         }
-        
-        // Cập nhật status thành CANCELLED
         int affectedRows = orderMapper.updateStatus(orderId, "CANCELLED");
-        if (affectedRows == 0) {
-            throw new OrderException("Hủy đơn hàng thất bại");
-        }
+        if (affectedRows == 0) throw new OrderException("Hủy đơn hàng thất bại");
     }
 
     @Override
     public PageResponse<OrderResponse> getAllOrdersForAdmin(String status, String searchTerm, int page, int size) {
-        // Reuse getAllOrders method (chúng giống nhau)
         return getAllOrders(status, searchTerm, page, size);
     }
 

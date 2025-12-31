@@ -23,23 +23,46 @@
         <result property="updateBy" column="update_by"/>
     </resultMap>
 
+    <resultMap id="ProductDetailResultMap" type="com.fpl.edu.shoeStore.product.entity.Product" extends="ProductResultMap">
+        <collection property="variants" ofType="com.fpl.edu.shoeStore.product.entity.ProductVariant" javaType="java.util.List">
+            <id property="variantId" column="v_variant_id"/>
+            <result property="productId" column="product_id"/>
+            <result property="color" column="v_color"/>
+            <result property="size" column="v_size"/>
+            <result property="price" column="v_price"/>
+            <result property="stockQty" column="v_stock_qty"/>
+            <result property="image" column="v_image"/>
+            <result property="productVariantCode" column="v_code"/>
+        </collection>
+    </resultMap>
+
     <select id="findAll" resultMap="ProductResultMap">
-        SELECT product_id, category_id, title, url, product_code, description, 
+        SELECT product_id, category_id, title, url, product_code, description,
                base_price, is_active, brand, `condition`,
                default_image, status, create_at, update_at, create_by, update_by
         FROM products
     </select>
 
-    <select id="findById" parameterType="int" resultMap="ProductResultMap">
-        SELECT product_id, category_id, title, url, product_code, description, 
-               base_price, is_active, brand, `condition`,
-               default_image, status, create_at, update_at, create_by, update_by
-        FROM products
-        WHERE product_id = #{productId}
+    <select id="findById" parameterType="int" resultMap="ProductDetailResultMap">
+        SELECT 
+            p.product_id, p.category_id, p.title, p.url, p.product_code, p.description,
+            p.base_price, p.is_active, p.brand, p.`condition`,
+            p.default_image, p.status, p.create_at, p.update_at, p.create_by, p.update_by,
+            -- Các cột của Variant (đặt alias v_ để không trùng tên)
+            v.variant_id AS v_variant_id,
+            v.color AS v_color,
+            v.size AS v_size,
+            v.price AS v_price,
+            v.stock_qty AS v_stock_qty,
+            v.image AS v_image,
+            v.product_variant_code AS v_code
+        FROM products p
+        LEFT JOIN product_variants v ON p.product_id = v.product_id
+        WHERE p.product_id = #{productId}
     </select>
 
     <select id="findByTitle" parameterType="string" resultMap="ProductResultMap">
-        SELECT product_id, category_id, title, url, product_code, description, 
+        SELECT product_id, category_id, title, url, product_code, description,
                base_price, is_active, brand, `condition`,
                default_image, status, create_at, update_at, create_by, update_by
         FROM products
@@ -49,10 +72,10 @@
     <insert id="insert" parameterType="com.fpl.edu.shoeStore.product.entity.Product"
             useGeneratedKeys="true"
             keyProperty="productId">
-        INSERT INTO products (category_id, title, url, product_code, description, 
-                             base_price, is_active, brand, `condition`,
-                             default_image, status, create_at, update_at, create_by, update_by)
-        VALUES (#{categoryId}, #{title}, #{url}, #{productCode}, #{description}, 
+        INSERT INTO products (category_id, title, url, product_code, description,
+                              base_price, is_active, brand, `condition`,
+                              default_image, status, create_at, update_at, create_by, update_by)
+        VALUES (#{categoryId}, #{title}, #{url}, #{productCode}, #{description},
                 #{basePrice}, #{isActive}, #{brand}, #{condition},
                 #{defaultImage}, #{status}, #{createAt}, #{updateAt}, #{createBy}, #{updateBy})
     </insert>
@@ -81,7 +104,7 @@
     </delete>
 
     <select id="findAllPaged" parameterType="map" resultMap="ProductResultMap">
-        SELECT product_id, category_id, title, url, product_code, description, 
+        SELECT product_id, category_id, title, url, product_code, description,
                base_price, is_active, brand, `condition`,
                default_image, status, create_at, update_at, create_by, update_by
         FROM products
@@ -120,6 +143,83 @@
                 AND is_active = #{isActive}
             </if>
         </where>
+    </select>
+
+    <update id="incrementViewCount">
+        UPDATE products
+        SET view_count = COALESCE(view_count, 0) + 1
+        WHERE product_id = #{productId}
+    </update>
+
+    <select id="findTopFeatured" resultMap="ProductResultMap">
+        SELECT * FROM products
+        WHERE is_active = true
+          AND status = 'active'
+        ORDER BY view_count DESC
+        LIMIT 5
+    </select>
+
+        <select id="findBestSellers" resultMap="ProductResultMap">
+        SELECT 
+            p.*, 
+            SUM(oi.quantity) as total_sold
+        FROM products p
+        JOIN product_variants v ON p.product_id = v.product_id
+        JOIN order_items oi ON v.variant_id = oi.variant_id
+        JOIN orders o ON oi.order_id = o.order_id
+        WHERE o.status = 'DELIVERED'  -- Hoặc trạng thái thành công tương ứng của bạn
+        GROUP BY p.product_id
+        ORDER BY total_sold DESC
+        LIMIT 5
+    </select>
+
+    <select id="countAllProducts" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM products
+    </select>
+    
+    <!-- ==================== SEARCH & FILTER ==================== -->
+    
+    <!-- Best Sellers với phân trang (tối đa 50) -->
+    <select id="findBestFiftySellers" resultMap="ProductResultMap">
+        SELECT 
+            p.*, 
+            COALESCE(SUM(oi.quantity), 0) as total_sold
+        FROM products p
+        LEFT JOIN product_variants v ON p.product_id = v.product_id
+        LEFT JOIN order_items oi ON v.variant_id = oi.variant_id
+        LEFT JOIN orders o ON oi.order_id = o.order_id AND o.status = 'DELIVERED'
+        WHERE p.is_active = true
+        GROUP BY p.product_id
+        ORDER BY total_sold DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+    
+    <!-- Count Best Sellers -->
+    <select id="countBestSellers" resultType="java.lang.Long">
+        SELECT COUNT(DISTINCT p.product_id)
+        FROM products p
+        LEFT JOIN product_variants v ON p.product_id = v.product_id
+        LEFT JOIN order_items oi ON v.variant_id = oi.variant_id
+        LEFT JOIN orders o ON oi.order_id = o.order_id AND o.status = 'DELIVERED'
+        WHERE p.is_active = true
+    </select>
+    
+    <!-- Search products by brand or name -->
+    <select id="findProductsBySearch" resultMap="ProductResultMap">
+    SELECT p.* FROM products p 
+    WHERE p.is_active = true 
+    AND (p.brand LIKE CONCAT('%', #{keyword}, '%') OR p.title LIKE CONCAT('%', #{keyword}, '%')) 
+    ORDER BY p.create_at DESC 
+    LIMIT #{limit} OFFSET #{offset}
+</select>
+    
+    <!-- Count search results -->
+    <select id="countSearchResults" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM products p
+        WHERE p.is_active = true
+          AND (p.brand LIKE CONCAT('%', #{keyword}, '%')
+               OR p.title LIKE CONCAT('%', #{keyword}, '%'))
     </select>
 
 </mapper>
