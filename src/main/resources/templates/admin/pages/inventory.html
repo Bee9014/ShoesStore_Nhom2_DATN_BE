@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/main-layout}">
+<head>
+    <title>Quản lý kho hàng</title>
+    <th:block layout:fragment="page-css">
+        </th:block>
+</head>
+<body>
+
+    <div layout:fragment="page-actions">
+        <button class="btn btn-outline-warning" id="btnFilterStock">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Lọc sắp hết hàng
+        </button>
+    </div>
+
+    <section layout:fragment="content">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-12" id="search-container">
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div id="inventoryTableContainer">
+                    </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="inventoryModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold">Cập nhật kho & Giá</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4" id="inventoryModalBody">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <th:block layout:fragment="page-scripts">
+        <script type="module" th:src="@{/admin/js/pages/inventory.page.js}"></script>
+    </th:block>
+</body>
+</html>

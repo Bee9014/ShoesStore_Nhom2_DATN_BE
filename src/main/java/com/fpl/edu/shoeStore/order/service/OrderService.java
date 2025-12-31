@@ -27,7 +27,7 @@ public interface OrderService {
     /**
      * Lấy danh sách đơn hàng của user (buyerId)
      */
-    PageResponse<OrderResponse> getMyOrders(int userId, int page, int size);
+    PageResponse<OrderResponse> getMyOrders(int userId, String status, int page, int size);
 
     /**
      * Lấy tất cả đơn hàng (Admin) với filter và search

@@ -190,5 +190,13 @@
             </if>
         </where>
     </select>
+    
+    <select id="countNewUsersInMonth" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM sys_user
+        WHERE YEAR(created_at) = #{year}
+          AND MONTH(created_at) = #{month}
+          AND status != 'deleted'
+    </select>
 
 </mapper>

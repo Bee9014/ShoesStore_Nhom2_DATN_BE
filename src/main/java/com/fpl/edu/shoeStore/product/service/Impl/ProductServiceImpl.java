@@ -21,7 +21,7 @@ import com.fpl.edu.shoeStore.product.dto.response.ProductDtoResponse;
 import com.fpl.edu.shoeStore.product.entity.Product;
 import com.fpl.edu.shoeStore.product.mapper.ProductMapper;
 import com.fpl.edu.shoeStore.product.service.ProductService;
-import com.fpl.edu.shoeStore.product.service.ProductVariantService; // 👈 1. Import Service con
+import com.fpl.edu.shoeStore.product.service.ProductVariantService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,9 +30,9 @@ import lombok.RequiredArgsConstructor;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductMapper productMapper;
-    private final ProductVariantService productVariantService; // 👈 2. Inject Service con
+    private final ProductVariantService productVariantService;
 
-    // Hàm saveFile giữ nguyên
+    // --- HELPER: LƯU FILE ---
     private String saveFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             return null;
@@ -51,33 +51,31 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    // --- CREATE PRODUCT ---
     @Override
     @Transactional
     public ProductDtoResponse createProduct(ProductDtoRequest request, MultipartFile file) {
-        // 1. Tạo Product Entity (Cha)
         Product product = ProductConverter.toEntity(request);
-
-        // 2. Xử lý ảnh
         String imagePath = saveFile(file);
         if (imagePath != null) {
             product.setDefaultImage(imagePath);
         }
+        if (product.getIsActive() == null) {
+            product.setIsActive(true); 
+        }
         product.setCreateAt(LocalDateTime.now());
         product.setUpdateAt(LocalDateTime.now());
         
-        // 3. Insert Product -> Có ID
         productMapper.insert(product);
 
-        // 4. 👇 GỌI SERVICE CON ĐỂ TẠO VARIANTS (QUAN TRỌNG)
-        // Kiểm tra xem request có gửi kèm danh sách variants không
         if (request.getVariants() != null && !request.getVariants().isEmpty()) {
-            // Truyền ID vừa tạo của cha sang cho con
             productVariantService.createVariants(product.getProductId(), request.getVariants());
         }
 
         return ProductConverter.toResponse(product);
     }
 
+    // --- UPDATE PRODUCT ---
     @Override
     @Transactional
     public ProductDtoResponse updateProduct(Integer id, ProductDtoRequest request, MultipartFile file) {
@@ -89,12 +87,12 @@ public class ProductServiceImpl implements ProductService {
         if (request.getCategoryId() != null) existing.setCategoryId(request.getCategoryId());
         if (request.getTitle() != null) existing.setTitle(request.getTitle());
         if (request.getDescription() != null) existing.setDescription(request.getDescription());
+        if (request.getIsActive() != null) existing.setIsActive(request.getIsActive());
         if (request.getBrand() != null) existing.setBrand(request.getBrand());
         if (request.getCondition() != null) existing.setCondition(request.getCondition());
         if (request.getStatus() != null) existing.setStatus(request.getStatus());
         if (request.getUpdateBy() != null) existing.setUpdateBy(request.getUpdateBy());
         
-        // Chỉ update ảnh nếu người dùng chọn file mới
         String newImagePath = saveFile(file);
         if (newImagePath != null) {
             existing.setDefaultImage(newImagePath);
@@ -103,12 +101,10 @@ public class ProductServiceImpl implements ProductService {
         existing.setUpdateAt(LocalDateTime.now());
         productMapper.update(existing);
 
-        // (Tùy chọn) Nếu muốn update cả variants trong cùng API này thì gọi variantService ở đây
-        // Nhưng thường update variants sẽ làm ở API riêng hoặc logic phức tạp hơn.
-
         return ProductConverter.toResponse(existing);
     }
 
+    // --- DELETE PRODUCT ---
     @Override
     @Transactional
     public int deleteProduct(Integer id) {
@@ -116,15 +112,13 @@ public class ProductServiceImpl implements ProductService {
         if (existing == null) {
             throw new RuntimeException("Không tìm thấy Product để xóa");
         }
-        // Lưu ý: Nếu DB không có ON DELETE CASCADE, bạn cần xóa variants trước:
-        // productVariantService.deleteByProductId(id); (Cần thêm hàm này bên Service con nếu cần)
-        
         return productMapper.deleteById(id);
     }
 
-    // Các hàm findById, findByTitle, findAllPaged giữ nguyên
+    // --- FIND BY ID/TITLE ---
     @Override
     public ProductDtoResponse findById(Integer id) {
+        productMapper.incrementViewCount(id);
         Product product = productMapper.findById(id);
         return product == null ? null : ProductConverter.toResponse(product);
     }
@@ -135,9 +129,15 @@ public class ProductServiceImpl implements ProductService {
         return product == null ? null : ProductConverter.toResponse(product);
     }
 
+    // --- 1. FIND ALL PAGED (FIXED OFFSET ERROR) ---
     @Override
     public PageResponse<ProductDtoResponse> findAllPaged(Integer categoryId, String title, String status, Boolean isActive, int page, int size) {
+        // Đảm bảo số trang tối thiểu là 1
+        page = Math.max(page, 1);
+        size = Math.max(size, 1);
+        
         int offset = (page - 1) * size;
+        
         List<Product> products = productMapper.findAllPaged(categoryId, title, status, isActive, offset, size);
         long totalElements = productMapper.countAll(categoryId, title, status, isActive);
         
@@ -149,6 +149,74 @@ public class ProductServiceImpl implements ProductService {
         
         return PageResponse.<ProductDtoResponse>builder()
                 .content(content)
+                .pageNumber(page)
+                .pageSize(size)
+                .totalElements(totalElements)
+                .totalPages(totalPages)
+                .build();
+    }
+
+    @Override
+    public List<ProductDtoResponse> getFeaturedProducts() {
+        List<Product> products = productMapper.findTopFeatured();
+        return products.stream()
+                .map(ProductConverter::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductDtoResponse> getBestSellers() {
+        List<Product> bestSellers = productMapper.findBestSellers();
+        return bestSellers.stream()
+                .map(ProductConverter::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    // --- 2. BEST SELLERS PAGED (FIXED OFFSET ERROR) ---
+    @Override
+    public PageResponse<ProductDtoResponse> getBestSellersPaged(int page, int size) {
+        page = Math.max(page, 1);
+        size = Math.max(size, 1);
+        
+        if (size > 50) size = 50; // Giới hạn tối đa 50 theo yêu cầu
+        
+        int offset = (page - 1) * size;
+        
+        List<Product> products = productMapper.findBestFiftySellers(size, offset);
+        List<ProductDtoResponse> productDtos = products.stream()
+                .map(ProductConverter::toResponse)
+                .collect(Collectors.toList());
+        
+        long totalElements = productMapper.countBestSellers();
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        
+        return PageResponse.<ProductDtoResponse>builder()
+                .content(productDtos)
+                .pageNumber(page)
+                .pageSize(size)
+                .totalElements(totalElements)
+                .totalPages(totalPages)
+                .build();
+    }
+
+    // --- 3. SEARCH PRODUCTS (FIXED OFFSET ERROR) ---
+    @Override
+    public PageResponse<ProductDtoResponse> searchProducts(String keyword, int page, int size) {
+        page = Math.max(page, 1);
+        size = Math.max(size, 1);
+        
+        int offset = (page - 1) * size;
+        
+        List<Product> products = productMapper.findProductsBySearch(keyword, size, offset);
+        List<ProductDtoResponse> productDtos = products.stream()
+                .map(ProductConverter::toResponse)
+                .collect(Collectors.toList());
+        
+        long totalElements = productMapper.countSearchResults(keyword);
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        
+        return PageResponse.<ProductDtoResponse>builder()
+                .content(productDtos)
                 .pageNumber(page)
                 .pageSize(size)
                 .totalElements(totalElements)

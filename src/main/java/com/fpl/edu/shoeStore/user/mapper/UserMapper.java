@@ -19,11 +19,11 @@ public interface UserMapper {
 
     User findByUsername(String username);
 
-    int insert(User user);
+    Integer insert(User user);
 
-    int update(User user);
+    Integer update(User user);
 
-    int deleteById(Integer id);
+    Integer deleteById(Integer id);
 
     List<User> findAllPaged(
             @Param("userId") Integer userId,
@@ -64,4 +64,15 @@ public interface UserMapper {
 
     @Select("SELECT COUNT(user_id) FROM sys_user WHERE phone = #{phone} AND user_id != #{id} AND status != 'deleted'")
     int countByPhoneExcludingId(@Param("phone") String phone, @Param("id") Integer id);
+    
+    /**
+     * Dashboard: Count all users
+     */
+    @Select("SELECT COUNT(*) FROM sys_user WHERE status != 'deleted'")
+    Long countAllUsers();
+    
+    /**
+     * Dashboard: Count new users in specific month/year
+     */
+    Long countNewUsersInMonth(@Param("year") Integer year, @Param("month") Integer month);
 }

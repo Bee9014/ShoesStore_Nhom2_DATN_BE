@@ -56,7 +56,7 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(authorize -> authorize
                 // Public resources
-                .requestMatchers(
+                .requestMatchers("/uploads/**",
                         "/css/**", "/js/**", "/images/**",
                         "/login/**", "/register/**", "/home/**", 
                         "/", "/403", "/error/**",
