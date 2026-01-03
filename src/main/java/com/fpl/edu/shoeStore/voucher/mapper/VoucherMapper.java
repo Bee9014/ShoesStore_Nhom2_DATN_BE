@@ -11,21 +11,48 @@ import com.fpl.edu.shoeStore.voucher.entity.Voucher;
 
 @Mapper
 public interface VoucherMapper {
-    List<Voucher> findAll();
 
-    Voucher findById(Integer id);
-
-    // Trả về danh sách vì có thể một code có nhiều đợt phát hành
-    List<Voucher> findByCode(String code);
-
-    int insert(Voucher voucher);
-
-    int update(Voucher voucher);
-
-    int deleteById(Integer id);
+    // ==================== CƠ BẢN (CRUD) ====================
 
     /**
-     * Lưu ý XML: SQL Server cần dùng OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+     * Lấy danh sách toàn bộ các mã giảm giá có trong hệ thống.
+     */
+    List<Voucher> findAll();
+
+    /**
+     * Tìm kiếm thông tin chi tiết của một Voucher dựa trên ID duy nhất.
+     */
+    Voucher findById(Integer id);
+
+    /**
+     * Tìm kiếm Voucher theo mã code (Ví dụ: 'SALE2024').
+     * Trả về danh sách vì một mã code có thể được thiết lập cho nhiều đợt phát hành khác nhau.
+     */
+    List<Voucher> findByCode(String code);
+
+    /**
+     * Thêm mới một chương trình Voucher vào cơ sở dữ liệu.
+     * SQL Server sẽ tự động sinh ID Identity và MyBatis gán ngược vào object voucher.
+     */
+    int insert(Voucher voucher);
+
+    /**
+     * Cập nhật thông tin Voucher (Ví dụ: thay đổi ngày hết hạn, số lượng sử dụng còn lại).
+     */
+    int update(Voucher voucher);
+
+    /**
+     * Xóa vĩnh viễn một Voucher khỏi hệ thống dựa trên ID.
+     */
+    int deleteById(Integer id);
+
+    // ==================== PHÂN TRANG & BỘ LỌC (ADMIN) ====================
+
+    /**
+     * Tìm kiếm và phân trang danh sách Voucher với nhiều tiêu chí lọc nâng cao.
+     * @param offset: Vị trí bắt đầu lấy bản ghi.
+     * @param size: Số lượng bản ghi cần lấy.
+     * Lưu ý XML: SQL Server sử dụng OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY.
      */
     List<Voucher> findAllPaged(
             @Param("voucherId") Integer voucherId,
@@ -41,6 +68,9 @@ public interface VoucherMapper {
             @Param("size") int size
     );
 
+    /**
+     * Đếm tổng số lượng Voucher thỏa mãn các điều kiện lọc để phục vụ tính toán phân trang.
+     */
     long countAll(
             @Param("voucherId") Integer voucherId,
             @Param("code") String code,

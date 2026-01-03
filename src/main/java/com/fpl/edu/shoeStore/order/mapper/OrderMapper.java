@@ -13,24 +13,41 @@ import com.fpl.edu.shoeStore.order.entity.OrderItem;
 @Mapper
 public interface OrderMapper {
 
-    // Thêm mới Order (MyBatis sẽ lấy Identity từ SQL Server gán vào object)
-    void insertOrder(Order order);
-
-    // Thêm mới OrderItem
-    void insertOrderItem(OrderItem item);
-
-    // Lấy Order theo ID
-    Order findById(int orderId);
-
-    // Lấy tất cả OrderItem theo Order ID
-    List<OrderItem> findItemsByOrderId(int orderId);
-
-    // Cập nhật trạng thái (SQL Server trả về số dòng bị tác động)
-    int updateStatus(@Param("orderId") int orderId, @Param("status") String status);
+    // ==================== ORDER PROCESSING (XỬ LÝ ĐƠN HÀNG) ====================
 
     /**
-     * Lấy danh sách Order theo Buyer ID
-     * Lưu ý XML: Sử dụng OFFSET #{offset} ROWS FETCH NEXT #{limit} ROWS ONLY
+     * Tạo một đơn hàng mới (Master record).
+     * MyBatis sẽ tự động lấy ID tự tăng từ SQL Server và gán ngược lại vào object 'order'.
+     */
+    void insertOrder(Order order);
+
+    /**
+     * Lưu chi tiết từng sản phẩm trong đơn hàng (Detail records).
+     * Mỗi OrderItem sẽ liên kết với OrderId vừa được tạo.
+     */
+    void insertOrderItem(OrderItem item);
+
+    /**
+     * Tìm kiếm thông tin đơn hàng theo mã ID duy nhất.
+     */
+    Order findById(int orderId);
+
+    /**
+     * Lấy danh sách tất cả sản phẩm thuộc về một đơn hàng cụ thể.
+     */
+    List<OrderItem> findItemsByOrderId(int orderId);
+
+    /**
+     * Cập nhật trạng thái của đơn hàng (ví dụ: PENDING -> DELIVERED).
+     * Trả về số dòng bị tác động trong SQL Server.
+     */
+    int updateStatus(@Param("orderId") int orderId, @Param("status") String status);
+
+    // ==================== QUERIES & PAGINATION (TRUY VẤN & PHÂN TRANG) ====================
+
+    /**
+     * Lấy danh sách lịch sử mua hàng của một khách hàng (có phân trang).
+     * Phù hợp cho trang "Đơn hàng của tôi" trên Website.
      */
     List<Order> findByBuyerId(@Param("userId") int userId, 
                               @Param("status") String status, 
@@ -38,8 +55,8 @@ public interface OrderMapper {
                               @Param("limit") int limit);
 
     /**
-     * Lấy danh sách Order với filter (Admin)
-     * SQL Server yêu cầu ORDER BY khi dùng phân trang
+     * Tìm kiếm và lọc danh sách đơn hàng cho trang quản trị Admin.
+     * Cho phép lọc theo trạng thái và tìm kiếm tên khách hàng hoặc mã đơn.
      */
     List<Order> findAllPaged(
         @Param("status") String status,
@@ -48,39 +65,45 @@ public interface OrderMapper {
         @Param("size") int size
     );
 
-    // Đếm trả về kiểu long (BIGINT trong SQL Server)
+    /**
+     * Đếm tổng số đơn hàng của một người dùng để tính toán phân trang.
+     */
     long countByBuyerId(@Param("userId") int userId, @Param("status") String status);
 
+    /**
+     * Đếm tổng số đơn hàng thỏa mãn bộ lọc (Admin) để phục vụ phân trang.
+     */
     long countAll(
         @Param("status") String status,
         @Param("searchTerm") String searchTerm
     );
 
+    /**
+     * Đếm số lượng đơn hàng theo một trạng thái cụ thể (ví dụ: có bao nhiêu đơn đang chờ duyệt).
+     */
     long countByStatus(@Param("status") String status);
     
-    // ==================== DASHBOARD STATISTICS ====================
+    // ==================== DASHBOARD STATISTICS (THỐNG KÊ DOANH THU) ====================
     
     /**
-     * Đếm tổng số đơn hàng
-     * Dùng Long để tránh overflow nếu dữ liệu lớn
+     * Thống kê: Tổng số lượng đơn hàng đã phát sinh trên toàn hệ thống.
      */
     Long countAllOrders();
     
     /**
-     * Tính tổng doanh thu (Chỉ đơn DELIVERED)
-     * BigDecimal tương ứng với kiểu DECIMAL/MONEY trong SQL Server
+     * Thống kê: Tính tổng doanh thu thực tế (chỉ tính trên các đơn hàng đã giao thành công - DELIVERED).
      */
     BigDecimal calculateTotalRevenue();
     
     /**
-     * Tính doanh thu theo tháng
-     * XML lưu ý dùng: WHERE YEAR(order_date) = #{year} AND MONTH(order_date) = #{month}
+     * Thống kê: Tính doanh thu của một tháng cụ thể trong năm.
+     * Dùng để vẽ biểu đồ doanh thu theo thời gian.
      */
     BigDecimal calculateRevenueByMonth(@Param("year") Integer year, @Param("month") Integer month);
     
     /**
-     * Lấy top sản phẩm bán chạy
-     * SQL Server dùng SELECT TOP #{limit} ...
+     * Thống kê: Tìm danh sách các sản phẩm bán chạy nhất.
+     * Trả về List các Map chứa thông tin sản phẩm và số lượng đã bán.
      */
     List<Map<String, Object>> findTopSellingProducts(@Param("limit") Integer limit);
 }
