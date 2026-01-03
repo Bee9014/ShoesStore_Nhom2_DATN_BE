@@ -1,79 +1,63 @@
- package com.fpl.edu.shoeStore.product.mapper;
+package com.fpl.edu.shoeStore.product.mapper;
 
-     import java.util.List;
+import java.util.List;
 
-     import org.apache.ibatis.annotations.Mapper;
-     import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
-     import com.fpl.edu.shoeStore.product.entity.Product;
+import com.fpl.edu.shoeStore.product.entity.Product;
 
-     @Mapper
-     public interface ProductMapper {
-         List<Product> findAll();
+@Mapper
+public interface ProductMapper {
+    List<Product> findAll();
 
-         Product findById(@Param("productId") Integer productId);           // Đổi Long → Integer
+    Product findById(@Param("productId") Integer productId);
 
-         Product findByTitle(@Param("title") String title);                 // Đổi từ findByName
+    Product findByTitle(@Param("title") String title);
 
-         int insert(Product product);
+    int insert(Product product);
 
-         int update(Product product);
+    int update(Product product);
 
-         int deleteById(@Param("productId") Integer productId);             // Đổi Long → Integer
+    int deleteById(@Param("productId") Integer productId);
 
-         List<Product> findAllPaged(
-             @Param("categoryId") Integer categoryId,
-             @Param("title") String title,
-             @Param("status") String status,
-             @Param("isActive") Boolean isActive,
-             @Param("offset") int offset,
-             @Param("size") int size
-         );
+    // SQL Server: Dùng OFFSET/FETCH. Phải có ORDER BY trong XML.
+    List<Product> findAllPaged(
+        @Param("categoryId") Integer categoryId,
+        @Param("title") String title,
+        @Param("status") String status,
+        @Param("isActive") Boolean isActive,
+        @Param("offset") int offset,
+        @Param("size") int size
+    );
 
-         long countAll(
-             @Param("categoryId") Integer categoryId,
-             @Param("title") String title,
-             @Param("status") String status,
-             @Param("isActive") Boolean isActive
-         );
+    long countAll(
+        @Param("categoryId") Integer categoryId,
+        @Param("title") String title,
+        @Param("status") String status,
+        @Param("isActive") Boolean isActive
+    );
 
-
-
-         void incrementViewCount(Integer productId);
+    void incrementViewCount(Integer productId);
 
     List<Product> findTopFeatured();
 
+    // SQL Server XML: SELECT TOP (10) ...
     List<Product> findBestSellers();
 
-    /**
-     * Count total products for dashboard
-     */
     Long countAllProducts();
     
-    // ==================== SEARCH & FILTER ====================
-    
-    /**
-     * Find best selling products with pagination
-     * @param limit Page size
-     * @param offset Page offset
-     * @return List of products sorted by total sold
-     */
+    // Tìm 50 sản phẩm bán chạy có phân trang
     List<Product> findBestFiftySellers(
         @Param("limit") Integer limit,
         @Param("offset") Integer offset
     );
     
-    /**
-     * Count total best sellers for pagination
-     */
     Long countBestSellers();
     
     /**
-     * Search products by brand or product name
-     * @param keyword Search keyword
-     * @param limit Page size
-     * @param offset Page offset
-     * @return List of matching products
+     * Tìm kiếm sản phẩm. 
+     * Lưu ý XML SQL Server: Dùng LIKE '%' + #{keyword} + '%'
      */
     List<Product> findProductsBySearch(
         @Param("keyword") String keyword,
@@ -81,11 +65,5 @@
         @Param("offset") Integer offset
     );
     
-    /**
-     * Count search results for pagination
-     * @param keyword Search keyword
-     * @return Total count of matching products
-     */
     Long countSearchResults(@Param("keyword") String keyword);
-
-     }
+}

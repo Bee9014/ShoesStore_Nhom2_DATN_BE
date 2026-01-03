@@ -1,33 +1,36 @@
- package com.fpl.edu.shoeStore.product.mapper;
+package com.fpl.edu.shoeStore.product.mapper;
 
-     import com.fpl.edu.shoeStore.product.entity.ProductVariant;
-     import org.apache.ibatis.annotations.Mapper;
-     import org.apache.ibatis.annotations.Param;
+import java.util.List;
 
-     import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
-     @Mapper
-     public interface ProductVariantMapper {
-         List<ProductVariant> findByProductId(@Param("productId") Integer productId);  // Đổi Long → Integer
+import com.fpl.edu.shoeStore.product.entity.ProductVariant;
 
-         ProductVariant findById(@Param("variantId") Integer variantId);                // Đổi Long → Integer
+@Mapper
+public interface ProductVariantMapper {
+    List<ProductVariant> findByProductId(@Param("productId") Integer productId);
 
-         int insert(ProductVariant variant);
+    ProductVariant findById(@Param("variantId") Integer variantId);
 
-         int update(ProductVariant variant);
+    int insert(ProductVariant variant);
 
-         int deleteById(@Param("variantId") Integer variantId);                         // Đổi Long → Integer
+    int update(ProductVariant variant);
 
-         List<ProductVariant> findAll();
+    int deleteById(@Param("variantId") Integer variantId);
 
-         int updateStock(@Param("variantId") Integer variantId, @Param("quantity") Integer quantity);  // Đổi Long → Integer
+    List<ProductVariant> findAll();
 
-         ProductVariant findByCode(@Param("productVariantCode") String productVariantCode);
+    /**
+     * Cập nhật số lượng tồn kho. 
+     * Thường dùng: SET stock_quantity = stock_quantity + #{quantity}
+     */
+    int updateStock(@Param("variantId") Integer variantId, @Param("quantity") Integer quantity);
 
-         // XÓA: findActiveByProductId (vì DB không có is_active)
-         
-         /**
-          * Count variants with stock below threshold
-          */
-         Long countLowStock(@Param("threshold") Integer threshold);
-     }
+    ProductVariant findByCode(@Param("productVariantCode") String productVariantCode);
+    
+    /**
+     * Thống kê hàng sắp hết (SQL Server: count_low_stock)
+     */
+    Long countLowStock(@Param("threshold") Integer threshold);
+}
