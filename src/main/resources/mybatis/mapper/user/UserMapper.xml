@@ -5,7 +5,6 @@
 
 <mapper namespace="com.fpl.edu.shoeStore.user.mapper.UserMapper">
 
-    <!-- Result Map -->
     <resultMap id="UserResultMap" type="com.fpl.edu.shoeStore.user.entity.User">
         <id property="userId" column="user_id"/>
         <result property="roleId" column="role_id"/>
@@ -19,174 +18,81 @@
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
-    <!-- Select All -->
     <select id="findAll" resultMap="UserResultMap">
-        SELECT user_id,
-               role_id,
-               username,
-               password_hash,
-               full_name,
-               email,
-               phone,
-               status,
-               created_at,
-               updated_at
+        SELECT user_id, role_id, username, password_hash, full_name, 
+               email, phone, [status], created_at, updated_at
         FROM sys_user
     </select>
 
-    <!-- Select by ID -->
     <select id="findById" parameterType="int" resultMap="UserResultMap">
-        SELECT user_id,
-               role_id,
-               username,
-               password_hash,
-               full_name,
-               email,
-               phone,
-               status,
-               created_at,
-               updated_at
+        SELECT user_id, role_id, username, password_hash, full_name, 
+               email, phone, [status], created_at, updated_at
         FROM sys_user
         WHERE user_id = #{id}
     </select>
 
-    <!-- Select by Username -->
-    <select id="findByUsername" parameterType="string" resultMap="UserResultMap">
-        SELECT user_id,
-               role_id,
-               username,
-               password_hash,
-               full_name,
-               email,
-               phone,
-               status,
-               created_at,
-               updated_at
-        FROM sys_user
-        WHERE username = #{username}
-    </select>
-
-    <!-- Select by Phone -->
-    <select id="findByPhone" parameterType="string" resultMap="UserResultMap">
-        SELECT user_id,
-               role_id,
-               username,
-               password_hash,
-               full_name,
-               email,
-               phone,
-               status,
-               created_at,
-               updated_at
-        FROM sys_user
-        WHERE phone = #{phone}
-    </select>
-
-    <!-- Insert -->
-    <insert id="insert" parameterType="com.fpl.edu.shoeStore.user.entity.User" useGeneratedKeys="true" keyProperty="userId">
-        INSERT INTO sys_user (role_id, username, password_hash, full_name, email, phone, status, created_at)
-        VALUES (#{roleId}, #{username}, #{passwordHash}, #{fullName}, #{email}, #{phone}, #{status}, NOW())
+    <insert id="insert" parameterType="com.fpl.edu.shoeStore.user.entity.User" 
+            useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO sys_user (role_id, username, password_hash, full_name, email, phone, [status], created_at)
+        VALUES (#{roleId}, #{username}, #{passwordHash}, #{fullName}, #{email}, #{phone}, #{status}, GETDATE())
     </insert>
 
-    <!-- Update -->
     <update id="update" parameterType="com.fpl.edu.shoeStore.user.entity.User">
         UPDATE sys_user
-        SET role_id       = #{roleId},
+        SET role_id      = #{roleId},
             username      = #{username},
             password_hash = #{passwordHash},
             full_name     = #{fullName},
             email         = #{email},
             phone         = #{phone},
-            status        = #{status},
-            updated_at    = NOW()
+            [status]      = #{status},
+            updated_at    = GETDATE()
         WHERE user_id = #{userId}
     </update>
 
-    <!-- Delete -->
-    <delete id="deleteById" parameterType="int">
-        DELETE FROM sys_user
-        WHERE user_id = #{id}
-    </delete>
-
-    <!-- Paged select with filters -->
     <select id="findAllPaged" parameterType="map" resultMap="UserResultMap">
-        SELECT user_id,
-               role_id,
-               username,
-               password_hash,
-               full_name,
-               email,
-               phone,
-               status,
-               created_at,
-               updated_at
+        SELECT user_id, role_id, username, password_hash, full_name, 
+               email, phone, [status], created_at, updated_at
         FROM sys_user
         <where>
-            <!-- Search by userId -->
             <if test="userId != null">
                 AND user_id = #{userId}
             </if>
-            <!-- Search by username -->
             <if test="username != null and username != ''">
-                AND LOWER(username) LIKE CONCAT('%', LOWER(#{username}), '%')
+                AND LOWER(username) LIKE '%' + LOWER(#{username}) + '%'
             </if>
-            <!-- Search by fullName -->
             <if test="fullName != null and fullName != ''">
-                AND LOWER(full_name) LIKE CONCAT('%', LOWER(#{fullName}), '%')
+                AND LOWER(full_name) LIKE '%' + LOWER(#{fullName}) + '%'
             </if>
-            <!-- Search by email -->
             <if test="email != null and email != ''">
-                AND LOWER(email) LIKE CONCAT('%', LOWER(#{email}), '%')
+                AND LOWER(email) LIKE '%' + LOWER(#{email}) + '%'
             </if>
-            <!-- Search by phone -->
             <if test="phone != null and phone != ''">
-                AND phone LIKE CONCAT('%', #{phone}, '%')
+                AND phone LIKE '%' + #{phone} + '%'
             </if>
-            <!-- Filter by roleId -->
             <if test="roleId != null">
                 AND role_id = #{roleId}
             </if>
-            <!-- Filter by status -->
             <if test="status != null and status != ''">
-                AND status = #{status}
+                AND [status] = #{status}
             </if>
         </where>
         ORDER BY user_id DESC
-        LIMIT #{size} OFFSET #{offset}
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 
-    <!-- Count with filters -->
     <select id="countAll" parameterType="map" resultType="long">
         SELECT COUNT(user_id)
         FROM sys_user
         <where>
-            <!-- Search by userId -->
             <if test="userId != null">
                 AND user_id = #{userId}
             </if>
-            <!-- Search by username -->
             <if test="username != null and username != ''">
-                AND LOWER(username) LIKE CONCAT('%', LOWER(#{username}), '%')
+                AND LOWER(username) LIKE '%' + LOWER(#{username}) + '%'
             </if>
-            <!-- Search by fullName -->
-            <if test="fullName != null and fullName != ''">
-                AND LOWER(full_name) LIKE CONCAT('%', LOWER(#{fullName}), '%')
-            </if>
-            <!-- Search by email -->
-            <if test="email != null and email != ''">
-                AND LOWER(email) LIKE CONCAT('%', LOWER(#{email}), '%')
-            </if>
-            <!-- Search by phone -->
-            <if test="phone != null and phone != ''">
-                AND phone LIKE CONCAT('%', #{phone}, '%')
-            </if>
-            <!-- Filter by roleId -->
-            <if test="roleId != null">
-                AND role_id = #{roleId}
-            </if>
-            <!-- Filter by status -->
             <if test="status != null and status != ''">
-                AND status = #{status}
+                AND [status] = #{status}
             </if>
         </where>
     </select>
@@ -196,7 +102,7 @@
         FROM sys_user
         WHERE YEAR(created_at) = #{year}
           AND MONTH(created_at) = #{month}
-          AND status != 'deleted'
+          AND [status] != 'deleted'
     </select>
 
 </mapper>
