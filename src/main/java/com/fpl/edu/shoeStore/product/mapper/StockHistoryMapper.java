@@ -9,6 +9,8 @@ import com.fpl.edu.shoeStore.product.entity.StockHistory;
 
 @Mapper
 public interface StockHistoryMapper {
+    // Lưu ý XML SQL Server: Sử dụng GETDATE() cho cột created_at
     void insert(StockHistory history);
+    
     List<StockHistory> findByVariantId(@Param("variantId") Integer variantId);
 }

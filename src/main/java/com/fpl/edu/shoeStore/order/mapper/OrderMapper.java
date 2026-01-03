@@ -1,4 +1,5 @@
 package com.fpl.edu.shoeStore.order.mapper;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,7 @@ import com.fpl.edu.shoeStore.order.entity.OrderItem;
 @Mapper
 public interface OrderMapper {
 
-    // Thêm mới Order (sử dụng <insert> và keyProperty/useGeneratedKeys trong XML)
+    // Thêm mới Order (MyBatis sẽ lấy Identity từ SQL Server gán vào object)
     void insertOrder(Order order);
 
     // Thêm mới OrderItem
@@ -24,16 +25,22 @@ public interface OrderMapper {
     // Lấy tất cả OrderItem theo Order ID
     List<OrderItem> findItemsByOrderId(int orderId);
 
-    // Cập nhật trạng thái
+    // Cập nhật trạng thái (SQL Server trả về số dòng bị tác động)
     int updateStatus(@Param("orderId") int orderId, @Param("status") String status);
 
-    // Lấy danh sách Order theo Buyer ID
+    /**
+     * Lấy danh sách Order theo Buyer ID
+     * Lưu ý XML: Sử dụng OFFSET #{offset} ROWS FETCH NEXT #{limit} ROWS ONLY
+     */
     List<Order> findByBuyerId(@Param("userId") int userId, 
-                          @Param("status") String status, 
-                          @Param("offset") int offset, 
-                          @Param("limit") int limit);
+                              @Param("status") String status, 
+                              @Param("offset") int offset, 
+                              @Param("limit") int limit);
 
-    // Lấy danh sách Order với filter (Admin)
+    /**
+     * Lấy danh sách Order với filter (Admin)
+     * SQL Server yêu cầu ORDER BY khi dùng phân trang
+     */
     List<Order> findAllPaged(
         @Param("status") String status,
         @Param("searchTerm") String searchTerm,
@@ -41,36 +48,39 @@ public interface OrderMapper {
         @Param("size") int size
     );
 
+    // Đếm trả về kiểu long (BIGINT trong SQL Server)
     long countByBuyerId(@Param("userId") int userId, @Param("status") String status);
 
-    // Đếm tổng số orders với filter
     long countAll(
         @Param("status") String status,
         @Param("searchTerm") String searchTerm
     );
 
-    // Đếm số order theo status
     long countByStatus(@Param("status") String status);
     
     // ==================== DASHBOARD STATISTICS ====================
     
     /**
      * Đếm tổng số đơn hàng
+     * Dùng Long để tránh overflow nếu dữ liệu lớn
      */
     Long countAllOrders();
     
     /**
-     * Tính tổng doanh thu (chỉ tính các đơn DELIVERED)
+     * Tính tổng doanh thu (Chỉ đơn DELIVERED)
+     * BigDecimal tương ứng với kiểu DECIMAL/MONEY trong SQL Server
      */
     BigDecimal calculateTotalRevenue();
     
     /**
      * Tính doanh thu theo tháng
+     * XML lưu ý dùng: WHERE YEAR(order_date) = #{year} AND MONTH(order_date) = #{month}
      */
     BigDecimal calculateRevenueByMonth(@Param("year") Integer year, @Param("month") Integer month);
     
     /**
      * Lấy top sản phẩm bán chạy
+     * SQL Server dùng SELECT TOP #{limit} ...
      */
     List<Map<String, Object>> findTopSellingProducts(@Param("limit") Integer limit);
 }

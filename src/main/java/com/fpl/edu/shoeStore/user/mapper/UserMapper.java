@@ -19,12 +19,17 @@ public interface UserMapper {
 
     User findByUsername(String username);
 
+    // Trả về số dòng ảnh hưởng
     Integer insert(User user);
 
     Integer update(User user);
 
     Integer deleteById(Integer id);
 
+    /**
+     * Phân trang SQL Server yêu cầu ORDER BY.
+     * Logic này sẽ nằm trong file XML tương ứng với OFFSET/FETCH.
+     */
     List<User> findAllPaged(
             @Param("userId") Integer userId,
             @Param("username") String username,
@@ -47,32 +52,30 @@ public interface UserMapper {
             @Param("status") String status
     );
 
-    @Select("SELECT COUNT(user_id) FROM sys_user WHERE username = #{username} AND status != 'deleted'")
+    // SQL Server bọc [status] nếu cần thiết trong XML, ở đây là chuỗi nên giữ nguyên
+    @Select("SELECT COUNT(user_id) FROM sys_user WHERE username = #{username} AND [status] != 'deleted'")
     int countByUsername(@Param("username") String username);
 
-    @Select("SELECT COUNT(user_id) FROM sys_user WHERE email = #{email} AND status != 'deleted'")
+    @Select("SELECT COUNT(user_id) FROM sys_user WHERE email = #{email} AND [status] != 'deleted'")
     int countByEmail(@Param("email") String email);
 
-    @Select("SELECT COUNT(user_id) FROM sys_user WHERE phone = #{phone} AND status != 'deleted'")
+    @Select("SELECT COUNT(user_id) FROM sys_user WHERE phone = #{phone} AND [status] != 'deleted'")
     int countByPhone(@Param("phone") String phone);
 
-    @Select("SELECT COUNT(user_id) FROM sys_user WHERE username = #{username} AND user_id != #{id} AND status != 'deleted'")
+    @Select("SELECT COUNT(user_id) FROM sys_user WHERE username = #{username} AND user_id != #{id} AND [status] != 'deleted'")
     int countByUsernameExcludingId(@Param("username") String username, @Param("id") Integer id);
 
-    @Select("SELECT COUNT(user_id) FROM sys_user WHERE email = #{email} AND user_id != #{id} AND status != 'deleted'")
+    @Select("SELECT COUNT(user_id) FROM sys_user WHERE email = #{email} AND user_id != #{id} AND [status] != 'deleted'")
     int countByEmailExcludingId(@Param("email") String email, @Param("id") Integer id);
 
-    @Select("SELECT COUNT(user_id) FROM sys_user WHERE phone = #{phone} AND user_id != #{id} AND status != 'deleted'")
+    @Select("SELECT COUNT(user_id) FROM sys_user WHERE phone = #{phone} AND user_id != #{id} AND [status] != 'deleted'")
     int countByPhoneExcludingId(@Param("phone") String phone, @Param("id") Integer id);
     
-    /**
-     * Dashboard: Count all users
-     */
-    @Select("SELECT COUNT(*) FROM sys_user WHERE status != 'deleted'")
+    @Select("SELECT COUNT(*) FROM sys_user WHERE [status] != 'deleted'")
     Long countAllUsers();
     
     /**
-     * Dashboard: Count new users in specific month/year
+     * Dashboard: SQL Server sử dụng YEAR() và MONTH() giống MySQL.
      */
     Long countNewUsersInMonth(@Param("year") Integer year, @Param("month") Integer month);
 }
