@@ -1,21 +1,21 @@
 package com.fpl.edu.shoeStore.voucher.mapper;
 
-import com.fpl.edu.shoeStore.voucher.dto.response.VoucherDTOResponse;
-import com.fpl.edu.shoeStore.voucher.entity.Voucher;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.fpl.edu.shoeStore.voucher.entity.Voucher;
+
 @Mapper
 public interface VoucherMapper {
-    // CRUD methods for Voucher
     List<Voucher> findAll();
 
     Voucher findById(Integer id);
 
+    // Trả về danh sách vì có thể một code có nhiều đợt phát hành
     List<Voucher> findByCode(String code);
 
     int insert(Voucher voucher);
@@ -24,6 +24,9 @@ public interface VoucherMapper {
 
     int deleteById(Integer id);
 
+    /**
+     * Lưu ý XML: SQL Server cần dùng OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+     */
     List<Voucher> findAllPaged(
             @Param("voucherId") Integer voucherId,
             @Param("code") String code,
