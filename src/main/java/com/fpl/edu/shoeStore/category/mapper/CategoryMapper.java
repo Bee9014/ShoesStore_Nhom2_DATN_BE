@@ -1,61 +1,39 @@
 package com.fpl.edu.shoeStore.category.mapper;
 
-import com.fpl.edu.shoeStore.category.dto.response.CategoryDtoResponse;
-import com.fpl.edu.shoeStore.category.entity.Category;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import com.fpl.edu.shoeStore.category.dto.response.CategoryDtoResponse;
+import com.fpl.edu.shoeStore.category.entity.Category;
 
 @Mapper
 public interface CategoryMapper {
     
     // ==================== BASIC CRUD ====================
     
-    /**
-     * Lấy tất cả categories
-     */
     List<Category> findAll();
     
-    /**
-     * Lấy category theo ID
-     */
     Category findById(@Param("categoryId") Integer categoryId);
     
-    /**
-     * Lấy category theo name (check duplicate)
-     */
     Category findByName(@Param("name") String name);
     
-    /**
-     * Thêm category mới
-     */
+    // SQL Server sẽ trả về số dòng bị tác động (1 nếu thành công)
     int insert(Category category);
     
-    /**
-     * Cập nhật category
-     */
     int update(Category category);
     
-    /**
-     * Soft delete (set is_active = 0)
-     */
+    // Soft delete thực chất là lệnh UPDATE
     int softDelete(@Param("categoryId") Integer categoryId);
     
-    /**
-     * Hard delete (for testing only)
-     */
     int deleteById(@Param("categoryId") Integer categoryId);
     
     // ==================== PAGING & FILTERING ====================
     
     /**
-     * Lấy categories có phân trang + filter
-     * @param search - Tìm theo tên (LIKE)
-     * @param isActive - Filter theo trạng thái
-     * @param offset - Vị trí bắt đầu
-     * @param size - Số lượng records
-     * @return List categories với parentName được JOIN
+     * Lưu ý: Trong XML tương ứng, offset và size sẽ được dùng cho 
+     * OFFSET ... ROWS FETCH NEXT ... ROWS ONLY
      */
     List<CategoryDtoResponse> findAllPaged(
         @Param("search") String search,
@@ -64,9 +42,7 @@ public interface CategoryMapper {
         @Param("size") int size
     );
     
-    /**
-     * Đếm tổng số categories (for pagination)
-     */
+    // SQL Server COUNT trả về kiểu Long (BIGINT)
     long countAll(
         @Param("search") String search,
         @Param("isActive") Boolean isActive
@@ -74,33 +50,24 @@ public interface CategoryMapper {
     
     // ==================== SELECT OPTIONS ====================
     
-    /**
-     * Lấy tất cả active categories (for dropdown)
-     * Sorted by name A-Z
-     */
     List<Category> findAllActive();
     
     // ==================== VALIDATION QUERIES ====================
     
-    /**
-     * Kiểm tra category có products không
-     * @return số lượng products thuộc category
-     */
+    // Trả về số lượng sản phẩm liên quan
     int countProductsByCategory(@Param("categoryId") Integer categoryId);
     
-    /**
-     * Kiểm tra category có subcategories không
-     * @return số lượng child categories
-     */
+    // Trả về số lượng danh mục con
     int countChildCategories(@Param("categoryId") Integer categoryId);
     
     /**
-     * Kiểm tra tồn tại theo ID
+     * MyBatis tự động convert kết quả COUNT(*) > 0 thành true cho SQL Server
      */
     boolean existsById(@Param("categoryId") Integer categoryId);
     
     /**
-     * Kiểm tra tên trùng (excluding current ID for update)
+     * Kiểm tra tên trùng, dùng cho cả insert (excludeId = null) 
+     * và update (excludeId = currentId)
      */
     boolean existsByName(
         @Param("name") String name,
