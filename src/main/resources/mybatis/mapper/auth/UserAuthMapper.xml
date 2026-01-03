@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.fpl.edu.shoeStore.auth.mapper.UserAuthMapper">
 
-<resultMap id="UserAuthResultMap" type="com.fpl.edu.shoeStore.auth.entity.UserAuth">
+    <resultMap id="UserAuthResultMap" type="com.fpl.edu.shoeStore.auth.entity.UserAuth">
         <id property="userId" column="user_id"/>
         <result property="roleId" column="role_id"/>
         <result property="username" column="username"/>
@@ -19,18 +19,18 @@
     </resultMap>
 
     <select id="findUserByUsername" resultMap="UserAuthResultMap" parameterType="string">
-        SELECT 
-            u.user_id,
-            u.role_id,
-            u.username,
-            r.role_name,
-            u.password_hash,
-            u.full_name,
-            u.email,
-            u.phone,
-            u.status,
-            u.created_at,
-            u.updated_at
+        SELECT
+        u.user_id,
+        u.role_id,
+        u.username,
+        r.role_name,
+        u.password_hash,
+        u.full_name,
+        u.email,
+        u.phone,
+        u.status,
+        u.created_at,
+        u.updated_at
         FROM sys_user u
         JOIN sys_role r ON u.role_id = r.role_id
         WHERE u.username = #{username}
@@ -40,7 +40,7 @@
         SELECT role_id
         FROM sys_user
         WHERE username = #{username}
-          AND status = 'active'
+        AND status = 'active'
     </select>
 
     <select id="existsByUsername" resultType="java.lang.Integer">
@@ -64,25 +64,25 @@
     <insert id="insertUser" parameterType="com.fpl.edu.shoeStore.user.entity.User"
             useGeneratedKeys="true" keyProperty="userId" keyColumn="user_id">
         INSERT INTO sys_user (
-            role_id,
-            username,
-            password_hash,
-            full_name,
-            email,
-            phone,
-            status,
-            created_at,
-            updated_at
+        role_id,
+        username,
+        password_hash,
+        full_name,
+        email,
+        phone,
+        status,
+        created_at,
+        updated_at
         ) VALUES (
-            #{roleId},
-            #{username},
-            #{passwordHash},
-            #{fullName},
-            #{email},
-            #{phone},
-            #{status},
-            #{createdAt},
-            #{updatedAt}
+        #{roleId},
+        #{username},
+        #{passwordHash},
+        #{fullName},
+        #{email},
+        #{phone},
+        #{status},
+        #{createdAt},
+        #{updatedAt}
         )
     </insert>
 

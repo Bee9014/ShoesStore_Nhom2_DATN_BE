@@ -1,28 +1,25 @@
- package com.fpl.edu.shoeStore.product.mapper;
+package com.fpl.edu.shoeStore.product.mapper;
 
-     import com.fpl.edu.shoeStore.product.entity.ProductVariant;
-     import org.apache.ibatis.annotations.Mapper;
-     import org.apache.ibatis.annotations.Param;
+import com.fpl.edu.shoeStore.product.entity.ProductVariant;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import java.util.List;
 
-     import java.util.List;
+@Mapper
+public interface ProductVariantMapper {
+    List<ProductVariant> findByProductId(@Param("productId") Integer productId);
 
-     @Mapper
-     public interface ProductVariantMapper {
-         List<ProductVariant> findByProductId(@Param("productId") Integer productId);  // Đổi Long → Integer
+    ProductVariant findById(@Param("variantId") Integer variantId);
 
-         ProductVariant findById(@Param("variantId") Integer variantId);                // Đổi Long → Integer
+    int insert(ProductVariant variant);
 
-         int insert(ProductVariant variant);
+    int update(ProductVariant variant);
 
-         int update(ProductVariant variant);
+    int deleteById(@Param("variantId") Integer variantId);
 
-         int deleteById(@Param("variantId") Integer variantId);                         // Đổi Long → Integer
+    List<ProductVariant> findAll();
 
-         List<ProductVariant> findAll();
+    int updateStock(@Param("variantId") Integer variantId, @Param("quantity") Integer quantity);
 
-         int updateStock(@Param("variantId") Integer variantId, @Param("quantity") Integer quantity);  // Đổi Long → Integer
-
-         ProductVariant findByCode(@Param("productVariantCode") String productVariantCode);
-
-         // XÓA: findActiveByProductId (vì DB không có is_active)
-     }
+    ProductVariant findByCode(@Param("productVariantCode") String productVariantCode);
+}

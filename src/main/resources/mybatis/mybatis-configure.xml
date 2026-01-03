@@ -3,15 +3,16 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
-    <!-- Global Settings -->
     <settings>
-        <!-- DB snake_case ↔ Java camelCase -->
         <setting name="mapUnderscoreToCamelCase" value="true"/>
-        <!-- Log SQL to console -->
+
         <setting name="logImpl" value="STDOUT_LOGGING"/>
+
+        <setting name="jdbcTypeForNull" value="NULL"/>
+
+        <setting name="useGeneratedKeys" value="true"/>
     </settings>
 
-    <!-- Type Aliases (scan all entity packages) -->
     <typeAliases>
         <package name="com.fpl.edu.shoeStore.auth.entity"/>
         <package name="com.fpl.edu.shoeStore.user.entity"/>
@@ -22,16 +23,14 @@
         <package name="com.fpl.edu.shoeStore.shipment.entity"/>
     </typeAliases>
 
-    <!-- Mappers -->
     <mappers>
-        <!-- Explicit XML mappers -->
         <mapper resource="mybatis/mapper/auth/UserAuthMapper.xml"/>
         <mapper resource="mybatis/mapper/user/UserMapper.xml"/>
         <mapper resource="mybatis/mapper/order/OrderMapper.xml"/>
         <mapper resource="mybatis/mapper/shipment/ShipmentMapper.xml"/>
         <mapper resource="mybatis/mapper/promotion/VoucherMapper.xml"/>
         <mapper resource="mybatis/mapper/product/ProductMapper.xml"/>
-        <!-- Annotation-based mappers -->
+
         <package name="com.fpl.edu.shoeStore.auth.mapper"/>
         <package name="com.fpl.edu.shoeStore.user.mapper"/>
         <package name="com.fpl.edu.shoeStore.product.mapper"/>

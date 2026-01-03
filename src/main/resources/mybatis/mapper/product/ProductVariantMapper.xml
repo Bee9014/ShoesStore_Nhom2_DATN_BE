@@ -1,161 +1,120 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-          "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-     <mapper namespace="com.fpl.edu.shoeStore.product.mapper.ProductVariantMapper">
+<mapper namespace="com.fpl.edu.shoeStore.product.mapper.ProductVariantMapper">
 
-         <!-- Result Map -->
-         <resultMap id="ProductVariantResultMap"
-     type="com.fpl.edu.shoeStore.product.entity.ProductVariant">
-             <id property="variantId" column="variant_id"/>
-             <result property="productId" column="product_id"/>
-             <result property="productVariantCode" column="product_variant_code"/>
-             <result property="price" column="price"/>
-             <result property="stockQty" column="stock_qty"/>
-             <result property="weightGrams" column="weight_grams"/>
-             <result property="attribute" column="attribute"/>
-             <result property="image" column="image"/>
-             <result property="createAt" column="create_at"/>
-             <result property="updateAt" column="update_at"/>
-             <result property="createBy" column="create_by"/>
-             <result property="updateBy" column="update_by"/>
-         </resultMap>
+    <resultMap id="ProductVariantResultMap" type="com.fpl.edu.shoeStore.product.entity.ProductVariant">
+        <id property="variantId" column="variant_id"/>
+        <result property="productId" column="product_id"/>
+        <result property="variantName" column="variant_name"/>
+        <result property="productVariantCode" column="product_variant_code"/>
+        <result property="price" column="price"/>
+        <result property="stockQty" column="stock_qty"/>
+        <result property="isActive" column="is_active"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="weightGrams" column="weight_grams"/>
+        <result property="size" column="size"/>
+        <result property="color" column="color"/>
+        <result property="image" column="image"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+    </resultMap>
 
-         <!-- Find by Product ID -->
-         <select id="findByProductId" parameterType="int"
-     resultMap="ProductVariantResultMap">
-             SELECT variant_id,
-                    product_id,
-                    product_variant_code,
-                    price,
-                    stock_qty,
-                    weight_grams,
-                    attribute,
-                    image,
-                    create_at,
-                    update_at,
-                    create_by,
-                    update_by
-             FROM product_variant
-             WHERE product_id = #{productId}
-             ORDER BY variant_id ASC
-         </select>
+    <sql id="Base_Column_List">
+        variant_id, product_id, variant_name, product_variant_code, price, stock_qty,
+        is_active, created_at, updated_at, weight_grams, [size], color, image, create_by, update_by
+    </sql>
 
-         <!-- Find by Variant ID -->
-         <select id="findById" parameterType="int" resultMap="ProductVariantResultMap">
-             SELECT variant_id,
-                    product_id,
-                    product_variant_code,
-                    price,
-                    stock_qty,
-                    weight_grams,
-                    attribute,
-                    image,
-                    create_at,
-                    update_at,
-                    create_by,
-                    update_by
-             FROM product_variant
-             WHERE variant_id = #{variantId}
-         </select>
+    <select id="findByProductId" parameterType="int" resultMap="ProductVariantResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM product_variants
+        WHERE product_id = #{productId}
+        ORDER BY variant_id ASC
+    </select>
 
-         <!-- Insert -->
-         <insert id="insert"
-     parameterType="com.fpl.edu.shoeStore.product.entity.ProductVariant"
-                 useGeneratedKeys="true"
-                 keyProperty="variantId">
-             INSERT INTO product_variant (
-                 product_id,
-                 product_variant_code,
-                 price,
-                 stock_qty,
-                 weight_grams,
-                 attribute,
-                 image,
-                 create_at,
-                 update_at,
-                 create_by,
-                 update_by
-             )
-             VALUES (
-                 #{productId},
-                 #{productVariantCode},
-                 #{price},
-                 #{stockQty},
-                 #{weightGrams},
-                 #{attribute},
-                 #{image},
-                 GETDATE(),
-                 GETDATE(),
-                 #{createBy},
-                 #{updateBy}
-             )
-         </insert>
+    <select id="findById" parameterType="int" resultMap="ProductVariantResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM product_variants
+        WHERE variant_id = #{variantId}
+    </select>
 
-         <!-- Update -->
-         <update id="update"
-     parameterType="com.fpl.edu.shoeStore.product.entity.ProductVariant">
-             UPDATE product_variant
-             SET product_id = #{productId},
-                 product_variant_code = #{productVariantCode},
-                 price = #{price},
-                 stock_qty = #{stockQty},
-                 weight_grams = #{weightGrams},
-                 attribute = #{attribute},
-                 image = #{image},
-                 update_at = GETDATE(),
-                 update_by = #{updateBy}
-             WHERE variant_id = #{variantId}
-         </update>
+    <insert id="insert" parameterType="com.fpl.edu.shoeStore.product.entity.ProductVariant"
+            useGeneratedKeys="true" keyProperty="variantId">
+        INSERT INTO product_variants (
+        product_id,
+        variant_name,
+        product_variant_code,
+        price,
+        stock_qty,
+        is_active,
+        weight_grams,
+        [size],
+        color,
+        image,
+        create_by,
+        update_by,
+        created_at,
+        updated_at
+        )
+        VALUES (
+        #{productId},
+        #{variantName},
+        #{productVariantCode},
+        #{price},
+        #{stockQty},
+        #{isActive},
+        #{weightGrams},
+        #{size},
+        #{color},
+        #{image},
+        #{createBy},
+        #{updateBy},
+        GETDATE(),
+        GETDATE()
+        )
+    </insert>
 
-         <!-- Delete by ID -->
-         <delete id="deleteById" parameterType="int">
-             DELETE FROM product_variant
-             WHERE variant_id = #{variantId}
-         </delete>
+    <update id="update" parameterType="com.fpl.edu.shoeStore.product.entity.ProductVariant">
+        UPDATE product_variants
+        SET product_id = #{productId},
+        variant_name = #{variantName},
+        product_variant_code = #{productVariantCode},
+        price = #{price},
+        stock_qty = #{stockQty},
+        is_active = #{isActive},
+        weight_grams = #{weightGrams},
+        [size] = #{size},
+        color = #{color},
+        image = #{image},
+        update_by = #{updateBy},
+        updated_at = GETDATE()
+        WHERE variant_id = #{variantId}
+    </update>
 
-         <!-- Find All Variants -->
-         <select id="findAll" resultMap="ProductVariantResultMap">
-             SELECT variant_id,
-                    product_id,
-                    product_variant_code,
-                    price,
-                    stock_qty,
-                    weight_grams,
-                    attribute,
-                    image,
-                    create_at,
-                    update_at,
-                    create_by,
-                    update_by
-             FROM product_variant
-             ORDER BY variant_id DESC
-         </select>
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM product_variants
+        WHERE variant_id = #{variantId}
+    </delete>
 
-         <!-- Update Stock Quantity -->
-         <update id="updateStock" parameterType="map">
-             UPDATE product_variant
-             SET stock_qty = stock_qty + #{quantity},
-                 update_at = GETDATE()
-             WHERE variant_id = #{variantId}
-         </update>
+    <select id="findAll" resultMap="ProductVariantResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM product_variants
+        ORDER BY variant_id DESC
+    </select>
 
-         <!-- Find by Product Variant Code -->
-         <select id="findByCode" parameterType="string" resultMap="ProductVariantResultMap">
-             SELECT variant_id,
-                    product_id,
-                    product_variant_code,
-                    price,
-                    stock_qty,
-                    weight_grams,
-                    attribute,
-                    image,
-                    create_at,
-                    update_at,
-                    create_by,
-                    update_by
-             FROM product_variant
-             WHERE product_variant_code = #{productVariantCode}
-         </select>
+    <update id="updateStock" parameterType="map">
+        UPDATE product_variants
+        SET stock_qty = stock_qty + #{quantity},
+        updated_at = GETDATE()
+        WHERE variant_id = #{variantId}
+    </update>
 
-     </mapper>
+    <select id="findByCode" parameterType="string" resultMap="ProductVariantResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM product_variants
+        WHERE product_variant_code = #{productVariantCode}
+    </select>
+
+</mapper>

@@ -3,7 +3,6 @@ package com.fpl.edu.shoeStore.payment.mapper;
 import com.fpl.edu.shoeStore.payment.entity.Payment;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,7 +20,7 @@ public interface PaymentMapper {
 
     int update(Payment payment);
 
-    int deleteById(@Param("id")int id);
+    int deleteById(@Param("id") int id);
 
     List<Payment> findAllPaged(
             @Param("paymentId") Integer paymentId,
@@ -31,7 +30,7 @@ public interface PaymentMapper {
             @Param("paymentDate") LocalDateTime paymentDate,
             @Param("status") String status,
             @Param("amount") BigDecimal amount,
-            @Param("transactionCode")String transactionCode,
+            @Param("transactionCode") String transactionCode,
             @Param("offset") int offset,
             @Param("size") int size
     );
@@ -41,10 +40,9 @@ public interface PaymentMapper {
             @Param("orderId") Integer orderId,
             @Param("payerId") Integer payerId,
             @Param("paymentMethod") String paymentMethod,
-            @Param("paymentDate")LocalDateTime paymentDate,
+            @Param("paymentDate") LocalDateTime paymentDate,
             @Param("status") String status,
-            @Param("amount")BigDecimal amount,
-            @Param("transactionCode")String transactionCode
+            @Param("amount") BigDecimal amount,
+            @Param("transactionCode") String transactionCode
     );
-
 }
