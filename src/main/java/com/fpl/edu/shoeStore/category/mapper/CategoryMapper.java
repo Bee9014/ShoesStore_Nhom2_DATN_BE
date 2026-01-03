@@ -11,29 +11,50 @@ import com.fpl.edu.shoeStore.category.entity.Category;
 @Mapper
 public interface CategoryMapper {
     
-    // ==================== BASIC CRUD ====================
-    
-    List<Category> findAll();
-    
-    Category findById(@Param("categoryId") Integer categoryId);
-    
-    Category findByName(@Param("name") String name);
-    
-    // SQL Server sẽ trả về số dòng bị tác động (1 nếu thành công)
-    int insert(Category category);
-    
-    int update(Category category);
-    
-    // Soft delete thực chất là lệnh UPDATE
-    int softDelete(@Param("categoryId") Integer categoryId);
-    
-    int deleteById(@Param("categoryId") Integer categoryId);
-    
-    // ==================== PAGING & FILTERING ====================
+    // ==================== BASIC CRUD (THAO TÁC CƠ BẢN) ====================
     
     /**
-     * Lưu ý: Trong XML tương ứng, offset và size sẽ được dùng cho 
-     * OFFSET ... ROWS FETCH NEXT ... ROWS ONLY
+     * Lấy danh sách tất cả các danh mục có trong hệ thống.
+     */
+    List<Category> findAll();
+    
+    /**
+     * Tìm kiếm một danh mục cụ thể thông qua mã ID.
+     */
+    Category findById(@Param("categoryId") Integer categoryId);
+    
+    /**
+     * Tìm kiếm danh mục dựa trên tên chính xác (thường dùng để kiểm tra trước khi tạo mới).
+     */
+    Category findByName(@Param("name") String name);
+    
+    /**
+     * Thêm mới một danh mục vào cơ sở dữ liệu.
+     * Trả về số dòng bị tác động (1 nếu thành công).
+     */
+    int insert(Category category);
+    
+    /**
+     * Cập nhật thông tin của một danh mục hiện có (tên, mô tả, v.v.).
+     */
+    int update(Category category);
+    
+    /**
+     * Xóa tạm thời danh mục bằng cách cập nhật trạng thái hoạt động (is_active = false).
+     * Giúp giữ lại dữ liệu lịch sử thay vì xóa vĩnh viễn.
+     */
+    int softDelete(@Param("categoryId") Integer categoryId);
+    
+    /**
+     * Xóa vĩnh viễn một danh mục khỏi cơ sở dữ liệu dựa trên ID.
+     */
+    int deleteById(@Param("categoryId") Integer categoryId);
+    
+    // ==================== PAGING & FILTERING (PHÂN TRANG & BỘ LỌC) ====================
+    
+    /**
+     * Lấy danh sách danh mục có hỗ trợ tìm kiếm theo tên, lọc trạng thái và phân trang.
+     * Phù hợp cho giao diện quản lý danh mục ở trang Admin.
      */
     List<CategoryDtoResponse> findAllPaged(
         @Param("search") String search,
@@ -42,32 +63,42 @@ public interface CategoryMapper {
         @Param("size") int size
     );
     
-    // SQL Server COUNT trả về kiểu Long (BIGINT)
+    /**
+     * Đếm tổng số danh mục thỏa mãn điều kiện lọc để phục vụ việc tính toán số trang.
+     */
     long countAll(
         @Param("search") String search,
         @Param("isActive") Boolean isActive
     );
     
-    // ==================== SELECT OPTIONS ====================
+    // ==================== SELECT OPTIONS (LỰA CHỌN) ====================
     
+    /**
+     * Lấy danh sách các danh mục đang hoạt động để hiển thị lên dropdown hoặc menu chọn lọc.
+     */
     List<Category> findAllActive();
     
-    // ==================== VALIDATION QUERIES ====================
+    // ==================== VALIDATION QUERIES (KIỂM TRA RÀNG BUỘC) ====================
     
-    // Trả về số lượng sản phẩm liên quan
+    /**
+     * Đếm số lượng sản phẩm thuộc về danh mục này. 
+     * Dùng để kiểm tra trước khi xóa (không cho xóa nếu còn sản phẩm).
+     */
     int countProductsByCategory(@Param("categoryId") Integer categoryId);
     
-    // Trả về số lượng danh mục con
+    /**
+     * Đếm số lượng danh mục con thuộc về danh mục này.
+     */
     int countChildCategories(@Param("categoryId") Integer categoryId);
     
     /**
-     * MyBatis tự động convert kết quả COUNT(*) > 0 thành true cho SQL Server
+     * Kiểm tra nhanh xem một mã ID danh mục có tồn tại trong hệ thống hay không.
      */
     boolean existsById(@Param("categoryId") Integer categoryId);
     
     /**
-     * Kiểm tra tên trùng, dùng cho cả insert (excludeId = null) 
-     * và update (excludeId = currentId)
+     * Kiểm tra xem tên danh mục đã tồn tại chưa. 
+     * Tham số excludeId dùng để bỏ qua ID hiện tại khi thực hiện cập nhật (update).
      */
     boolean existsByName(
         @Param("name") String name,
