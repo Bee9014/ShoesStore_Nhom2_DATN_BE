@@ -1,7 +1,6 @@
 package com.fpl.edu.shoeStore.voucher.mapper;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -15,71 +14,64 @@ public interface VoucherMapper {
     // ==================== CƠ BẢN (CRUD) ====================
 
     /**
-     * Lấy danh sách toàn bộ các mã giảm giá có trong hệ thống.
+     * Truy vấn toàn bộ danh sách Voucher. 
+     * Thường dùng cho các báo cáo tổng hợp hoặc danh sách nội bộ.
      */
     List<Voucher> findAll();
 
     /**
-     * Tìm kiếm thông tin chi tiết của một Voucher dựa trên ID duy nhất.
+     * Tìm thông tin chi tiết của một Voucher qua ID. 
+     * Lưu ý: XML mapping tham số là #{id}.
      */
-    Voucher findById(Integer id);
+    Voucher findById(@Param("id") Integer id);
 
     /**
-     * Tìm kiếm Voucher theo mã code (Ví dụ: 'SALE2024').
-     * Trả về danh sách vì một mã code có thể được thiết lập cho nhiều đợt phát hành khác nhau.
+     * Tìm kiếm Voucher theo mã code.
+     * XML sử dụng LIKE nên sẽ trả về danh sách các voucher chứa chuỗi code tương ứng.
      */
-    List<Voucher> findByCode(String code);
+    List<Voucher> findByCode(@Param("code") String code);
 
     /**
-     * Thêm mới một chương trình Voucher vào cơ sở dữ liệu.
-     * SQL Server sẽ tự động sinh ID Identity và MyBatis gán ngược vào object voucher.
+     * Thêm mới một chương trình khuyến mãi/Voucher. 
+     * ID tự tăng (voucherId) sẽ được gán lại vào object Voucher.
      */
     int insert(Voucher voucher);
 
     /**
-     * Cập nhật thông tin Voucher (Ví dụ: thay đổi ngày hết hạn, số lượng sử dụng còn lại).
+     * Cập nhật thông tin Voucher. 
+     * Sử dụng voucher_id = #{voucherId} làm điều kiện định danh.
      */
     int update(Voucher voucher);
 
     /**
-     * Xóa vĩnh viễn một Voucher khỏi hệ thống dựa trên ID.
+     * Xóa vĩnh viễn một Voucher khỏi cơ sở dữ liệu qua ID.
      */
-    int deleteById(Integer id);
+    int deleteById(@Param("id") Integer id);
 
     // ==================== PHÂN TRANG & BỘ LỌC (ADMIN) ====================
 
     /**
-     * Tìm kiếm và phân trang danh sách Voucher với nhiều tiêu chí lọc nâng cao.
-     * @param offset: Vị trí bắt đầu lấy bản ghi.
-     * @param size: Số lượng bản ghi cần lấy.
-     * Lưu ý XML: SQL Server sử dụng OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY.
+     * Truy vấn danh sách Voucher với bộ lọc dựa trên XML hiện tại.
+     * Lưu ý: Tên tham số đã được đổi từ 'type' sang 'voucherType' để khớp với #{voucherType} trong XML.
+     * @param offset Vị trí bắt đầu (Phân trang).
+     * @param size Số lượng bản ghi mỗi trang.
      */
     List<Voucher> findAllPaged(
             @Param("voucherId") Integer voucherId,
             @Param("code") String code,
-            @Param("description") String description,
-            @Param("type") String type,
-            @Param("discountValue") BigDecimal discountValue,
+            @Param("voucherType") String voucherType,
             @Param("minSpend") BigDecimal minSpend,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate,
-            @Param("usageLimit") Integer usageLimit,
             @Param("offset") int offset,
             @Param("size") int size
     );
 
     /**
-     * Đếm tổng số lượng Voucher thỏa mãn các điều kiện lọc để phục vụ tính toán phân trang.
+     * Đếm tổng số lượng Voucher thỏa mãn bộ lọc hiện có trong XML.
+     * Phục vụ tính toán tổng số trang cho Admin.
      */
     long countAll(
             @Param("voucherId") Integer voucherId,
             @Param("code") String code,
-            @Param("description") String description,
-            @Param("type") String type,
-            @Param("discountValue") BigDecimal discountValue,
-            @Param("minSpend") BigDecimal minSpend,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate,
-            @Param("usageLimit") Integer usageLimit
+            @Param("voucherType") String voucherType
     );
 }

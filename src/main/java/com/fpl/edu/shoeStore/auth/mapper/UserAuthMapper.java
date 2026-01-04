@@ -8,28 +8,46 @@ import com.fpl.edu.shoeStore.user.entity.User;
 
 @Mapper
 public interface UserAuthMapper {
-    /** * Tìm kiếm thông tin đăng nhập của người dùng qua Username.
-     * Thường dùng trong quá trình xử lý Login của Spring Security.
+
+    /**
+     * Tìm kiếm người dùng kèm theo thông tin vai trò (Role) để phục vụ đăng nhập.
+     * @param username Tên đăng nhập.
+     * @return Đối tượng UserAuth chứa thông tin tài khoản và phân quyền.
      */
     UserAuth findUserByUsername(@Param("username") String username);
-    
-    /** * Lấy mã quyền (Role ID) từ Username để phân quyền (Admin/User).
+
+    /**
+     * Lấy ID vai trò của người dùng dựa trên username (chỉ áp dụng cho tài khoản 'active').
+     * @param username Tên đăng nhập.
+     * @return ID của vai trò (Integer).
      */
     Integer getRoleIdByUsername(@Param("username") String username);
-    
-    /** * Kiểm tra Username đã tồn tại chưa (trả về true nếu đã có).
+
+    /**
+     * Kiểm tra sự tồn tại của tên đăng nhập trong hệ thống.
+     * @param username Tên cần kiểm tra.
+     * @return true nếu đã tồn tại, false nếu chưa.
      */
     boolean existsByUsername(@Param("username") String username);
-    
-    /** * Kiểm tra Email đã tồn tại chưa để tránh đăng ký trùng.
+
+    /**
+     * Kiểm tra sự tồn tại của email trong hệ thống.
+     * @param email Email cần kiểm tra.
+     * @return true nếu đã tồn tại, false nếu chưa.
      */
     boolean existsByEmail(@Param("email") String email);
-    
-    /** * Kiểm tra số điện thoại đã tồn tại chưa.
+
+    /**
+     * Kiểm tra sự tồn tại của số điện thoại trong hệ thống.
+     * @param phone Số điện thoại cần kiểm tra.
+     * @return true nếu đã tồn tại, false nếu chưa.
      */
     boolean existsByPhone(@Param("phone") String phone);
-    
-    /** * Đăng ký/Thêm mới người dùng vào hệ thống.
+
+    /**
+     * Thêm mới tài khoản người dùng (thường dùng cho chức năng Đăng ký).
+     * @param user Đối tượng chứa thông tin người dùng mới.
+     * @return Số dòng được thêm thành công (int).
      */
     int insertUser(User user);
 }

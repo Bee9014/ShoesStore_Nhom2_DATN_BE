@@ -134,5 +134,11 @@
         ELSE
         SELECT 0
     </select>
+<select id="findAllActive" resultMap="CategoryResultMap">
+    SELECT * FROM categories WHERE is_active = 1 ORDER BY sort_order ASC
+</select>
 
+<select id="countProductsByCategory" resultType="int">
+    SELECT COUNT(*) FROM products WHERE category_id = #{categoryId}
+</select>
 </mapper>

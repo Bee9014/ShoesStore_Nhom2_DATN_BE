@@ -12,23 +12,23 @@ public interface ProductVariantMapper {
 
     /**
      * Lấy danh sách tất cả các biến thể thuộc về một sản phẩm cụ thể.
-     * Ví dụ: Lấy tất cả các size và màu của đôi "Nike Air Force 1".
+     * @param productId ID của sản phẩm cha.
      */
     List<ProductVariant> findByProductId(@Param("productId") Integer productId);
 
     /**
-     * Tìm kiếm thông tin chi tiết của một biến thể dựa trên mã ID duy nhất.
+     * Tìm kiếm thông tin chi tiết của một biến thể dựa trên ID duy nhất.
      */
     ProductVariant findById(@Param("variantId") Integer variantId);
 
     /**
-     * Thêm mới một biến thể sản phẩm (Size/Màu mới).
-     * SQL Server sẽ tự động sinh ID (Identity) và MyBatis gán ngược vào object.
+     * Thêm mới một biến thể sản phẩm. 
+     * ID tự tăng từ SQL Server sẽ được gán vào trường variantId của object.
      */
     int insert(ProductVariant variant);
 
     /**
-     * Cập nhật thông tin biến thể (Thay đổi giá, màu sắc hoặc thuộc tính khác).
+     * Cập nhật toàn bộ thông tin biến thể.
      */
     int update(ProductVariant variant);
 
@@ -38,28 +38,25 @@ public interface ProductVariantMapper {
     int deleteById(@Param("variantId") Integer variantId);
 
     /**
-     * Lấy danh sách toàn bộ các biến thể của tất cả sản phẩm trong hệ thống.
+     * Lấy danh sách toàn bộ các biến thể hiện có trong hệ thống.
      */
     List<ProductVariant> findAll();
 
     /**
-     * Cập nhật số lượng tồn kho của biến thể.
-     * @param variantId: ID của biến thể cần cập nhật.
-     * @param quantity: Số lượng thay đổi (dùng số dương để nhập kho, số âm để xuất kho).
-     * Lưu ý XML: SET stock_quantity = stock_quantity + #{quantity}
+     * Cập nhật số lượng tồn kho (Stock Quantity).
+     * @param variantId ID biến thể.
+     * @param quantity Số lượng thay đổi (cộng thêm hoặc trừ đi).
      */
     int updateStock(@Param("variantId") Integer variantId, @Param("quantity") Integer quantity);
 
     /**
-     * Tìm kiếm biến thể bằng mã Code duy nhất (SKU).
-     * Thường dùng để quét mã vạch hoặc tìm nhanh sản phẩm trong kho.
+     * Tìm kiếm biến thể bằng mã SKU (product_variant_code).
      */
     ProductVariant findByCode(@Param("productVariantCode") String productVariantCode);
-    
+
     /**
-     * Thống kê số lượng biến thể có mức tồn kho dưới ngưỡng cho phép.
-     * Phục vụ chức năng cảnh báo hết hàng trên Dashboard Admin.
-     * @param threshold: Ngưỡng số lượng (Ví dụ: dưới 5 sản phẩm là sắp hết).
+     * LƯU Ý: Phương thức countLowStock hiện chưa có trong file XML bạn cung cấp.
+     * Nếu bạn muốn sử dụng, hãy thêm thẻ <select id="countLowStock"> vào XML.
      */
-    Long countLowStock(@Param("threshold") Integer threshold);
+    // Long countLowStock(@Param("threshold") Integer threshold);
 }

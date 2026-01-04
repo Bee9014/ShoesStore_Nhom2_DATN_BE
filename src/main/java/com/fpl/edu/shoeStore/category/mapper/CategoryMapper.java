@@ -11,97 +11,77 @@ import com.fpl.edu.shoeStore.category.entity.Category;
 @Mapper
 public interface CategoryMapper {
     
-    // ==================== BASIC CRUD (THAO TÁC CƠ BẢN) ====================
-    
     /**
-     * Lấy danh sách tất cả các danh mục có trong hệ thống.
+     * Lấy toàn bộ danh mục sản phẩm sắp xếp theo sort_order và tên.
      */
     List<Category> findAll();
     
     /**
-     * Tìm kiếm một danh mục cụ thể thông qua mã ID.
+     * Tìm danh mục theo ID.
      */
     Category findById(@Param("categoryId") Integer categoryId);
-    
+
     /**
-     * Tìm kiếm danh mục dựa trên tên chính xác (thường dùng để kiểm tra trước khi tạo mới).
+     * Tìm danh mục theo tên chính xác (Lấy bản ghi đầu tiên).
      */
     Category findByName(@Param("name") String name);
     
     /**
-     * Thêm mới một danh mục vào cơ sở dữ liệu.
-     * Trả về số dòng bị tác động (1 nếu thành công).
+     * Thêm danh mục mới. ID tự sinh sẽ được gán vào object.
      */
     int insert(Category category);
     
     /**
-     * Cập nhật thông tin của một danh mục hiện có (tên, mô tả, v.v.).
+     * Cập nhật toàn bộ thông tin danh mục bao gồm cả người cập nhật.
      */
     int update(Category category);
     
     /**
-     * Xóa tạm thời danh mục bằng cách cập nhật trạng thái hoạt động (is_active = false).
-     * Giúp giữ lại dữ liệu lịch sử thay vì xóa vĩnh viễn.
+     * Ẩn danh mục (isActive = 0).
      */
     int softDelete(@Param("categoryId") Integer categoryId);
-    
+
     /**
-     * Xóa vĩnh viễn một danh mục khỏi cơ sở dữ liệu dựa trên ID.
+     * Xóa vĩnh viễn danh mục khỏi cơ sở dữ liệu.
      */
     int deleteById(@Param("categoryId") Integer categoryId);
     
-    // ==================== PAGING & FILTERING (PHÂN TRANG & BỘ LỌC) ====================
-    
     /**
-     * Lấy danh sách danh mục có hỗ trợ tìm kiếm theo tên, lọc trạng thái và phân trang.
-     * Phù hợp cho giao diện quản lý danh mục ở trang Admin.
+     * Tìm kiếm và phân trang danh mục trả về DTO bao gồm số lượng sản phẩm.
+     * @param search Từ khóa tìm kiếm tên danh mục.
+     * @param isActive Trạng thái hoạt động.
+     * @param offset Vị trí bắt đầu.
+     * @param size Số lượng bản ghi mỗi trang.
      */
     List<CategoryDtoResponse> findAllPaged(
-        @Param("search") String search,
-        @Param("isActive") Boolean isActive,
-        @Param("offset") int offset,
+        @Param("search") String search, 
+        @Param("isActive") Boolean isActive, 
+        @Param("offset") int offset, 
         @Param("size") int size
     );
-    
+
     /**
-     * Đếm tổng số danh mục thỏa mãn điều kiện lọc để phục vụ việc tính toán số trang.
+     * Đếm tổng số danh mục theo bộ lọc để tính toán phân trang.
      */
-    long countAll(
-        @Param("search") String search,
-        @Param("isActive") Boolean isActive
-    );
-    
-    // ==================== SELECT OPTIONS (LỰA CHỌN) ====================
-    
+    long countAll(@Param("search") String search, @Param("isActive") Boolean isActive);
+
     /**
-     * Lấy danh sách các danh mục đang hoạt động để hiển thị lên dropdown hoặc menu chọn lọc.
-     */
-    List<Category> findAllActive();
-    
-    // ==================== VALIDATION QUERIES (KIỂM TRA RÀNG BUỘC) ====================
-    
-    /**
-     * Đếm số lượng sản phẩm thuộc về danh mục này. 
-     * Dùng để kiểm tra trước khi xóa (không cho xóa nếu còn sản phẩm).
-     */
-    int countProductsByCategory(@Param("categoryId") Integer categoryId);
-    
-    /**
-     * Đếm số lượng danh mục con thuộc về danh mục này.
-     */
-    int countChildCategories(@Param("categoryId") Integer categoryId);
-    
-    /**
-     * Kiểm tra nhanh xem một mã ID danh mục có tồn tại trong hệ thống hay không.
+     * Kiểm tra danh mục có tồn tại hay không qua ID.
      */
     boolean existsById(@Param("categoryId") Integer categoryId);
-    
+
     /**
-     * Kiểm tra xem tên danh mục đã tồn tại chưa. 
-     * Tham số excludeId dùng để bỏ qua ID hiện tại khi thực hiện cập nhật (update).
+     * Kiểm tra tên danh mục đã tồn tại chưa (có hỗ trợ loại trừ ID hiện tại).
      */
-    boolean existsByName(
-        @Param("name") String name,
-        @Param("excludeId") Integer excludeId
-    );
+    boolean existsByName(@Param("name") String name, @Param("excludeId") Integer excludeId);
+
+    /**
+     * Lấy danh sách các danh mục đang hoạt động.
+     */
+    List<Category> findAllActive();
+
+    /**
+     * Đếm số lượng sản phẩm đang thuộc về danh mục này.
+     */
+    int countProductsByCategory(@Param("categoryId") Integer categoryId);
 }
