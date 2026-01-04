@@ -1,54 +1,102 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.fpl.edu.shoeStore.product.mapper.ProductMapper">
 
     <resultMap id="ProductResultMap" type="com.fpl.edu.shoeStore.product.entity.Product">
         <id property="productId" column="product_id"/>
         <result property="categoryId" column="category_id"/>
         <result property="title" column="title"/>
+        <result property="url" column="url"/>
+        <result property="productCode" column="product_code"/>
+        <result property="description" column="description"/>
+        <result property="basePrice" column="base_price"/>
+        <result property="isActive" column="is_active"/>
+        <result property="brand" column="brand"/>
         <result property="condition" column="condition"/>
+        <result property="defaultImage" column="default_image"/>
         <result property="status" column="status"/>
+        <result property="createAt" column="create_at"/>
+        <result property="updateAt" column="update_at"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="viewCount" column="view_count"/>
     </resultMap>
 
-    <resultMap id="ProductDetailResultMap" type="com.fpl.edu.shoeStore.product.entity.Product" extends="ProductResultMap">
-        <collection property="variants" ofType="com.fpl.edu.shoeStore.product.entity.ProductVariant">
-            <id property="variantId" column="v_variant_id"/>
-            <result property="color" column="v_color"/>
-            <result property="size" column="v_size"/>
-            <result property="price" column="v_price"/>
-            <result property="stockQty" column="v_stock_qty"/>
-        </collection>
-    </resultMap>
-
-    <select id="findById" resultMap="ProductDetailResultMap">
-        SELECT p.*, p.[condition], v.variant_id AS v_variant_id, v.color AS v_color, 
-               v.size AS v_size, v.price AS v_price, v.stock_qty AS v_stock_qty
-        FROM products p
-        LEFT JOIN product_variants v ON p.product_id = v.product_id
-        WHERE p.product_id = #{productId}
+    <select id="findAll" resultMap="ProductResultMap">
+        SELECT product_id, category_id, title, url, product_code, description,
+               base_price, is_active, brand, [condition],
+               default_image, [status], create_at, update_at, create_by, update_by, view_count
+        FROM products
     </select>
 
-    <select id="findAllPaged" resultMap="ProductResultMap">
+    <select id="findById" parameterType="int" resultMap="ProductResultMap">
+        SELECT product_id, category_id, title, url, product_code, description,
+               base_price, is_active, brand, [condition],
+               default_image, [status], create_at, update_at, create_by, update_by, view_count
+        FROM products
+        WHERE product_id = #{productId}
+    </select>
+
+    <insert id="insert" parameterType="com.fpl.edu.shoeStore.product.entity.Product"
+            useGeneratedKeys="true" keyProperty="productId">
+        INSERT INTO products (category_id, title, url, product_code, description,
+                              base_price, is_active, brand, [condition],
+                              default_image, [status], create_at, update_at,
+                              create_by, update_by, view_count)
+        VALUES (#{categoryId}, #{title}, #{url}, #{productCode}, #{description},
+                #{basePrice}, #{isActive}, #{brand}, #{condition},
+                #{defaultImage}, #{status}, GETDATE(), GETDATE(),
+                #{createBy}, #{updateBy}, 0)
+    </insert>
+
+    <update id="update" parameterType="com.fpl.edu.shoeStore.product.entity.Product">
+        UPDATE products
+        SET category_id = #{categoryId},
+            title = #{title},
+            url = #{url},
+            product_code = #{productCode},
+            description = #{description},
+            base_price = #{basePrice},
+            is_active = #{isActive},
+            brand = #{brand},
+            [condition] = #{condition},
+            default_image = #{defaultImage},
+            [status] = #{status},
+            update_at = GETDATE(),
+            update_by = #{updateBy}
+        WHERE product_id = #{productId}
+    </update>
+
+    <select id="findAllPaged" parameterType="map" resultMap="ProductResultMap">
         SELECT * FROM products
         <where>
-            <if test="categoryId != null">AND category_id = #{categoryId}</if>
-            <if test="title != null and title != ''">AND title LIKE '%' + #{title} + '%'</if>
-            <if test="status != null">AND [status] = #{status}</if>
+            <if test="title != null and title != ''">
+                AND title LIKE ('%' + #{title} + '%')
+            </if>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
         </where>
         ORDER BY create_at DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 
-    <select id="findBestSellers" resultMap="ProductResultMap">
-        SELECT TOP 5 p.*, SUM(oi.quantity) as total_sold
-        FROM products p
-        JOIN product_variants v ON p.product_id = v.product_id
-        JOIN order_items oi ON v.variant_id = oi.variant_id
-        JOIN orders o ON oi.order_id = o.order_id
-        WHERE o.[status] = 'DELIVERED'
-        GROUP BY p.product_id, p.category_id, p.title, p.url, p.product_code, p.description, 
-                 p.base_price, p.is_active, p.brand, p.[condition], p.default_image, 
-                 p.[status], p.create_at, p.update_at, p.create_by, p.update_by
-        ORDER BY total_sold DESC
+    <select id="countAll" parameterType="map" resultType="long">
+        SELECT COUNT(*)
+        FROM products
+        <where>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
+            <if test="title != null and title != ''">
+                AND title LIKE ('%' + #{title} + '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND [status] = #{status}
+            </if>
+        </where>
     </select>
+
 </mapper>

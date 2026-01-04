@@ -1,54 +1,220 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.fpl.edu.shoeStore.order.mapper.OrderMapper">
 
     <resultMap id="OrderResultMap" type="com.fpl.edu.shoeStore.order.entity.Order">
         <id property="orderId" column="order_id"/>
         <result property="userId" column="user_id"/>
+        <result property="voucherId" column="voucher_id"/>
+        <result property="orderDate" column="order_date"/>
         <result property="status" column="status"/>
+        <result property="totalAmount" column="total_amount"/>
+        <result property="discountAmount" column="discount_amount"/>
         <result property="finalAmount" column="final_amount"/>
+        <result property="shippingFee" column="shipping_fee"/>
         <result property="shippingFullname" column="shipping_fullname"/>
+        <result property="shippingPhone" column="shipping_phone"/>
+        <result property="shippingAddress" column="shipping_address"/>
+        <result property="shippingCity" column="shipping_city"/>
+        <result property="shippingCountry" column="shipping_country"/>
+        <result property="note" column="note"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
-    <insert id="insertOrder" useGeneratedKeys="true" keyProperty="orderId">
-        INSERT INTO orders (user_id, voucher_id, order_date, [status], total_amount, discount_amount, final_amount, 
-                            shipping_fullname, shipping_phone, shipping_address, shipping_city, note, created_at)
-        VALUES (#{userId}, #{voucherId}, GETDATE(), 'pending', #{totalAmount}, #{discountAmount}, #{finalAmount}, 
-                #{shippingFullname}, #{shippingPhone}, #{shippingAddress}, #{shippingCity}, #{note}, GETDATE())
+    <resultMap id="OrderItemResultMap" type="com.fpl.edu.shoeStore.order.entity.OrderItem">
+        <id property="orderItemId" column="order_item_id"/>
+        <result property="orderId" column="order_id"/>
+        <result property="variantId" column="variant_id"/>
+        <result property="productNameSnapshot" column="product_name_snapshot"/>
+        <result property="quantity" column="quantity"/>
+        <result property="unitPrice" column="unit_price"/>
+        <result property="totalPrice" column="total_price"/>
+    </resultMap>
+
+    <insert id="insertOrder"
+            parameterType="com.fpl.edu.shoeStore.order.entity.Order"
+            useGeneratedKeys="true"
+            keyProperty="orderId">
+        INSERT INTO orders (
+            user_id,
+            voucher_id,
+            order_date,
+            [status],
+            total_amount,
+            discount_amount,
+            final_amount,
+            shipping_fee,
+            shipping_fullname,
+            shipping_phone,
+            shipping_address,
+            shipping_city,
+            shipping_country,
+            [note],
+            created_at,
+            updated_at
+        )
+        VALUES (
+                   #{userId},
+                   #{voucherId},
+                   ISNULL(#{orderDate}, GETDATE()),
+                   #{status},
+                   #{totalAmount},
+                   #{discountAmount},
+                   #{finalAmount},
+                   #{shippingFee},
+                   #{shippingFullname},
+                   #{shippingPhone},
+                   #{shippingAddress},
+                   #{shippingCity},
+                   #{shippingCountry},
+                   #{note},
+                   GETDATE(),
+                   GETDATE()
+               )
     </insert>
 
+    <insert id="insertOrderItem"
+            parameterType="com.fpl.edu.shoeStore.order.entity.OrderItem">
+        INSERT INTO order_items (
+            order_id,
+            variant_id,
+            product_name_snapshot,
+            quantity,
+            unit_price,
+            total_price
+        )
+        VALUES (
+                   #{orderId},
+                   #{variantId},
+                   #{productNameSnapshot},
+                   #{quantity},
+                   #{unitPrice},
+                   #{totalPrice}
+               )
+    </insert>
+
+    <select id="findById" parameterType="int" resultMap="OrderResultMap">
+        SELECT
+            order_id,
+            user_id,
+            voucher_id,
+            order_date,
+            [status],
+            total_amount,
+            discount_amount,
+            final_amount,
+            shipping_fee,
+            shipping_fullname,
+            shipping_phone,
+            shipping_address,
+            shipping_city,
+            shipping_country,
+            [note],
+            created_at,
+            updated_at
+        FROM orders
+        WHERE order_id = #{orderId}
+    </select>
+
+    <select id="findItemsByOrderId" parameterType="int" resultMap="OrderItemResultMap">
+        SELECT
+            order_item_id,
+            order_id,
+            variant_id,
+            product_name_snapshot,
+            quantity,
+            unit_price,
+            total_price
+        FROM order_items
+        WHERE order_id = #{orderId}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE orders
+        SET [status] = #{status},
+            updated_at = GETDATE()
+        WHERE order_id = #{orderId}
+    </update>
+
+    <select id="findByBuyerId" parameterType="int" resultMap="OrderResultMap">
+        SELECT
+            order_id,
+            user_id,
+            voucher_id,
+            order_date,
+            [status],
+            total_amount,
+            discount_amount,
+            final_amount,
+            shipping_fee,
+            shipping_fullname,
+            shipping_phone,
+            shipping_address,
+            shipping_city,
+            shipping_country,
+            [note],
+            created_at,
+            updated_at
+        FROM orders
+        WHERE user_id = #{userId}
+        ORDER BY order_date DESC
+    </select>
+
     <select id="findAllPaged" resultMap="OrderResultMap">
-        SELECT * FROM orders
-        <where>
-            <if test="status != null and status != ''">
-                AND [status] = #{status}
-            </if>
-            <if test="searchTerm != null and searchTerm != ''">
-                AND (shipping_fullname LIKE '%' + #{searchTerm} + '%' 
-                     OR shipping_phone LIKE '%' + #{searchTerm} + '%'
-                     OR CAST(order_id AS VARCHAR) = #{searchTerm})
-            </if>
-        </where>
+        SELECT
+        order_id,
+        user_id,
+        voucher_id,
+        order_date,
+        [status],
+        total_amount,
+        discount_amount,
+        final_amount,
+        shipping_fee,
+        shipping_fullname,
+        shipping_phone,
+        shipping_address,
+        shipping_city,
+        shipping_country,
+        [note],
+        created_at,
+        updated_at
+        FROM orders
+        WHERE 1=1
+        <if test="status != null and status != ''">
+            AND [status] = #{status}
+        </if>
+        <if test="searchTerm != null and searchTerm != ''">
+            AND (shipping_fullname LIKE ('%' + #{searchTerm} + '%')
+            OR shipping_phone LIKE ('%' + #{searchTerm} + '%')
+            OR CAST(order_id AS VARCHAR) = #{searchTerm})
+        </if>
         ORDER BY order_date DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 
-    <select id="calculateRevenueByMonth" resultType="java.math.BigDecimal">
-        SELECT COALESCE(SUM(final_amount), 0)
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*)
         FROM orders
-        WHERE [status] = 'DELIVERED'
-          AND YEAR(order_date) = #{year}
-          AND MONTH(order_date) = #{month}
+        WHERE 1=1
+        <if test="status != null and status != ''">
+            AND [status] = #{status}
+        </if>
+        <if test="searchTerm != null and searchTerm != ''">
+            AND (shipping_fullname LIKE ('%' + #{searchTerm} + '%')
+            OR shipping_phone LIKE ('%' + #{searchTerm} + '%')
+            OR CAST(order_id AS VARCHAR) = #{searchTerm})
+        </if>
     </select>
 
-    <select id="findTopSellingProducts" resultType="java.util.HashMap">
-        SELECT TOP (#{limit})
-            p.product_id, p.title as product_name, SUM(oi.quantity) as total_sold
-        FROM order_items oi
-        INNER JOIN orders o ON oi.order_id = o.order_id
-        INNER JOIN products p ON oi.variant_id = p.product_id -- Lưu ý khớp variant_id/product_id
-        WHERE o.[status] IN ('SHIPPING', 'DELIVERED')
-        GROUP BY p.product_id, p.title
-        ORDER BY total_sold DESC
+    <select id="countByStatus" resultType="long">
+        SELECT COUNT(*)
+        FROM orders
+        WHERE [status] = #{status}
     </select>
+
 </mapper>

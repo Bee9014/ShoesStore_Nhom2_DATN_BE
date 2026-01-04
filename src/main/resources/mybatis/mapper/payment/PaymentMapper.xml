@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.fpl.edu.shoeStore.payment.mapper.PaymentMapper">
 
     <resultMap id="PaymentResultMap" type="com.fpl.edu.shoeStore.payment.entity.Payment">
@@ -17,35 +20,212 @@
         <result property="createdAt" column="created_at"/>
     </resultMap>
 
+    <select id="findAll" resultMap="PaymentResultMap">
+        SELECT
+            payment_id,
+            order_id,
+            payer_id,
+            payment_method,
+            amount,
+            [status],
+            transaction_ref,
+            gateway_transaction_id,
+            bank_code,
+            transaction_desc,
+            payment_date,
+            created_at
+        FROM payments
+        ORDER BY created_at DESC
+    </select>
+
     <select id="findById" resultMap="PaymentResultMap">
-        SELECT * FROM payments WHERE payment_id = #{id}
+        SELECT
+            payment_id,
+            order_id,
+            payer_id,
+            payment_method,
+            amount,
+            [status],
+            transaction_ref,
+            gateway_transaction_id,
+            bank_code,
+            transaction_desc,
+            payment_date,
+            created_at
+        FROM payments
+        WHERE payment_id = #{id}
+    </select>
+
+    <select id="findByTransactionRef" resultMap="PaymentResultMap">
+        SELECT
+            payment_id,
+            order_id,
+            payer_id,
+            payment_method,
+            amount,
+            [status],
+            transaction_ref,
+            gateway_transaction_id,
+            bank_code,
+            transaction_desc,
+            payment_date,
+            created_at
+        FROM payments
+        WHERE transaction_ref = #{transactionRef}
     </select>
 
     <select id="findByOrderId" resultMap="PaymentResultMap">
-        SELECT TOP 1 * FROM payments 
-        WHERE order_id = #{orderId} 
+        SELECT TOP 1
+            payment_id,
+            order_id,
+            payer_id,
+            payment_method,
+            amount,
+            [status],
+            transaction_ref,
+            gateway_transaction_id,
+            bank_code,
+            transaction_desc,
+            payment_date,
+            created_at
+        FROM payments
+        WHERE order_id = #{orderId}
         ORDER BY created_at DESC
     </select>
 
     <select id="findAllPaged" resultMap="PaymentResultMap">
-        SELECT * FROM payments
-        <where>
-            <if test="paymentMethod != null and paymentMethod != ''">AND payment_method = #{paymentMethod}</if>
-            <if test="status != null and status != ''">AND [status] = #{status}</if>
-            <if test="paymentDate != null">
-                AND CAST(payment_date AS DATE) = CAST(#{paymentDate} AS DATE)
-            </if>
-        </where>
+        SELECT
+        payment_id,
+        order_id,
+        payer_id,
+        payment_method,
+        amount,
+        [status],
+        transaction_ref,
+        gateway_transaction_id,
+        bank_code,
+        transaction_desc,
+        payment_date,
+        created_at
+        FROM payments
+        WHERE 1=1
+        <if test="paymentId != null">
+            AND payment_id = #{paymentId}
+        </if>
+        <if test="orderId != null">
+            AND order_id = #{orderId}
+        </if>
+        <if test="payerId != null">
+            AND payer_id = #{payerId}
+        </if>
+        <if test="paymentMethod != null and paymentMethod != ''">
+            AND payment_method = #{paymentMethod}
+        </if>
+        <if test="status != null and status != ''">
+            AND [status] = #{status}
+        </if>
+        <if test="transactionRef != null and transactionRef != ''">
+            AND transaction_ref = #{transactionRef}
+        </if>
+        <if test="amount != null">
+            AND amount = #{amount}
+        </if>
+        <if test="paymentDate != null">
+            AND CAST(payment_date AS DATE) = CAST(#{paymentDate} AS DATE)
+        </if>
         ORDER BY created_at DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*)
+        FROM payments
+        WHERE 1=1
+        <if test="paymentId != null">
+            AND payment_id = #{paymentId}
+        </if>
+        <if test="orderId != null">
+            AND order_id = #{orderId}
+        </if>
+        <if test="payerId != null">
+            AND payer_id = #{payerId}
+        </if>
+        <if test="paymentMethod != null and paymentMethod != ''">
+            AND payment_method = #{paymentMethod}
+        </if>
+        <if test="status != null and status != ''">
+            AND [status] = #{status}
+        </if>
+        <if test="transactionRef != null and transactionRef != ''">
+            AND transaction_ref = #{transactionRef}
+        </if>
+        <if test="amount != null">
+            AND amount = #{amount}
+        </if>
+        <if test="paymentDate != null">
+            AND CAST(payment_date AS DATE) = CAST(#{paymentDate} AS DATE)
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="com.fpl.edu.shoeStore.payment.entity.Payment"
+            useGeneratedKeys="true" keyProperty="paymentId">
+        INSERT INTO payments (
+            order_id,
+            payer_id,
+            payment_method,
+            amount,
+            [status],
+            transaction_ref,
+            gateway_transaction_id,
+            bank_code,
+            transaction_desc,
+            payment_date,
+            created_at
+        )
+        VALUES (
+                   #{orderId},
+                   #{payerId},
+                   #{paymentMethod},
+                   #{amount},
+                   #{status},
+                   #{transactionRef},
+                   #{gatewayTransactionId},
+                   #{bankCode},
+                   #{transactionDesc},
+                   GETDATE(),
+                   GETDATE()
+               )
+    </insert>
+
+    <update id="update">
+        UPDATE payments
+        SET
+            order_id = #{orderId},
+            payer_id = #{payerId},
+            payment_method = #{paymentMethod},
+            amount = #{amount},
+            [status] = #{status},
+            transaction_ref = #{transactionRef},
+            gateway_transaction_id = #{gatewayTransactionId},
+            bank_code = #{bankCode},
+            transaction_desc = #{transactionDesc},
+            payment_date = #{paymentDate}
+        WHERE payment_id = #{paymentId}
+    </update>
+
     <update id="updatePaymentStatus">
         UPDATE payments
-        SET [status] = #{status}, 
-            gateway_transaction_id = #{gatewayTransactionId}, 
-            bank_code = #{bankCode}, 
+        SET
+            [status] = #{status},
+            gateway_transaction_id = #{gatewayTransactionId},
+            bank_code = #{bankCode},
             payment_date = GETDATE()
         WHERE transaction_ref = #{transactionRef}
     </update>
+
+    <delete id="deleteById">
+        DELETE FROM payments
+        WHERE payment_id = #{id}
+    </delete>
+
 </mapper>

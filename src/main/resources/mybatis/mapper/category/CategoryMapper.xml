@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.fpl.edu.shoeStore.category.mapper.CategoryMapper">
 
     <resultMap id="CategoryResultMap" type="com.fpl.edu.shoeStore.category.entity.Category">
@@ -16,49 +18,121 @@
         <result property="updatedBy" column="updated_by"/>
     </resultMap>
 
-    <select id="findById" resultMap="CategoryResultMap">
-        SELECT * FROM categories WHERE category_id = #{categoryId}
+    <select id="findAll" resultMap="CategoryResultMap">
+        SELECT category_id, parent_id, [name], url, [description], is_active,
+            sort_order, created_at, updated_at, created_by, updated_by
+        FROM categories
+        ORDER BY sort_order ASC, [name] ASC
     </select>
 
-    <select id="findByName" resultMap="CategoryResultMap">
-        SELECT TOP 1 * FROM categories WHERE [name] = #{name}
+    <select id="findById" parameterType="int" resultMap="CategoryResultMap">
+        SELECT category_id, parent_id, [name], url, [description], is_active,
+            sort_order, created_at, updated_at, created_by, updated_by
+        FROM categories
+        WHERE category_id = #{categoryId}
     </select>
 
-    <insert id="insert">
-        INSERT INTO categories (category_id, parent_id, [name], url, description, is_active, sort_order, created_at, updated_at, created_by, updated_by)
-        VALUES (#{categoryId}, #{parentId}, #{name}, #{url}, #{description}, #{isActive}, #{sortOrder}, GETDATE(), GETDATE(), #{createdBy}, #{updatedBy})
+    <select id="findByName" parameterType="string" resultMap="CategoryResultMap">
+        SELECT TOP 1 category_id, parent_id, [name], url, [description], is_active,
+            sort_order, created_at, updated_at, created_by, updated_by
+        FROM categories
+        WHERE [name] = #{name}
+    </select>
+
+    <insert id="insert" parameterType="com.fpl.edu.shoeStore.category.entity.Category"
+            useGeneratedKeys="true" keyProperty="categoryId">
+        INSERT INTO categories (
+            parent_id, [name], url, [description], is_active, sort_order,
+            created_at, updated_at, created_by, updated_by
+        )
+        VALUES (
+                   #{parentId}, #{name}, #{url}, #{description}, #{isActive}, #{sortOrder},
+                   GETDATE(), GETDATE(), #{createdBy}, #{updatedBy}
+               )
     </insert>
 
-    <update id="update">
+    <update id="update" parameterType="com.fpl.edu.shoeStore.category.entity.Category">
         UPDATE categories
-        SET parent_id = #{parentId}, [name] = #{name}, url = #{url}, description = #{description},
-            is_active = #{isActive}, sort_order = #{sortOrder}, updated_at = GETDATE(), updated_by = #{updatedBy}
+        SET parent_id = #{parentId},
+            [name] = #{name},
+            url = #{url},
+            [description] = #{description},
+            is_active = #{isActive},
+            sort_order = #{sortOrder},
+            updated_at = GETDATE(),
+            updated_by = #{updatedBy}
         WHERE category_id = #{categoryId}
     </update>
 
-    <update id="softDelete">
-        UPDATE categories SET is_active = 0, updated_at = GETDATE() WHERE category_id = #{categoryId}
+    <update id="softDelete" parameterType="int">
+        UPDATE categories
+        SET is_active = 0,
+            updated_at = GETDATE()
+        WHERE category_id = #{categoryId}
     </update>
 
-    <select id="findAllPaged" resultType="com.fpl.edu.shoeStore.category.dto.response.CategoryDtoResponse">
-        SELECT c.category_id AS categoryId, c.parent_id AS parentId, p.[name] AS parentName,
-               c.[name] AS [name], c.url AS url, c.is_active AS isActive,
-               (SELECT COUNT(*) FROM products WHERE category_id = c.category_id) AS productCount
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM categories
+        WHERE category_id = #{categoryId}
+    </delete>
+
+    <select id="findAllPaged" parameterType="map" resultType="com.fpl.edu.shoeStore.category.dto.response.CategoryDtoResponse">
+        SELECT
+        c.category_id AS categoryId,
+        c.parent_id AS parentId,
+        p.[name] AS parentName,
+        c.[name],
+        c.url,
+        c.[description],
+        c.is_active AS isActive,
+        c.sort_order AS sortOrder,
+        c.created_at AS createdAt,
+        (SELECT COUNT(*) FROM products WHERE category_id = c.category_id) AS productCount
         FROM categories c
         LEFT JOIN categories p ON c.parent_id = p.category_id
         <where>
             <if test="search != null and search != ''">
-                AND c.[name] LIKE '%' + #{search} + '%'
+                AND c.[name] LIKE ('%' + #{search} + '%')
             </if>
             <if test="isActive != null">
                 AND c.is_active = #{isActive}
             </if>
         </where>
-        ORDER BY c.sort_order ASC
+        ORDER BY c.sort_order ASC, c.[name] ASC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 
-    <select id="existsById" resultType="boolean">
-        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END FROM categories WHERE category_id = #{categoryId}
+    <select id="countAll" parameterType="map" resultType="long">
+        SELECT COUNT(*)
+        FROM categories
+        <where>
+            <if test="search != null and search != ''">
+                AND [name] LIKE ('%' + #{search} + '%')
+            </if>
+            <if test="isActive != null">
+                AND is_active = #{isActive}
+            </if>
+        </where>
     </select>
+
+    <select id="existsById" parameterType="int" resultType="boolean">
+        IF EXISTS (SELECT 1 FROM categories WHERE category_id = #{categoryId})
+        SELECT 1
+            ELSE
+        SELECT 0
+    </select>
+
+    <select id="existsByName" parameterType="map" resultType="boolean">
+        IF EXISTS (
+        SELECT 1 FROM categories
+        WHERE [name] = #{name}
+        <if test="excludeId != null">
+            AND category_id != #{excludeId}
+        </if>
+        )
+        SELECT 1
+        ELSE
+        SELECT 0
+    </select>
+
 </mapper>

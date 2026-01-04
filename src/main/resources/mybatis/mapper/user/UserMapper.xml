@@ -11,6 +11,8 @@
         <result property="username" column="username"/>
         <result property="passwordHash" column="password_hash"/>
         <result property="fullName" column="full_name"/>
+        <result property="gender" column="gender"/>
+        <result property="birthday" column="birthday"/>
         <result property="email" column="email"/>
         <result property="phone" column="phone"/>
         <result property="status" column="status"/>
@@ -18,31 +20,54 @@
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
+    <sql id="Base_Column_List">
+                user_id, role_id, username, password_hash, full_name,
+                gender, birthday, email, phone, [status], created_at, updated_at
+    </sql>
+
     <select id="findAll" resultMap="UserResultMap">
-        SELECT user_id, role_id, username, password_hash, full_name, 
-               email, phone, [status], created_at, updated_at
+        SELECT <include refid="Base_Column_List" />
         FROM sys_user
+        ORDER BY created_at DESC
     </select>
 
     <select id="findById" parameterType="int" resultMap="UserResultMap">
-        SELECT user_id, role_id, username, password_hash, full_name, 
-               email, phone, [status], created_at, updated_at
+        SELECT <include refid="Base_Column_List" />
         FROM sys_user
         WHERE user_id = #{id}
     </select>
 
-    <insert id="insert" parameterType="com.fpl.edu.shoeStore.user.entity.User" 
-            useGeneratedKeys="true" keyProperty="userId">
-        INSERT INTO sys_user (role_id, username, password_hash, full_name, email, phone, [status], created_at)
-        VALUES (#{roleId}, #{username}, #{passwordHash}, #{fullName}, #{email}, #{phone}, #{status}, GETDATE())
+    <select id="findByUsername" parameterType="string" resultMap="UserResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM sys_user
+        WHERE username = #{username}
+    </select>
+
+    <select id="findByPhone" parameterType="string" resultMap="UserResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM sys_user
+        WHERE phone = #{phone}
+    </select>
+
+    <insert id="insert" parameterType="com.fpl.edu.shoeStore.user.entity.User" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO sys_user (
+            role_id, username, password_hash, full_name,
+            gender, birthday, email, phone, [status], created_at, updated_at
+        )
+        VALUES (
+                   #{roleId}, #{username}, #{passwordHash}, #{fullName},
+                   #{gender}, #{birthday}, #{email}, #{phone}, #{status}, GETDATE(), GETDATE()
+               )
     </insert>
 
     <update id="update" parameterType="com.fpl.edu.shoeStore.user.entity.User">
         UPDATE sys_user
-        SET role_id      = #{roleId},
+        SET role_id       = #{roleId},
             username      = #{username},
             password_hash = #{passwordHash},
             full_name     = #{fullName},
+            gender        = #{gender},
+            birthday      = #{birthday},
             email         = #{email},
             phone         = #{phone},
             [status]      = #{status},
@@ -50,25 +75,28 @@
         WHERE user_id = #{userId}
     </update>
 
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM sys_user WHERE user_id = #{id}
+    </delete>
+
     <select id="findAllPaged" parameterType="map" resultMap="UserResultMap">
-        SELECT user_id, role_id, username, password_hash, full_name, 
-               email, phone, [status], created_at, updated_at
+        SELECT <include refid="Base_Column_List" />
         FROM sys_user
         <where>
             <if test="userId != null">
                 AND user_id = #{userId}
             </if>
             <if test="username != null and username != ''">
-                AND LOWER(username) LIKE '%' + LOWER(#{username}) + '%'
+                AND LOWER(username) LIKE ('%' + LOWER(#{username}) + '%')
             </if>
             <if test="fullName != null and fullName != ''">
-                AND LOWER(full_name) LIKE '%' + LOWER(#{fullName}) + '%'
+                AND LOWER(full_name) LIKE ('%' + LOWER(#{fullName}) + '%')
             </if>
             <if test="email != null and email != ''">
-                AND LOWER(email) LIKE '%' + LOWER(#{email}) + '%'
+                AND LOWER(email) LIKE ('%' + LOWER(#{email}) + '%')
             </if>
             <if test="phone != null and phone != ''">
-                AND phone LIKE '%' + #{phone} + '%'
+                AND phone LIKE ('%' + #{phone} + '%')
             </if>
             <if test="roleId != null">
                 AND role_id = #{roleId}
@@ -77,7 +105,7 @@
                 AND [status] = #{status}
             </if>
         </where>
-        ORDER BY user_id DESC
+        ORDER BY created_at DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 
@@ -89,20 +117,24 @@
                 AND user_id = #{userId}
             </if>
             <if test="username != null and username != ''">
-                AND LOWER(username) LIKE '%' + LOWER(#{username}) + '%'
+                AND LOWER(username) LIKE ('%' + LOWER(#{username}) + '%')
+            </if>
+            <if test="fullName != null and fullName != ''">
+                AND LOWER(full_name) LIKE ('%' + LOWER(#{fullName}) + '%')
+            </if>
+            <if test="email != null and email != ''">
+                AND LOWER(email) LIKE ('%' + LOWER(#{email}) + '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND phone LIKE ('%' + #{phone} + '%')
+            </if>
+            <if test="roleId != null">
+                AND role_id = #{roleId}
             </if>
             <if test="status != null and status != ''">
                 AND [status] = #{status}
             </if>
         </where>
-    </select>
-    
-    <select id="countNewUsersInMonth" resultType="java.lang.Long">
-        SELECT COUNT(*)
-        FROM sys_user
-        WHERE YEAR(created_at) = #{year}
-          AND MONTH(created_at) = #{month}
-          AND [status] != 'deleted'
     </select>
 
 </mapper>
