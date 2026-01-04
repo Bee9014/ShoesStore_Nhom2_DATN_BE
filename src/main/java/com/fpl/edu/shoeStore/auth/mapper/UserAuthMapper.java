@@ -10,33 +10,44 @@ import com.fpl.edu.shoeStore.user.entity.User;
 public interface UserAuthMapper {
 
     /**
-     * Tìm kiếm thông tin đăng nhập bao gồm cả tên Role.
-     * Khớp với <select id="findUserByUsername" resultMap="UserAuthResultMap">
+     * Tìm kiếm người dùng kèm theo thông tin vai trò (Role) để phục vụ đăng nhập.
+     * @param username Tên đăng nhập.
+     * @return Đối tượng UserAuth chứa thông tin tài khoản và phân quyền.
      */
     UserAuth findUserByUsername(@Param("username") String username);
-    
+
     /**
-     * Lấy Role ID cho người dùng đang hoạt động (status = 'active').
-     * Khớp với <select id="getRoleIdByUsername" resultType="java.lang.Integer">
+     * Lấy ID vai trò của người dùng dựa trên username (chỉ áp dụng cho tài khoản 'active').
+     * @param username Tên đăng nhập.
+     * @return ID của vai trò (Integer).
      */
     Integer getRoleIdByUsername(@Param("username") String username);
-    
+
     /**
-     * Trong XML dùng COUNT(*), trả về Integer sẽ an toàn hơn.
-     * MyBatis sẽ tự hiểu: 0 là false, >0 là true nếu bạn vẫn muốn để boolean.
-     * Nhưng để khớp nhất với resultType="java.lang.Integer", tôi khuyên dùng Integer hoặc int.
+     * Kiểm tra sự tồn tại của tên đăng nhập trong hệ thống.
+     * @param username Tên cần kiểm tra.
+     * @return true nếu đã tồn tại, false nếu chưa.
      */
-    int existsByUsername(@Param("username") String username);
-    
-    int existsByEmail(@Param("email") String email);
-    
-    int existsByPhone(@Param("phone") String phone);
-    
+    boolean existsByUsername(@Param("username") String username);
+
     /**
-     * Thêm mới người dùng. 
-     * XML sử dụng useGeneratedKeys="true" nên sau khi chạy, 
-     * ID sẽ được tự động fill vào object user.
-     * Trả về số dòng bị ảnh hưởng (thường là 1).
+     * Kiểm tra sự tồn tại của email trong hệ thống.
+     * @param email Email cần kiểm tra.
+     * @return true nếu đã tồn tại, false nếu chưa.
+     */
+    boolean existsByEmail(@Param("email") String email);
+
+    /**
+     * Kiểm tra sự tồn tại của số điện thoại trong hệ thống.
+     * @param phone Số điện thoại cần kiểm tra.
+     * @return true nếu đã tồn tại, false nếu chưa.
+     */
+    boolean existsByPhone(@Param("phone") String phone);
+
+    /**
+     * Thêm mới tài khoản người dùng (thường dùng cho chức năng Đăng ký).
+     * @param user Đối tượng chứa thông tin người dùng mới.
+     * @return Số dòng được thêm thành công (int).
      */
     int insertUser(User user);
 }

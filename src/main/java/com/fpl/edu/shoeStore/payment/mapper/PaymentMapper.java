@@ -1,5 +1,6 @@
 package com.fpl.edu.shoeStore.payment.mapper;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -11,23 +12,38 @@ import com.fpl.edu.shoeStore.payment.entity.Payment;
 public interface PaymentMapper {
 
     /**
-     * Tìm giao dịch thanh toán theo mã tham chiếu nội bộ (Transaction Reference).
-     * Dùng để đối soát với phản hồi từ VNPAY/Momo.
+     * Lấy toàn bộ danh sách giao dịch, sắp xếp theo thời gian tạo mới nhất.
+     */
+    List<Payment> findAll();
+
+    /**
+     * Tìm thông tin giao dịch theo ID chính xác.
+     */
+    Payment findById(@Param("id") Integer id);
+
+    /**
+     * Tìm giao dịch theo mã tham chiếu nội bộ (Transaction Reference).
+     * Cực kỳ quan trọng để đối soát dữ liệu khi nhận IPN từ VNPAY/Momo.
      */
     Payment findByTransactionRef(@Param("transactionRef") String transactionRef);
     
     /**
-     * Tìm thông tin thanh toán mới nhất của một đơn hàng.
+     * Tìm thông tin thanh toán mới nhất gắn với một đơn hàng.
      */
     Payment findByOrderId(@Param("orderId") Integer orderId);
 
     /**
-     * Tạo bản ghi giao dịch thanh toán mới.
+     * Tạo bản ghi giao dịch thanh toán mới. ID sẽ tự động gán vào object.
      */
     int insert(Payment payment);
 
     /**
-     * Cập nhật trạng thái thanh toán và thông tin từ phía ngân hàng trả về.
+     * Cập nhật toàn bộ thông tin của một bản ghi thanh toán.
+     */
+    int update(Payment payment);
+
+    /**
+     * Cập nhật trạng thái thanh toán và thông tin từ ngân hàng sau khi giao dịch hoàn tất.
      */
     int updatePaymentStatus(
             @Param("transactionRef") String transactionRef,
@@ -37,12 +53,38 @@ public interface PaymentMapper {
     );
 
     /**
-     * Phân trang danh sách giao dịch phục vụ đối soát tài chính.
+     * Truy vấn nâng cao: Tìm kiếm, lọc và phân trang danh sách giao dịch.
+     * Hỗ trợ lọc theo nhiều tiêu chí: ID, OrderId, PayerId, Method, Status, v.v.
      */
     List<Payment> findAllPaged(
+            @Param("paymentId") Integer paymentId,
+            @Param("orderId") Integer orderId,
+            @Param("payerId") Integer payerId,
+            @Param("paymentMethod") String paymentMethod,
             @Param("status") String status,
             @Param("transactionRef") String transactionRef,
+            @Param("amount") Double amount,
+            @Param("paymentDate") Date paymentDate,
             @Param("offset") int offset,
             @Param("size") int size
     );
+
+    /**
+     * Đếm tổng số giao dịch dựa trên các tiêu chí lọc để phục vụ phân trang.
+     */
+    long countAll(
+            @Param("paymentId") Integer paymentId,
+            @Param("orderId") Integer orderId,
+            @Param("payerId") Integer payerId,
+            @Param("paymentMethod") String paymentMethod,
+            @Param("status") String status,
+            @Param("transactionRef") String transactionRef,
+            @Param("amount") Double amount,
+            @Param("paymentDate") Date paymentDate
+    );
+
+    /**
+     * Xóa bản ghi thanh toán theo ID.
+     */
+    int deleteById(@Param("id") Integer id);
 }

@@ -30,24 +30,22 @@ public interface UserMapper {
 
     /**
      * Tìm kiếm người dùng qua tên đăng nhập. 
-     * Thường dùng để lấy thông tin chi tiết sau khi người dùng đã xác thực thành công.
      */
     User findByUsername(@Param("username") String username);
 
     /**
-     * Thêm mới người dùng. MyBatis sẽ tự động xử lý mapping các thuộc tính như fullName, email, birthday...
-     * Trả về số dòng thành công (1).
+     * Thêm mới người dùng. Trả về số dòng thành công (1).
+     * ID tự tăng sẽ được MyBatis gán ngược vào object User.
      */
     Integer insert(User user);
 
     /**
-     * Cập nhật thông tin người dùng. Lưu ý: Chỉ cập nhật các trường được truyền giá trị vào đối tượng User.
+     * Cập nhật thông tin người dùng dựa trên userId.
      */
     Integer update(User user);
 
     /**
-     * Xóa vĩnh viễn tài khoản khỏi cơ sở dữ liệu. 
-     * (Khuyên dùng: Nên sử dụng cập nhật status sang 'deleted' thay vì xóa vật lý).
+     * Xóa vĩnh viễn tài khoản khỏi cơ sở dữ liệu theo ID.
      */
     Integer deleteById(@Param("id") Integer id);
 
@@ -55,9 +53,7 @@ public interface UserMapper {
 
     /**
      * Tìm kiếm nâng cao và phân trang cho Admin. 
-     * Cho phép lọc theo tất cả các tiêu chí như Role, Status, Họ tên, Email...
-     * @param offset Vị trí bắt đầu (Số trang * Kích thước trang)
-     * @param size Số lượng bản ghi cần lấy
+     * Hỗ trợ lọc theo Role, Status, Họ tên, Email, Phone...
      */
     List<User> findAllPaged(
             @Param("userId") Integer userId,
@@ -72,7 +68,7 @@ public interface UserMapper {
     );
 
     /**
-     * Đếm tổng số lượng bản ghi thỏa mãn bộ lọc phía trên để tính toán tổng số trang hiển thị.
+     * Đếm tổng số lượng bản ghi thỏa mãn bộ lọc để tính toán phân trang.
      */
     long countAll(
             @Param("userId") Integer userId,
@@ -84,57 +80,55 @@ public interface UserMapper {
             @Param("status") String status
     );
 
-    // ==================== KIỂM TRA TRÙNG LẶP (VALIDATION) ====================
+    // ==================== KIỂM TRA TRÙNG LẶP (BOOLEAN) ====================
 
     /**
      * Kiểm tra Username đã tồn tại hay chưa. 
-     * Trả về số lượng (thường là 0 hoặc 1).
+     * Trả về true nếu đã tồn tại, false nếu chưa.
      */
     @Select("SELECT COUNT(user_id) FROM sys_user WHERE username = #{username} AND [status] != 'deleted'")
-    int countByUsername(@Param("username") String username);
+    boolean countByUsername(@Param("username") String username);
 
     /**
      * Kiểm tra Email đã tồn tại hay chưa để tránh đăng ký trùng.
      */
     @Select("SELECT COUNT(user_id) FROM sys_user WHERE email = #{email} AND [status] != 'deleted'")
-    int countByEmail(@Param("email") String email);
+    boolean countByEmail(@Param("email") String email);
 
     /**
-     * Kiểm tra số điện thoại đã được đăng ký cho tài khoản nào khác chưa.
+     * Kiểm tra số điện thoại đã được đăng ký chưa.
      */
     @Select("SELECT COUNT(user_id) FROM sys_user WHERE phone = #{phone} AND [status] != 'deleted'")
-    int countByPhone(@Param("phone") String phone);
+    boolean countByPhone(@Param("phone") String phone);
 
     /**
-     * Kiểm tra trùng lặp Username khi UPDATE. 
-     * Phải loại trừ ID của chính người dùng đang sửa để không tự trùng với chính mình.
+     * Kiểm tra trùng lặp Username khi UPDATE (loại trừ ID của chính mình).
      */
     @Select("SELECT COUNT(user_id) FROM sys_user WHERE username = #{username} AND user_id != #{id} AND [status] != 'deleted'")
-    int countByUsernameExcludingId(@Param("username") String username, @Param("id") Integer id);
+    boolean countByUsernameExcludingId(@Param("username") String username, @Param("id") Integer id);
 
     /**
-     * Kiểm tra trùng lặp Email khi UPDATE (loại trừ chính mình).
+     * Kiểm tra trùng lặp Email khi UPDATE (loại trừ ID của chính mình).
      */
     @Select("SELECT COUNT(user_id) FROM sys_user WHERE email = #{email} AND user_id != #{id} AND [status] != 'deleted'")
-    int countByEmailExcludingId(@Param("email") String email, @Param("id") Integer id);
+    boolean countByEmailExcludingId(@Param("email") String email, @Param("id") Integer id);
 
     /**
-     * Kiểm tra trùng lặp số điện thoại khi UPDATE (loại trừ chính mình).
+     * Kiểm tra trùng lặp số điện thoại khi UPDATE (loại trừ ID của chính mình).
      */
     @Select("SELECT COUNT(user_id) FROM sys_user WHERE phone = #{phone} AND user_id != #{id} AND [status] != 'deleted'")
-    int countByPhoneExcludingId(@Param("phone") String phone, @Param("id") Integer id);
+    boolean countByPhoneExcludingId(@Param("phone") String phone, @Param("id") Integer id);
     
     // ==================== THỐNG KÊ (DASHBOARD) ====================
 
     /**
-     * Đếm tổng số người dùng thực tế đang hoạt động/tồn tại (loại trừ đã xóa).
+     * Đếm tổng số người dùng đang hoạt động (loại trừ đã xóa).
      */
     @Select("SELECT COUNT(*) FROM sys_user WHERE [status] != 'deleted'")
     Long countAllUsers();
     
     /**
-     * Đếm số lượng người dùng mới trong tháng của năm cụ thể. 
-     * Thường dùng cho biểu đồ tăng trưởng Line Chart trên Dashboard.
+     * Đếm số lượng người dùng mới trong tháng của năm cụ thể.
      */
     Long countNewUsersInMonth(@Param("year") Integer year, @Param("month") Integer month);
 }

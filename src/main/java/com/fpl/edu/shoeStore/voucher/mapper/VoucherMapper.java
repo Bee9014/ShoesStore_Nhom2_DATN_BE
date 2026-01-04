@@ -1,7 +1,6 @@
 package com.fpl.edu.shoeStore.voucher.mapper;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -22,68 +21,57 @@ public interface VoucherMapper {
 
     /**
      * Tìm thông tin chi tiết của một Voucher qua ID. 
-     * Dùng để kiểm tra các ràng buộc như giá trị giảm, mức chi tiêu tối thiểu trước khi áp dụng.
+     * Lưu ý: XML mapping tham số là #{id}.
      */
     Voucher findById(@Param("id") Integer id);
 
     /**
-     * Tìm kiếm Voucher theo mã code (Ví dụ: 'SALE2024').
-     * @return Danh sách các Voucher trùng code (dùng trong trường hợp mã code được tái sử dụng cho các đợt khác nhau).
+     * Tìm kiếm Voucher theo mã code.
+     * XML sử dụng LIKE nên sẽ trả về danh sách các voucher chứa chuỗi code tương ứng.
      */
     List<Voucher> findByCode(@Param("code") String code);
 
     /**
      * Thêm mới một chương trình khuyến mãi/Voucher. 
-     * Tự động lấy ID định danh từ SQL Server sau khi insert thành công.
+     * ID tự tăng (voucherId) sẽ được gán lại vào object Voucher.
      */
     int insert(Voucher voucher);
 
     /**
      * Cập nhật thông tin Voucher. 
-     * Thường dùng để thay đổi hạn sử dụng hoặc giảm số lượng 'usage_limit' sau khi người dùng áp dụng mã thành công.
+     * Sử dụng voucher_id = #{voucherId} làm điều kiện định danh.
      */
     int update(Voucher voucher);
 
     /**
-     * Xóa vĩnh viễn một Voucher khỏi cơ sở dữ liệu.
+     * Xóa vĩnh viễn một Voucher khỏi cơ sở dữ liệu qua ID.
      */
     int deleteById(@Param("id") Integer id);
 
     // ==================== PHÂN TRANG & BỘ LỌC (ADMIN) ====================
 
     /**
-     * Truy vấn danh sách Voucher với bộ lọc đa năng cho trang quản trị.
-     * Hỗ trợ lọc theo thời gian hiệu lực (startDate, endDate) và điều kiện sử dụng (minSpend).
-     * @param offset Vị trí bắt đầu lấy dữ liệu (Phục vụ phân trang).
-     * @param size Số lượng bản ghi hiển thị trên mỗi trang.
+     * Truy vấn danh sách Voucher với bộ lọc dựa trên XML hiện tại.
+     * Lưu ý: Tên tham số đã được đổi từ 'type' sang 'voucherType' để khớp với #{voucherType} trong XML.
+     * @param offset Vị trí bắt đầu (Phân trang).
+     * @param size Số lượng bản ghi mỗi trang.
      */
     List<Voucher> findAllPaged(
             @Param("voucherId") Integer voucherId,
             @Param("code") String code,
-            @Param("description") String description,
-            @Param("type") String type,
-            @Param("discountValue") BigDecimal discountValue,
+            @Param("voucherType") String voucherType,
             @Param("minSpend") BigDecimal minSpend,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate,
-            @Param("usageLimit") Integer usageLimit,
             @Param("offset") int offset,
             @Param("size") int size
     );
 
     /**
-     * Đếm tổng số lượng Voucher thỏa mãn bộ lọc phía trên.
-     * Dùng để tính toán tổng số trang trên giao diện quản lý của Admin.
+     * Đếm tổng số lượng Voucher thỏa mãn bộ lọc hiện có trong XML.
+     * Phục vụ tính toán tổng số trang cho Admin.
      */
     long countAll(
             @Param("voucherId") Integer voucherId,
             @Param("code") String code,
-            @Param("description") String description,
-            @Param("type") String type,
-            @Param("discountValue") BigDecimal discountValue,
-            @Param("minSpend") BigDecimal minSpend,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate,
-            @Param("usageLimit") Integer usageLimit
+            @Param("voucherType") String voucherType
     );
 }
