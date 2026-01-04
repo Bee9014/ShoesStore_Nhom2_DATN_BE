@@ -8,6 +8,7 @@
         <result property="title" column="title"/>
         <result property="condition" column="condition"/>
         <result property="status" column="status"/>
+        <result property="productCode" column="product_code"/>
     </resultMap>
 
     <resultMap id="ProductDetailResultMap" type="com.fpl.edu.shoeStore.product.entity.Product" extends="ProductResultMap">

@@ -5,20 +5,22 @@
      import lombok.Data;
      import lombok.NoArgsConstructor;
 
-     @Data
-     @NoArgsConstructor
-     @AllArgsConstructor
-     @Builder
-     public class ProductVariantDtoRequest {
-         private Integer productId;
-         private String productVariantCode;
-         private Double price;
-         private Integer stockQty;
-         private Boolean isActive;
-         private Integer weightGrams;
-         private String size;
-         private String color;
-         private String image;
-         private Integer createBy;
-         private Integer updateBy;
-     }
+     import java.math.BigDecimal;
+
+ @Data
+ @NoArgsConstructor
+ @AllArgsConstructor
+ @Builder
+ public class ProductVariantDtoRequest {
+     private Integer productId;
+     private String productVariantCode;
+     private BigDecimal price;
+     private Integer stockQty;
+     private Boolean isActive;
+     private Integer weightGrams;
+     private String size;
+     private String color;
+     private String image;
+     private Integer createBy;
+     private Integer updateBy;
+ }

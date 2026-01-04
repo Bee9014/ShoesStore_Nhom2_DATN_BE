@@ -26,6 +26,7 @@
          private String condition;
          private String defaultImage;
          private String status;
+         private Long viewCount;
          private LocalDateTime createAt;
          private LocalDateTime updateAt;
          private Integer createBy;

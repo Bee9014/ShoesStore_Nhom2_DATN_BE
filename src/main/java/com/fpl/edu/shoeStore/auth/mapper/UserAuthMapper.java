@@ -19,15 +19,15 @@ public interface UserAuthMapper {
     
     /** * Kiểm tra Username đã tồn tại chưa (trả về true nếu đã có).
      */
-    boolean existsByUsername(@Param("username") String username);
+    Integer existsByUsername(@Param("username") String username);
     
     /** * Kiểm tra Email đã tồn tại chưa để tránh đăng ký trùng.
      */
-    boolean existsByEmail(@Param("email") String email);
+    Integer existsByEmail(@Param("email") String email);
     
     /** * Kiểm tra số điện thoại đã tồn tại chưa.
      */
-    boolean existsByPhone(@Param("phone") String phone);
+    Integer existsByPhone(@Param("phone") String phone);
     
     /** * Đăng ký/Thêm mới người dùng vào hệ thống.
      */
