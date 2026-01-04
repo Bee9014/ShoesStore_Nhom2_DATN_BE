@@ -166,7 +166,16 @@
             AND CAST(payment_date AS DATE) = CAST(#{paymentDate} AS DATE)
         </if>
     </select>
-
+<select id="findAllPaged" resultMap="PaymentResultMap">
+    SELECT * FROM payments
+    <where>
+        <if test="orderId != null"> AND order_id = #{orderId} </if>
+        <if test="status != null"> AND [status] = #{status} </if>
+        <if test="transactionRef != null"> AND transaction_ref LIKE '%' + #{transactionRef} + '%' </if>
+        </where>
+    ORDER BY payment_date DESC
+    OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+</select>
     <insert id="insert" parameterType="com.fpl.edu.shoeStore.payment.entity.Payment"
             useGeneratedKeys="true" keyProperty="paymentId">
         INSERT INTO payments (

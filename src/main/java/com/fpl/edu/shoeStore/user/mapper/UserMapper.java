@@ -14,47 +14,50 @@ public interface UserMapper {
     // ==================== CƠ BẢN (CRUD) ====================
 
     /**
-     * Lấy danh sách tất cả người dùng trong hệ thống (không phân trang).
+     * Lấy danh sách toàn bộ người dùng. Thường dùng cho các báo cáo nội bộ không yêu cầu phân trang.
      */
     List<User> findAll();
 
     /**
-     * Tìm kiếm thông tin chi tiết của một người dùng dựa trên mã ID nội bộ.
+     * Truy vấn chi tiết một người dùng qua ID. Dùng khi xem hồ sơ cá nhân hoặc chỉnh sửa.
      */
-    User findById(Integer id);
+    User findById(@Param("id") Integer id);
 
     /**
-     * Tìm kiếm người dùng dựa trên số điện thoại chính xác.
+     * Tìm kiếm người dùng bằng số điện thoại. Rất hữu ích khi tra cứu khách hàng tại quầy.
      */
-    User findByPhone(String phone);
+    User findByPhone(@Param("phone") String phone);
 
     /**
-     * Tìm kiếm người dùng dựa trên tên đăng nhập (username) chính xác.
+     * Tìm kiếm người dùng qua tên đăng nhập. 
+     * Thường dùng để lấy thông tin chi tiết sau khi người dùng đã xác thực thành công.
      */
-    User findByUsername(String username);
+    User findByUsername(@Param("username") String username);
 
     /**
-     * Thêm mới một tài khoản người dùng vào hệ thống.
-     * Trả về số dòng bị tác động (thường là 1 nếu thành công).
+     * Thêm mới người dùng. MyBatis sẽ tự động xử lý mapping các thuộc tính như fullName, email, birthday...
+     * Trả về số dòng thành công (1).
      */
     Integer insert(User user);
 
     /**
-     * Cập nhật thông tin cá nhân hoặc trạng thái của người dùng hiện tại.
+     * Cập nhật thông tin người dùng. Lưu ý: Chỉ cập nhật các trường được truyền giá trị vào đối tượng User.
      */
     Integer update(User user);
 
     /**
-     * Xóa vĩnh viễn bản ghi người dùng khỏi cơ sở dữ liệu dựa trên mã ID.
+     * Xóa vĩnh viễn tài khoản khỏi cơ sở dữ liệu. 
+     * (Khuyên dùng: Nên sử dụng cập nhật status sang 'deleted' thay vì xóa vật lý).
      */
-    Integer deleteById(Integer id);
+    Integer deleteById(@Param("id") Integer id);
 
     // ==================== PHÂN TRANG & BỘ LỌC (ADMIN) ====================
 
     /**
-     * Tìm kiếm, lọc và phân trang danh sách người dùng cho giao diện quản trị Admin.
-     * Hỗ trợ lọc đa năng theo ID, tên, email, số điện thoại, vai trò và trạng thái.
-     * Lưu ý: Trong XML phải dùng OFFSET...FETCH NEXT đặc thù của SQL Server.
+     * Tìm kiếm nâng cao và phân trang cho Admin. 
+     * Cho phép lọc theo tất cả các tiêu chí như Role, Status, Họ tên, Email...
+     * @param offset Vị trí bắt đầu (Số trang * Kích thước trang)
+     * @param size Số lượng bản ghi cần lấy
      */
     List<User> findAllPaged(
             @Param("userId") Integer userId,
@@ -69,7 +72,7 @@ public interface UserMapper {
     );
 
     /**
-     * Đếm tổng số lượng người dùng thỏa mãn bộ lọc để tính toán số trang trong phân trang.
+     * Đếm tổng số lượng bản ghi thỏa mãn bộ lọc phía trên để tính toán tổng số trang hiển thị.
      */
     long countAll(
             @Param("userId") Integer userId,
@@ -84,37 +87,39 @@ public interface UserMapper {
     // ==================== KIỂM TRA TRÙNG LẶP (VALIDATION) ====================
 
     /**
-     * Đếm số lượng tài khoản sử dụng Username này (trừ các tài khoản đã bị xóa).
+     * Kiểm tra Username đã tồn tại hay chưa. 
+     * Trả về số lượng (thường là 0 hoặc 1).
      */
     @Select("SELECT COUNT(user_id) FROM sys_user WHERE username = #{username} AND [status] != 'deleted'")
     int countByUsername(@Param("username") String username);
 
     /**
-     * Đếm số lượng tài khoản sử dụng Email này.
+     * Kiểm tra Email đã tồn tại hay chưa để tránh đăng ký trùng.
      */
     @Select("SELECT COUNT(user_id) FROM sys_user WHERE email = #{email} AND [status] != 'deleted'")
     int countByEmail(@Param("email") String email);
 
     /**
-     * Đếm số lượng tài khoản sử dụng số điện thoại này.
+     * Kiểm tra số điện thoại đã được đăng ký cho tài khoản nào khác chưa.
      */
     @Select("SELECT COUNT(user_id) FROM sys_user WHERE phone = #{phone} AND [status] != 'deleted'")
     int countByPhone(@Param("phone") String phone);
 
     /**
-     * Kiểm tra trùng lặp Username khi cập nhật thông tin (bỏ qua bản ghi hiện tại qua ID).
+     * Kiểm tra trùng lặp Username khi UPDATE. 
+     * Phải loại trừ ID của chính người dùng đang sửa để không tự trùng với chính mình.
      */
     @Select("SELECT COUNT(user_id) FROM sys_user WHERE username = #{username} AND user_id != #{id} AND [status] != 'deleted'")
     int countByUsernameExcludingId(@Param("username") String username, @Param("id") Integer id);
 
     /**
-     * Kiểm tra trùng lặp Email khi cập nhật thông tin (bỏ qua bản ghi hiện tại qua ID).
+     * Kiểm tra trùng lặp Email khi UPDATE (loại trừ chính mình).
      */
     @Select("SELECT COUNT(user_id) FROM sys_user WHERE email = #{email} AND user_id != #{id} AND [status] != 'deleted'")
     int countByEmailExcludingId(@Param("email") String email, @Param("id") Integer id);
 
     /**
-     * Kiểm tra trùng lặp số điện thoại khi cập nhật thông tin (bỏ qua bản ghi hiện tại qua ID).
+     * Kiểm tra trùng lặp số điện thoại khi UPDATE (loại trừ chính mình).
      */
     @Select("SELECT COUNT(user_id) FROM sys_user WHERE phone = #{phone} AND user_id != #{id} AND [status] != 'deleted'")
     int countByPhoneExcludingId(@Param("phone") String phone, @Param("id") Integer id);
@@ -122,14 +127,14 @@ public interface UserMapper {
     // ==================== THỐNG KÊ (DASHBOARD) ====================
 
     /**
-     * Thống kê: Tổng số lượng người dùng hiện có trong hệ thống (không tính những người đã xóa).
+     * Đếm tổng số người dùng thực tế đang hoạt động/tồn tại (loại trừ đã xóa).
      */
     @Select("SELECT COUNT(*) FROM sys_user WHERE [status] != 'deleted'")
     Long countAllUsers();
     
     /**
-     * Thống kê: Số lượng khách hàng mới đăng ký trong một tháng và năm cụ thể.
-     * Phục vụ vẽ biểu đồ tăng trưởng người dùng trên trang Dashboard.
+     * Đếm số lượng người dùng mới trong tháng của năm cụ thể. 
+     * Thường dùng cho biểu đồ tăng trưởng Line Chart trên Dashboard.
      */
     Long countNewUsersInMonth(@Param("year") Integer year, @Param("month") Integer month);
 }

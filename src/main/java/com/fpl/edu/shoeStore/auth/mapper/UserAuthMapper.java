@@ -8,28 +8,35 @@ import com.fpl.edu.shoeStore.user.entity.User;
 
 @Mapper
 public interface UserAuthMapper {
-    /** * Tìm kiếm thông tin đăng nhập của người dùng qua Username.
-     * Thường dùng trong quá trình xử lý Login của Spring Security.
+
+    /**
+     * Tìm kiếm thông tin đăng nhập bao gồm cả tên Role.
+     * Khớp với <select id="findUserByUsername" resultMap="UserAuthResultMap">
      */
     UserAuth findUserByUsername(@Param("username") String username);
     
-    /** * Lấy mã quyền (Role ID) từ Username để phân quyền (Admin/User).
+    /**
+     * Lấy Role ID cho người dùng đang hoạt động (status = 'active').
+     * Khớp với <select id="getRoleIdByUsername" resultType="java.lang.Integer">
      */
     Integer getRoleIdByUsername(@Param("username") String username);
     
-    /** * Kiểm tra Username đã tồn tại chưa (trả về true nếu đã có).
+    /**
+     * Trong XML dùng COUNT(*), trả về Integer sẽ an toàn hơn.
+     * MyBatis sẽ tự hiểu: 0 là false, >0 là true nếu bạn vẫn muốn để boolean.
+     * Nhưng để khớp nhất với resultType="java.lang.Integer", tôi khuyên dùng Integer hoặc int.
      */
-    boolean existsByUsername(@Param("username") String username);
+    int existsByUsername(@Param("username") String username);
     
-    /** * Kiểm tra Email đã tồn tại chưa để tránh đăng ký trùng.
-     */
-    boolean existsByEmail(@Param("email") String email);
+    int existsByEmail(@Param("email") String email);
     
-    /** * Kiểm tra số điện thoại đã tồn tại chưa.
-     */
-    boolean existsByPhone(@Param("phone") String phone);
+    int existsByPhone(@Param("phone") String phone);
     
-    /** * Đăng ký/Thêm mới người dùng vào hệ thống.
+    /**
+     * Thêm mới người dùng. 
+     * XML sử dụng useGeneratedKeys="true" nên sau khi chạy, 
+     * ID sẽ được tự động fill vào object user.
+     * Trả về số dòng bị ảnh hưởng (thường là 1).
      */
     int insertUser(User user);
 }
