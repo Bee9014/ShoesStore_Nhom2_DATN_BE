@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 public class Order {
     private int orderId;
     private int userId;
-    private int buyerId;
     private Integer voucherId;
     private LocalDateTime orderDate;
     private String status;

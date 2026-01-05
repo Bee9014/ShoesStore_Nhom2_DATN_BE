@@ -1,5 +1,7 @@
 package com.fpl.edu.shoeStore.payment.mapper;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -61,10 +63,10 @@ public interface PaymentMapper {
             @Param("orderId") Integer orderId,
             @Param("payerId") Integer payerId,
             @Param("paymentMethod") String paymentMethod,
+            @Param("paymentDate") LocalDateTime paymentDate,
             @Param("status") String status,
+            @Param("amount") BigDecimal amount,
             @Param("transactionRef") String transactionRef,
-            @Param("amount") Double amount,
-            @Param("paymentDate") Date paymentDate,
             @Param("offset") int offset,
             @Param("size") int size
     );
@@ -77,10 +79,10 @@ public interface PaymentMapper {
             @Param("orderId") Integer orderId,
             @Param("payerId") Integer payerId,
             @Param("paymentMethod") String paymentMethod,
+            @Param("paymentDate") LocalDateTime paymentDate,
             @Param("status") String status,
-            @Param("transactionRef") String transactionRef,
-            @Param("amount") Double amount,
-            @Param("paymentDate") Date paymentDate
+            @Param("amount") BigDecimal amount,
+            @Param("transactionRef") String transactionRef
     );
 
     /**

@@ -63,7 +63,10 @@ public interface CategoryMapper {
     /**
      * Đếm tổng số danh mục theo bộ lọc để tính toán phân trang.
      */
-    long countAll(@Param("search") String search, @Param("isActive") Boolean isActive);
+    long countAll(
+            @Param("search") String search,
+            @Param("isActive") Boolean isActive
+    );
 
     /**
      * Kiểm tra danh mục có tồn tại hay không qua ID.
@@ -84,4 +87,12 @@ public interface CategoryMapper {
      * Đếm số lượng sản phẩm đang thuộc về danh mục này.
      */
     int countProductsByCategory(@Param("categoryId") Integer categoryId);
+
+    /**
+     * Đếm số lượng danh mục con trực tiếp thuộc về danh mục này.
+     * Được sử dụng để kiểm tra ràng buộc trước khi thực hiện xóa danh mục.
+     * @param id ID của danh mục cha cần kiểm tra.
+     * @return Số lượng danh mục con tìm thấy.
+     */
+    int countChildCategories(@Param("id") Integer id);
 }

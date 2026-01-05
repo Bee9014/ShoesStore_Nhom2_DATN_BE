@@ -64,7 +64,7 @@
         WHERE category_id = #{categoryId}
     </update>
 
-    <update id="softDelete" parameterType="int">
+    <update id="softDelete">
         UPDATE categories
         SET is_active = 0,
             updated_at = GETDATE()
@@ -81,9 +81,9 @@
         c.category_id AS categoryId,
         c.parent_id AS parentId,
         p.[name] AS parentName,
-        c.[name],
-        c.url,
-        c.[description],
+        c.[name] AS name,
+        c.url AS url,
+        c.[description] AS description,
         c.is_active AS isActive,
         c.sort_order AS sortOrder,
         c.created_at AS createdAt,
@@ -134,11 +134,16 @@
         ELSE
         SELECT 0
     </select>
-<select id="findAllActive" resultMap="CategoryResultMap">
-    SELECT * FROM categories WHERE is_active = 1 ORDER BY sort_order ASC
-</select>
 
-<select id="countProductsByCategory" resultType="int">
-    SELECT COUNT(*) FROM products WHERE category_id = #{categoryId}
-</select>
+    <select id="findAllActive" resultMap="CategoryResultMap">
+        SELECT * FROM categories WHERE is_active = 1 ORDER BY sort_order ASC
+    </select>
+
+    <select id="countProductsByCategory" resultType="int">
+        SELECT COUNT(*) FROM products WHERE category_id = #{categoryId}
+    </select>
+
+    <select id="countChildCategories" resultType="int">
+        SELECT COUNT(*) FROM categories WHERE parent_id = #{id}
+    </select>
 </mapper>

@@ -28,21 +28,21 @@ public interface UserAuthMapper {
      * @param username Tên cần kiểm tra.
      * @return true nếu đã tồn tại, false nếu chưa.
      */
-    boolean existsByUsername(@Param("username") String username);
+    Integer existsByUsername(@Param("username") String username);
 
     /**
      * Kiểm tra sự tồn tại của email trong hệ thống.
      * @param email Email cần kiểm tra.
      * @return true nếu đã tồn tại, false nếu chưa.
      */
-    boolean existsByEmail(@Param("email") String email);
+    Integer existsByEmail(@Param("email") String email);
 
     /**
      * Kiểm tra sự tồn tại của số điện thoại trong hệ thống.
      * @param phone Số điện thoại cần kiểm tra.
      * @return true nếu đã tồn tại, false nếu chưa.
      */
-    boolean existsByPhone(@Param("phone") String phone);
+    Integer existsByPhone(@Param("phone") String phone);
 
     /**
      * Thêm mới tài khoản người dùng (thường dùng cho chức năng Đăng ký).
