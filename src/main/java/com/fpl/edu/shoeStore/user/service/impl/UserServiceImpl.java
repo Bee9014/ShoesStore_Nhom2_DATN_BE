@@ -1,5 +1,6 @@
 package com.fpl.edu.shoeStore.user.service.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -64,6 +65,8 @@ public class UserServiceImpl implements UserService {
         // 2. Update từng trường (Chỉ update nếu request có gửi lên)
         if (request.getUsername() != null) existingUser.setUsername(request.getUsername());
         if (request.getFullName() != null) existingUser.setFullName(request.getFullName());
+        if (request.getGender() != null) existingUser.setGender(request.getGender());
+        if (request.getBirthday() != null) existingUser.setBirthday(request.getBirthday());
         if (request.getEmail() != null) existingUser.setEmail(request.getEmail());
         if (request.getPhone() != null) existingUser.setPhone(request.getPhone());
         if (request.getStatus() != null) existingUser.setStatus(request.getStatus());
@@ -106,15 +109,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDtoResponse findByPhone(String phone) {
-        User user = userMapper.findByPhone(phone);
-        return UserConverter.toDto(user);
+    public List<UserDtoResponse> findByPhone(String phone) {
+        List<User> user = userMapper.findByPhone(phone);
+        return UserConverter.toDtoList(user);
     }
 
     @Override
-    public UserDtoResponse findByUsername(String username) {
-        User user = userMapper.findByUsername(username);
-        return UserConverter.toDto(user);
+    public List<UserDtoResponse> findByUsername(String username) {
+        List<User> user = userMapper.findByUsername(username);
+        return UserConverter.toDtoList(user);
     }
 
     @Override
@@ -122,6 +125,8 @@ public class UserServiceImpl implements UserService {
             Integer userId,
             String username,
             String fullName,
+            Integer gender,
+            LocalDate birthday,
             String email,
             String phone,
             Integer roleId,
@@ -135,11 +140,11 @@ public class UserServiceImpl implements UserService {
         // 2. Gọi Mapper
         // Lưu ý: Mapper này phải khớp với file UserMapper.java bạn vừa sửa
         List<User> users = userMapper.findAllPaged(
-                userId, username, fullName, email, phone, roleId, status, offset, size
+                userId, username, fullName, gender, birthday, email, phone, roleId, status, offset, size
         );
 
         long totalElements = userMapper.countAll(
-                userId, username, fullName, email, phone, roleId, status
+                userId, username, fullName, gender, birthday, email, phone, roleId, status
         );
 
         // 3. Convert sang DTO List

@@ -39,7 +39,7 @@
     <select id="findByCode" parameterType="String" resultMap="VoucherResultMap">
         SELECT <include refid="Base_Column_List" />
         FROM voucher
-        WHERE LOWER([code]) LIKE ('%' + LOWER(#{code}) + '%')
+        WHERE ([code]) LIKE ('%' + (#{code}) + '%')
     </select>
 
     <insert id="insert" parameterType="com.fpl.edu.shoeStore.voucher.entity.Voucher" useGeneratedKeys="true" keyProperty="voucherId">
@@ -79,7 +79,7 @@
                 AND voucher_id = #{voucherId}
             </if>
             <if test="code != null and code != ''">
-                AND LOWER([code]) LIKE ('%' + LOWER(#{code}) + '%')
+                AND ([code]) LIKE ('%' + (#{code}) + '%')
             </if>
             <if test="voucherType != null and voucherType != ''">
                 AND voucher_type = #{voucherType}
@@ -100,10 +100,13 @@
                 AND voucher_id = #{voucherId}
             </if>
             <if test="code != null and code != ''">
-                AND LOWER([code]) LIKE ('%' + LOWER(#{code}) + '%')
+                AND ([code]) LIKE ('%' + (#{code}) + '%')
             </if>
             <if test="voucherType != null and voucherType != ''">
                 AND voucher_type = #{voucherType}
+            </if>
+            <if test="minSpend != null">
+                AND min_spend = #{minSpend}
             </if>
         </where>
     </select>

@@ -209,7 +209,7 @@
             gateway_transaction_id = #{gatewayTransactionId},
             bank_code = #{bankCode},
             transaction_desc = #{transactionDesc},
-            payment_date = #{paymentDate}
+            payment_date = GETDATE()
         WHERE payment_id = #{paymentId}
     </update>
 

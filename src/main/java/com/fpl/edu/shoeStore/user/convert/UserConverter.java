@@ -25,7 +25,11 @@ public class UserConverter {
         user.setPasswordHash(dto.getPasswordHash());
 
         user.setFullName(dto.getFullName()); 
-        
+
+        user.setGender(dto.getGender());
+
+        user.setBirthday(dto.getBirthday());
+
         user.setEmail(dto.getEmail());
         
     
@@ -52,6 +56,8 @@ public class UserConverter {
                 
                 // Mapping các trường tên mới
                 .fullName(user.getFullName())
+                .gender(user.getGender())
+                .birthday(user.getBirthday())
                 .phone(user.getPhone())
                 
                 .email(user.getEmail())

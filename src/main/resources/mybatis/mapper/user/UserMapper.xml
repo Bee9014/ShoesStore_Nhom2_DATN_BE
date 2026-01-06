@@ -40,7 +40,7 @@
     <select id="findByUsername" parameterType="string" resultMap="UserResultMap">
         SELECT <include refid="Base_Column_List" />
         FROM sys_user
-        WHERE username = #{username}
+        WHERE username = LIKE ('%' + (#{username}) + '%')
     </select>
 
     <select id="findByPhone" parameterType="string" resultMap="UserResultMap">
