@@ -23,8 +23,8 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-                variant_id, product_id, variant_name, product_variant_code, price, stock_qty,
-                is_active, created_at, updated_at, weight_grams, [size], color, image, create_by, update_by
+                [variant_id], [product_id], [variant_name], [product_variant_code], [price], [stock_qty],
+                [is_active], [created_at], [updated_at], [weight_grams], [size], [color], [image], [create_by], [update_by]
     </sql>
 
     <select id="findByProductId" parameterType="int" resultMap="ProductVariantResultMap">
@@ -117,4 +117,9 @@
         WHERE product_variant_code = #{productVariantCode}
     </select>
 
+    <select id="countLowStock" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM [product_variants]
+        WHERE [stock_qty] &lt; #{threshold}
+    </select>
 </mapper>

@@ -1,6 +1,8 @@
 package com.fpl.edu.shoeStore.order.mapper;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -47,11 +49,29 @@ public interface OrderMapper {
     int updateStatus(@Param("orderId") int orderId, @Param("status") String status);
 
     /**
-     * Lấy danh sách đơn hàng đã mua của một người dùng cụ thể, sắp xếp theo ngày mới nhất.
-     * @param userId ID của người mua hàng.
-     * @return Danh sách đơn hàng của người dùng đó.
+     * Lấy danh sách đơn hàng đã mua của một người dùng cụ thể, hỗ trợ lọc theo trạng thái và phân trang.
+     * Kết quả thường được sắp xếp theo thời gian đặt hàng (order_date) giảm dần.
+     * * @param userId ID của người mua hàng (khách hàng).
+     * @param status Trạng thái đơn hàng cần lọc (VD: PENDING, COMPLETED). Nếu null sẽ lấy tất cả.
+     * @param offset Vị trí bắt đầu lấy bản ghi trong tập dữ liệu (phục vụ phân trang).
+     * @param size Số lượng bản ghi tối đa trả về trên một trang.
+     * @return Danh sách các đối tượng Order thỏa mãn điều kiện tìm kiếm.
      */
-    List<Order> findByBuyerId(@Param("userId") int userId);
+    List<Order> findByBuyerId(
+            @Param("userId") int userId,
+            @Param("status") String status,
+            @Param("offset") int offset,
+            @Param("size") int size
+    );
+
+    /**
+     * Đếm tổng số lượng đơn hàng của một người dùng cụ thể dựa trên trạng thái lọc.
+     * Kết quả này được sử dụng để tính toán tổng số trang (totalPages) trong logic phân trang.
+     * * @param userId ID của người mua hàng.
+     * @param status Trạng thái đơn hàng cần lọc để đếm.
+     * @return Tổng số lượng đơn hàng tìm thấy (kiểu long).
+     */
+    long countByBuyerId(@Param("userId") int userId, @Param("status") String status);
 
     /**
      * Tìm kiếm và phân trang đơn hàng dành cho giao diện quản trị Admin.
@@ -68,7 +88,6 @@ public interface OrderMapper {
         @Param("offset") int offset,
         @Param("size") int size
     );
-
     /**
      * Đếm tổng số lượng đơn hàng thỏa mãn điều kiện lọc để phục vụ tính toán phân trang.
      * @param status Trạng thái đơn hàng.
@@ -83,4 +102,21 @@ public interface OrderMapper {
      * @return Số lượng đơn hàng có trạng thái đó.
      */
     long countByStatus(@Param("status") String status);
+
+    // Tính tổng số đơn hàng
+    Long countAllOrders();
+
+    // Tính tổng doanh thu (chỉ tính đơn DELIVERED)
+    BigDecimal calculateTotalRevenue();
+
+    // Tính tổng doanh thu theo tháng
+    BigDecimal calculateRevenueByMonth(
+            @Param("year") Integer year,
+            @Param("month") Integer month
+    );
+
+    // Top sản phẩm bán chạy
+    List<Map<String, Object>> findTopSellingProducts(
+            @Param("limit") Integer limit
+    );
 }

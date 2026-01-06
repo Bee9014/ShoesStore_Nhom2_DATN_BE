@@ -13,6 +13,8 @@ public interface ProductMapper {
     /** Lấy danh sách toàn bộ sản phẩm không lọc. */
     List<Product> findAll();
 
+    Product findByTitle(@Param("title") String title);
+
     /** Tìm chi tiết sản phẩm theo mã ID. */
     Product findById(@Param("productId") int productId);
 
@@ -22,12 +24,15 @@ public interface ProductMapper {
     /** Cập nhật thông tin chi tiết sản phẩm. */
     int update(Product product);
 
+    int deleteById(@Param("productId") Integer id);
     /** * Phân trang và lọc sản phẩm. 
      * XML dùng parameterType="map", nên cần @Param chính xác.
      */
     List<Product> findAllPaged(
-        @Param("title") String title,
         @Param("categoryId") Integer categoryId,
+        @Param("title") String title,
+        @Param("status") String status,
+        @Param("isActive") Boolean isActive,
         @Param("offset") int offset, 
         @Param("size") int size
     );
@@ -36,6 +41,32 @@ public interface ProductMapper {
     long countAll(
         @Param("categoryId") Integer categoryId,
         @Param("title") String title,
-        @Param("status") String status
+        @Param("status") String status,
+        @Param("isActive") Boolean isActive
     );
+
+
+    void incrementViewCount(Integer productId);
+
+    List<Product> findTopFeatured();
+
+    List<Product> findBestSellers();
+
+    Long countAllProducts();
+
+    List<Product> findBestFiftySellers(
+            @Param("limit") Integer limit,
+            @Param("offset") Integer offset
+    );
+
+    Long countBestSellers();
+
+    List<Product> findProductsBySearch(
+            @Param("keyword") String keyword,
+            @Param("limit") Integer limit,
+            @Param("offset") Integer offset
+    );
+
+    Long countSearchResults(@Param("keyword") String keyword);
+
 }

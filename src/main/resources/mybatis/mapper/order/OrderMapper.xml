@@ -137,31 +137,35 @@
         UPDATE orders
         SET [status] = #{status},
             updated_at = GETDATE()
-        WHERE order_id = #{orderId}
+        WHERE order_id = #{orderId} AND [status] = 'PENDING' -- Thêm điều kiện này để an toàn hơn
     </update>
 
-    <select id="findByBuyerId" parameterType="int" resultMap="OrderResultMap">
-        SELECT
-            order_id,
-            user_id,
-            voucher_id,
-            order_date,
-            [status],
-            total_amount,
-            discount_amount,
-            final_amount,
-            shipping_fee,
-            shipping_fullname,
-            shipping_phone,
-            shipping_address,
-            shipping_city,
-            shipping_country,
-            [note],
-            created_at,
-            updated_at
+    <select id="countByBuyerId" resultType="long">
+        SELECT COUNT(*)
         FROM orders
-        WHERE user_id = #{userId}
+        <where>
+            user_id = #{userId}
+            <if test="status != null and status != ''">
+                AND [status] = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="findByBuyerId" resultMap="OrderResultMap">
+        SELECT
+        order_id, user_id, voucher_id, order_date, [status],
+        total_amount, discount_amount, final_amount, shipping_fee,
+        shipping_fullname, shipping_phone, shipping_address,
+        shipping_city, shipping_country, [note], created_at, updated_at
+        FROM orders
+        <where>
+            user_id = #{userId}
+            <if test="status != null and status != ''">
+                AND [status] = #{status}
+            </if>
+        </where>
         ORDER BY order_date DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 
     <select id="findAllPaged" resultMap="OrderResultMap">
@@ -217,4 +221,37 @@
         WHERE [status] = #{status}
     </select>
 
+    <select id="countAllOrders" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM orders
+    </select>
+
+    <select id="calculateTotalRevenue" resultType="java.math.BigDecimal">
+        SELECT COALESCE(SUM(final_amount), 0)
+        FROM orders
+        WHERE [status] = 'DELIVERED'
+    </select>
+
+    <select id="calculateRevenueByMonth" resultType="java.math.BigDecimal">
+        SELECT COALESCE(SUM(final_amount), 0)
+        FROM orders
+        WHERE [status] = 'DELIVERED'
+        AND YEAR(order_date) = #{year}
+        AND MONTH(order_date) = #{month}
+    </select>
+
+    <select id="findTopSellingProducts" resultType="java.util.HashMap">
+        SELECT
+        pv.product_id AS productId,
+        p.title AS productName,
+        SUM(oi.quantity) AS totalSold
+        FROM order_items oi
+        INNER JOIN orders o ON oi.order_id = o.order_id
+        -- Phải join qua variants vì order_items không có product_id trực tiếp
+        INNER JOIN product_variants pv ON oi.variant_id = pv.variant_id
+        INNER JOIN products p ON pv.product_id = p.product_id
+        WHERE o.[status] IN ('SHIPPING', 'DELIVERED', 'COMPLETED')
+        GROUP BY pv.product_id, p.title
+        ORDER BY totalSold DESC
+        OFFSET 0 ROWS FETCH NEXT #{limit} ROWS ONLY
+    </select>
 </mapper>

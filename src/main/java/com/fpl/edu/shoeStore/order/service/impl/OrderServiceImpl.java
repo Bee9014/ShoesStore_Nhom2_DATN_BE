@@ -224,7 +224,7 @@ public class OrderServiceImpl implements OrderService {
     public void cancelOrder(int orderId, int userId) throws OrderException {
         Order order = orderMapper.findById(orderId);
         if (order == null) throw new OrderException("Không tìm thấy đơn hàng #" + orderId);
-        if (order.getBuyerId() != userId && order.getUserId() != userId) {
+        if (order.getUserId() != userId) {
             throw new OrderException("Bạn không có quyền hủy đơn hàng này");
         }
         if (!"PENDING".equals(order.getStatus())) {
@@ -232,6 +232,11 @@ public class OrderServiceImpl implements OrderService {
         }
         int affectedRows = orderMapper.updateStatus(orderId, "CANCELLED");
         if (affectedRows == 0) throw new OrderException("Hủy đơn hàng thất bại");
+        List<OrderItem> items = orderMapper.findItemsByOrderId(orderId);
+        for (OrderItem item : items) {
+            // Cộng lại số lượng (truyền số dương vào hàm updateStock)
+            variantMapper.updateStock(item.getVariantId(), item.getQuantity());
+        }
     }
 
     @Override

@@ -21,7 +21,6 @@ public class OrderConverter {
     public OrderResponse toResponse(Order order, List<OrderItem> items) {
         OrderResponse response = new OrderResponse();
         response.setOrderId(order.getOrderId());
-        response.setBuyerId(order.getBuyerId());
         response.setVoucherId(order.getVoucherId());
         response.setOrderDate(order.getOrderDate());
         response.setStatus(order.getStatus());
@@ -61,7 +60,6 @@ public class OrderConverter {
         // ID orderId, orderDate, status, totalAmount, finalAmount, discountAmount
         // và các trường createAt/updateAt sẽ được thiết lập trong Service
 
-        order.setBuyerId(request.getBuyerId());
         order.setVoucherId(request.getVoucherId());
         order.setShippingFee(request.getShippingFee());
 

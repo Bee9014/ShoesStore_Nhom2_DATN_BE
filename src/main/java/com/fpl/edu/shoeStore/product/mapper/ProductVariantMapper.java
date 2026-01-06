@@ -58,5 +58,5 @@ public interface ProductVariantMapper {
      * LƯU Ý: Phương thức countLowStock hiện chưa có trong file XML bạn cung cấp.
      * Nếu bạn muốn sử dụng, hãy thêm thẻ <select id="countLowStock"> vào XML.
      */
-    // Long countLowStock(@Param("threshold") Integer threshold);
+     Long countLowStock(@Param("threshold") Integer threshold);
 }

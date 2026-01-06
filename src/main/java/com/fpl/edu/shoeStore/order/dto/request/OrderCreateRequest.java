@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 public class OrderCreateRequest {
     @NotNull(message = "Mã người mua không được để trống.")
-    private Integer buyerId;
+    private Integer userId;
 
     private Integer voucherId; // Có thể null
 

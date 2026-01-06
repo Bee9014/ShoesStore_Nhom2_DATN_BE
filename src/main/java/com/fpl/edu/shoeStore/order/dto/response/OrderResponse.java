@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class OrderResponse {
     private int orderId;
-    private int buyerId;
+    private int userId;
     private Integer voucherId;
     private LocalDateTime orderDate;
     private String status;
