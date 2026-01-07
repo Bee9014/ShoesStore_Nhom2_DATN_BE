@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -26,6 +28,8 @@ public class UserController {
             @RequestParam(required = false) Integer userId,
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String fullName,
+            @RequestParam(required = false) Integer gender,
+            @RequestParam(required = false) LocalDate birthday,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) Integer roleId,
@@ -35,7 +39,7 @@ public class UserController {
     ) {
         try {
             PageResponse<UserDtoResponse> pageResponse = userService.findAllPaged(
-                    userId, username, fullName, email, phone,
+                    userId, username, fullName, gender, birthday, email, phone,
                     roleId, status, page, size
             );
 

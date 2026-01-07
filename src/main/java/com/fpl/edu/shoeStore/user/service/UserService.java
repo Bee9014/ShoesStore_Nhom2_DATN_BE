@@ -4,6 +4,9 @@ import com.fpl.edu.shoeStore.common.handler.PageResponse;
 import com.fpl.edu.shoeStore.user.dto.request.UserDtoRequest;
 import com.fpl.edu.shoeStore.user.dto.response.UserDtoResponse;
 
+import java.time.LocalDate;
+import java.util.List;
+
 public interface UserService {
 
     /**
@@ -14,6 +17,8 @@ public interface UserService {
             Integer userId,
             String username,
             String fullName,      // Đổi từ hoVaTen
+            Integer gender,
+            LocalDate birthday,
             String email,
             String phone,         // Đổi từ phoneNumber
             Integer roleId,
@@ -31,7 +36,7 @@ public interface UserService {
     UserDtoResponse findById(Integer id);
 
     // Sửa kiểu tham số từ Integer -> String vì số điện thoại là chuỗi
-    UserDtoResponse findByPhone(String phone);
+    List<UserDtoResponse> findByPhone(String phone);
 
-    UserDtoResponse findByUsername(String username);
+    List<UserDtoResponse> findByUsername(String username);
 }

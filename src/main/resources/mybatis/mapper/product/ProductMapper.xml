@@ -120,7 +120,7 @@
         </where>
     </select>
 
-    <select id="findByTitle" parameterType="String">
+    <select id="findByTitle" parameterType="String" resultMap="ProductResultMap">
         SELECT * FROM products WHERE title = #{title}
     </select>
 

@@ -1,5 +1,6 @@
 package com.fpl.edu.shoeStore.user.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -21,8 +22,8 @@ public class User {
     private String username;
     private String passwordHash;
     private String fullName;
-
-   
+    private Integer gender;
+    private LocalDate birthday;
     private String email;
 
     private String phone;

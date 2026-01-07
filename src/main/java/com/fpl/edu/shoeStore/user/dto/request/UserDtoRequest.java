@@ -1,5 +1,6 @@
 package com.fpl.edu.shoeStore.user.dto.request;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
@@ -22,6 +23,8 @@ public class UserDtoRequest {
     private String passwordHash;
     private String fullName;
     private String email;
+    private Integer gender;
+    private LocalDate birthday;
     private String phone; 
     private String status; 
     private LocalDateTime createdAt;

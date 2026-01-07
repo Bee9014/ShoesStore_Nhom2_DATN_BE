@@ -195,7 +195,7 @@
         <if test="searchTerm != null and searchTerm != ''">
             AND (shipping_fullname LIKE ('%' + #{searchTerm} + '%')
             OR shipping_phone LIKE ('%' + #{searchTerm} + '%')
-            OR CAST(order_id AS VARCHAR) = #{searchTerm})
+            OR CAST(order_id AS VARCHAR) LIKE ('%' + #{searchTerm}) + '%')
         </if>
         ORDER BY order_date DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
@@ -211,7 +211,7 @@
         <if test="searchTerm != null and searchTerm != ''">
             AND (shipping_fullname LIKE ('%' + #{searchTerm} + '%')
             OR shipping_phone LIKE ('%' + #{searchTerm} + '%')
-            OR CAST(order_id AS VARCHAR) = #{searchTerm})
+            OR CAST(order_id AS VARCHAR) LIKE ('%' + #{searchTerm}) + '%')
         </if>
     </select>
 

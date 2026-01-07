@@ -1,5 +1,6 @@
 package com.fpl.edu.shoeStore.user.mapper;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -26,12 +27,12 @@ public interface UserMapper {
     /**
      * Tìm kiếm người dùng bằng số điện thoại. Rất hữu ích khi tra cứu khách hàng tại quầy.
      */
-    User findByPhone(@Param("phone") String phone);
+    List<User> findByPhone(@Param("phone") String phone);
 
     /**
      * Tìm kiếm người dùng qua tên đăng nhập. 
      */
-    User findByUsername(@Param("username") String username);
+    List<User> findByUsername(@Param("username") String username);
 
     /**
      * Thêm mới người dùng. Trả về số dòng thành công (1).
@@ -59,6 +60,8 @@ public interface UserMapper {
             @Param("userId") Integer userId,
             @Param("username") String username,
             @Param("fullName") String fullName,
+            @Param("gender") Integer gender,
+            @Param("birthday") LocalDate birthday,
             @Param("email") String email,
             @Param("phone") String phone,
             @Param("roleId") Integer roleId,
@@ -74,6 +77,8 @@ public interface UserMapper {
             @Param("userId") Integer userId,
             @Param("username") String username,
             @Param("fullName") String fullName,
+            @Param("gender") Integer gender,
+            @Param("birthday") LocalDate birthday,
             @Param("email") String email,
             @Param("phone") String phone,
             @Param("roleId") Integer roleId,
