@@ -23,6 +23,7 @@ import com.fpl.edu.shoeStore.product.entity.Product;
 import com.fpl.edu.shoeStore.product.entity.ProductVariant;
 import com.fpl.edu.shoeStore.product.mapper.ProductMapper;
 import com.fpl.edu.shoeStore.product.mapper.ProductVariantMapper;
+import com.fpl.edu.shoeStore.user.mapper.UserMapper;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -31,22 +32,31 @@ public class OrderServiceImpl implements OrderService {
     private final OrderConverter orderConverter;
     private final ProductVariantMapper variantMapper;
     private final ProductMapper productMapper;
+    private final UserMapper userMapper;
 
     @Autowired
     public OrderServiceImpl(
-            OrderMapper orderMapper, 
+            OrderMapper orderMapper,
             OrderConverter orderConverter,
             ProductVariantMapper variantMapper,
-            ProductMapper productMapper) {
+            ProductMapper productMapper,
+            UserMapper userMapper) {
         this.orderMapper = orderMapper;
         this.orderConverter = orderConverter;
         this.variantMapper = variantMapper;
         this.productMapper = productMapper;
+        this.userMapper = userMapper;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public OrderResponse createOrder(OrderCreateRequest request) throws OrderException {
+        // 0. CHECK USER EXISTENCE (Fix lỗi Foreign Key)
+        if (userMapper.findById(request.getUserId()) == null) {
+            throw new OrderException(
+                    "Người dùng không tồn tại (ID: " + request.getUserId() + "). Vui lòng đăng nhập lại.");
+        }
+
         // 1. CHUYỂN ĐỔI: Request -> Entity ban đầu
         Order order = orderConverter.toEntity(request);
         order.setOrderDate(LocalDateTime.now());
@@ -57,63 +67,65 @@ public class OrderServiceImpl implements OrderService {
         // 2. TÍNH TOÁN GIÁ DỰA TRÊN DỮ LIỆU DB THỰC TẾ
         BigDecimal totalGoodsValue = BigDecimal.ZERO;
         List<OrderItem> items = new ArrayList<>();
-        
+
         for (var itemReq : request.getItems()) {
             // TRUY VẤN DB: Lấy thông tin variant thực tế
             ProductVariant variant = variantMapper.findById(itemReq.getVariantId());
-            
+
             if (variant == null) {
                 throw new OrderException("Sản phẩm không tồn tại (Variant ID: " + itemReq.getVariantId() + ")");
             }
-            
+
             // Kiểm tra tồn kho
             if (variant.getStockQty() == null || variant.getStockQty() < itemReq.getQuantity()) {
-                throw new OrderException("Sản phẩm không đủ số lượng trong kho (Variant ID: " + itemReq.getVariantId() + ")");
+                throw new OrderException(
+                        "Sản phẩm không đủ số lượng trong kho (Variant ID: " + itemReq.getVariantId() + ")");
             }
-            
+
             // Lấy thông tin product để có tên sản phẩm
             Product product = productMapper.findById(variant.getProductId());
             if (product == null) {
                 throw new OrderException("Không tìm thấy thông tin sản phẩm");
             }
-            
+
             // Tạo OrderItem với dữ liệu thật từ DB
             OrderItem item = orderConverter.toItemEntity(itemReq);
-            
+
             // Sử dụng price từ variant (BigDecimal)
-            BigDecimal unitPrice = variant.getPrice() != null 
-                ? variant.getPrice()
-                : BigDecimal.ZERO;
-            
+            BigDecimal unitPrice = variant.getPrice() != null
+                    ? variant.getPrice()
+                    : BigDecimal.ZERO;
+
             item.setUnitPrice(unitPrice);
             item.setTotalPrice(unitPrice.multiply(BigDecimal.valueOf(itemReq.getQuantity())));
-            
+
             // 👇 SỬA ĐOẠN NÀY: Snapshot tên sản phẩm + Size + Color
             String productName = product.getTitle();
             String variantInfo = "";
-            
+
             // Nếu có size
             if (variant.getSize() != null && !variant.getSize().isEmpty()) {
                 variantInfo += variant.getSize();
             }
-            
+
             // Nếu có color
             if (variant.getColor() != null && !variant.getColor().isEmpty()) {
-                if (!variantInfo.isEmpty()) variantInfo += " - ";
+                if (!variantInfo.isEmpty())
+                    variantInfo += " - ";
                 variantInfo += variant.getColor();
             }
-            
+
             if (!variantInfo.isEmpty()) {
                 productName += " (" + variantInfo + ")";
             }
             // 👆 HẾT SỬA
-            
+
             item.setProductNameSnapshot(productName);
-            
+
             items.add(item);
             totalGoodsValue = totalGoodsValue.add(item.getTotalPrice());
         }
-        
+
         order.setTotalAmount(totalGoodsValue);
 
         // 3. KIỂM TRA VOUCHER TỪ DB (TODO: Implement voucher logic)
@@ -128,19 +140,21 @@ public class OrderServiceImpl implements OrderService {
         order.setFinalAmount(totalGoodsValue.subtract(discount).add(shippingFee));
 
         // 5. LƯU THỰC TẾ XUỐNG DB
-        orderMapper.insertOrder(order); 
+        orderMapper.insertOrder(order);
 
         for (OrderItem item : items) {
             item.setOrderId(order.getOrderId());
             orderMapper.insertOrderItem(item);
         }
-        
+
         // 6. Trừ tồn kho (Nên bật cái này lên nhé)
         for (var itemReq : request.getItems()) {
-             // Logic updateStock đã có trong ProductVariantService, nên inject service đó vào đây để dùng
-             // productVariantService.updateStock(itemReq.getVariantId(), -itemReq.getQuantity());
-             // Hoặc dùng tạm variantMapper như cũ:
-             variantMapper.updateStock(itemReq.getVariantId(), -itemReq.getQuantity());
+            // Logic updateStock đã có trong ProductVariantService, nên inject service đó
+            // vào đây để dùng
+            // productVariantService.updateStock(itemReq.getVariantId(),
+            // -itemReq.getQuantity());
+            // Hoặc dùng tạm variantMapper như cũ:
+            variantMapper.updateStock(itemReq.getVariantId(), -itemReq.getQuantity());
         }
 
         return orderConverter.toResponse(order, items);
@@ -168,16 +182,19 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public PageResponse<OrderResponse> getMyOrders(int userId, String status, int page, int size) {
-        if (page < 1) page = 1;
-        if (size < 1) size = 10;
-        
+        if (page < 1)
+            page = 1;
+        if (size < 1)
+            size = 10;
+
         // Tính offset cho SQL
         int offset = (page - 1) * size;
 
         // 1. Gọi Mapper lấy danh sách (có phân trang DB và lọc status)
-        // ⚠️ Lưu ý: Bạn cần chắc chắn Interface OrderMapper đã có hàm findByBuyerId(userId, status, offset, size)
+        // ⚠️ Lưu ý: Bạn cần chắc chắn Interface OrderMapper đã có hàm
+        // findByBuyerId(userId, status, offset, size)
         List<Order> orders = orderMapper.findByBuyerId(userId, status, offset, size);
-        
+
         // 2. Gọi Mapper đếm tổng số bản ghi (có lọc status)
         long totalElements = orderMapper.countByBuyerId(userId, status);
 
@@ -202,8 +219,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public PageResponse<OrderResponse> getAllOrders(String status, String searchTerm, int page, int size) {
-        if (page < 1) page = 1;
-        if (size < 1) size = 20;
+        if (page < 1)
+            page = 1;
+        if (size < 1)
+            size = 20;
         int offset = (page - 1) * size;
         List<Order> orders = orderMapper.findAllPaged(status, searchTerm, offset, size);
         long totalElements = orderMapper.countAll(status, searchTerm);
@@ -223,7 +242,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void cancelOrder(int orderId, int userId) throws OrderException {
         Order order = orderMapper.findById(orderId);
-        if (order == null) throw new OrderException("Không tìm thấy đơn hàng #" + orderId);
+        if (order == null)
+            throw new OrderException("Không tìm thấy đơn hàng #" + orderId);
         if (order.getUserId() != userId) {
             throw new OrderException("Bạn không có quyền hủy đơn hàng này");
         }
@@ -231,7 +251,8 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderException("Chỉ có thể hủy đơn hàng đang chờ xác nhận");
         }
         int affectedRows = orderMapper.updateStatus(orderId, "CANCELLED");
-        if (affectedRows == 0) throw new OrderException("Hủy đơn hàng thất bại");
+        if (affectedRows == 0)
+            throw new OrderException("Hủy đơn hàng thất bại");
         List<OrderItem> items = orderMapper.findItemsByOrderId(orderId);
         for (OrderItem item : items) {
             // Cộng lại số lượng (truyền số dương vào hàm updateStock)

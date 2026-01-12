@@ -19,7 +19,6 @@
         <result property="shippingPhone" column="shipping_phone"/>
         <result property="shippingAddress" column="shipping_address"/>
         <result property="shippingCity" column="shipping_city"/>
-        <result property="shippingCountry" column="shipping_country"/>
         <result property="note" column="note"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
@@ -52,7 +51,6 @@
             shipping_phone,
             shipping_address,
             shipping_city,
-            shipping_country,
             [note],
             created_at,
             updated_at
@@ -70,7 +68,6 @@
                    #{shippingPhone},
                    #{shippingAddress},
                    #{shippingCity},
-                   #{shippingCountry},
                    #{note},
                    GETDATE(),
                    GETDATE()
@@ -112,7 +109,6 @@
             shipping_phone,
             shipping_address,
             shipping_city,
-            shipping_country,
             [note],
             created_at,
             updated_at
@@ -156,7 +152,7 @@
         order_id, user_id, voucher_id, order_date, [status],
         total_amount, discount_amount, final_amount, shipping_fee,
         shipping_fullname, shipping_phone, shipping_address,
-        shipping_city, shipping_country, [note], created_at, updated_at
+        shipping_city, [note], created_at, updated_at
         FROM orders
         <where>
             user_id = #{userId}
@@ -183,7 +179,6 @@
         shipping_phone,
         shipping_address,
         shipping_city,
-        shipping_country,
         [note],
         created_at,
         updated_at

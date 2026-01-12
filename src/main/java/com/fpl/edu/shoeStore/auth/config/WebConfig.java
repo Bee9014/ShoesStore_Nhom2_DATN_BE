@@ -1,5 +1,6 @@
 package com.fpl.edu.shoeStore.auth.config;
 
+import java.io.File;
 import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
@@ -18,54 +19,55 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     @Override
-    public void addResourceHandlers( ResourceHandlerRegistry registry ) {
-        registry.addResourceHandler( "/uploads/**" )
-                .addResourceLocations( "file:uploads/" );
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // Resolve absolute path to uploads folder
+        String uploadsPath = System.getProperty("user.dir") + "/uploads/";
 
-        
+        // Ensure path ends with / and format properly for file: protocol
+        if (!uploadsPath.endsWith("/")) {
+            uploadsPath += "/";
+        }
+
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:" + uploadsPath);
+
+        // Add minimal logging if needed (optional, skipping for cleanliness)
     }
-    
+
     /**
      * CORS Configuration for Vue.js Frontend
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        
+
         // Allow Vue.js dev server origins
         configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000",
-            "http://localhost:3001",
-            "http://localhost:5173",  
-            "http://127.0.0.1:3000",
-            "http://127.0.0.1:3001",
-            "http://127.0.0.1:5173"
-        ));
-        
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "http://localhost:5173",
+                "http://127.0.0.1:3000",
+                "http://127.0.0.1:3001",
+                "http://127.0.0.1:5173"));
+
         // cấp quyền cho http
         configuration.setAllowedMethods(Arrays.asList(
-            "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
-        ));
-        
-        
+                "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        
-        
+
         configuration.setAllowCredentials(true);
-        
-        
+
         configuration.setMaxAge(3600L);
-        
 
         configuration.setExposedHeaders(Arrays.asList(
-            "Authorization",
-            "Content-Type",
-            "X-Total-Count"
-        ));
-        
+                "Authorization",
+                "Content-Type",
+                "X-Total-Count"));
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-        
+
         return source;
     }
 }

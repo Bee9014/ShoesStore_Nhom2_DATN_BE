@@ -44,12 +44,28 @@
         FROM products
     </select>
 
-    <select id="findById" parameterType="int" resultMap="ProductResultMap">
-        SELECT product_id, category_id, title, url, product_code, description,
-               base_price, is_active, brand, [condition],
-               default_image, [status], create_at, update_at, create_by, update_by, view_count
-        FROM products
-        WHERE product_id = #{productId}
+    <select id="findById" parameterType="int" resultMap="ProductDetailResultMap">
+        SELECT 
+            -- 1. Các cột của bảng cha (Products)
+            p.product_id, p.category_id, p.title, p.url, p.product_code, p.description,
+            p.base_price, p.is_active, p.brand, p.[condition],
+            p.default_image, p.[status], p.create_at, p.update_at, 
+            p.create_by, p.update_by, p.view_count,
+
+            -- 2. Các cột của bảng con (Variants) - Đặt Alias khớp với ResultMap
+            pv.variant_id           AS v_variant_id,
+            pv.color                AS v_color,
+            pv.size                 AS v_size,
+            pv.price                AS v_price,
+            pv.stock_qty            AS v_stock_qty,
+            pv.image                AS v_image,
+            pv.product_variant_code AS v_code
+
+        FROM products p
+        -- LEFT JOIN để lấy cả biến thể. Nếu sản phẩm chưa có biến thể nào vẫn hiện ra info sản phẩm.
+        LEFT JOIN product_variants pv ON p.product_id = pv.product_id
+        
+        WHERE p.product_id = #{productId}
     </select>
 
     <insert id="insert" parameterType="com.fpl.edu.shoeStore.product.entity.Product"

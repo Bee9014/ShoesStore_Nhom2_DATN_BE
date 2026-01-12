@@ -48,11 +48,13 @@ public class ProductConverter {
                 .updateAt(entity.getUpdateAt())
                 .createBy(entity.getCreateBy())
                 .updateBy(entity.getUpdateBy())
-                // 🔥 THÊM ĐOẠN NÀY: Kiểm tra nếu có variants thì map sang, nếu null thì trả về null
-                .variants(entity.getVariants() != null 
+                .viewCount(entity.getViewCount())
+                // 🔥 THÊM ĐOẠN NÀY: Kiểm tra nếu có variants thì map sang, nếu null thì trả về
+                // null
+                .variants(entity.getVariants() != null
                         ? entity.getVariants().stream()
-                            .map(ProductVariantConverter::toResponse)
-                            .collect(Collectors.toList()) 
+                                .map(ProductVariantConverter::toResponse)
+                                .collect(Collectors.toList())
                         : null)
                 .build();
     }

@@ -21,6 +21,9 @@ public class OrderConverter {
     public OrderResponse toResponse(Order order, List<OrderItem> items) {
         OrderResponse response = new OrderResponse();
         response.setOrderId(order.getOrderId());
+        // Thêm userId vào response để debug dễ hơn (tùy chọn)
+        response.setUserId(order.getUserId());
+
         response.setVoucherId(order.getVoucherId());
         response.setOrderDate(order.getOrderDate());
         response.setStatus(order.getStatus());
@@ -33,7 +36,6 @@ public class OrderConverter {
         response.setShippingPhone(order.getShippingPhone());
         response.setShippingAddress(order.getShippingAddress());
         response.setShippingCity(order.getShippingCity());
-        response.setShippingCountry(order.getShippingCountry());
         response.setNote(order.getNote());
 
         if (items != null) {
@@ -57,8 +59,11 @@ public class OrderConverter {
 
     public Order toEntity(OrderCreateRequest request) {
         Order order = new Order();
-        // ID orderId, orderDate, status, totalAmount, finalAmount, discountAmount
-        // và các trường createAt/updateAt sẽ được thiết lập trong Service
+
+        // =======================================================================
+        // QUAN TRỌNG: Gán userId từ Request vào Entity để tránh lỗi Foreign Key
+        // =======================================================================
+        order.setUserId(request.getUserId());
 
         order.setVoucherId(request.getVoucherId());
         order.setShippingFee(request.getShippingFee());
@@ -67,16 +72,16 @@ public class OrderConverter {
         order.setShippingPhone(request.getShippingPhone());
         order.setShippingAddress(request.getShippingAddress());
         order.setShippingCity(request.getShippingCity());
-        order.setShippingCountry(request.getShippingCountry());
         order.setNote(request.getNote());
 
         // Thiết lập giá trị mặc định ban đầu
         order.setOrderDate(LocalDateTime.now());
-        order.setStatus("PENDING"); // Hoặc một trạng thái mặc định khác
+        order.setStatus("PENDING"); // Trạng thái mặc định khi mới tạo đơn
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
 
-        // Các trường tiền tệ (Total/Discount/Final) sẽ được tính toán trong Service
+        // Các trường tiền tệ (Total/Discount/Final) sẽ được tính toán lại trong Service
+        // để đảm bảo bảo mật (không tin tưởng giá từ frontend gửi lên hoàn toàn)
 
         return order;
     }
@@ -85,7 +90,8 @@ public class OrderConverter {
         OrderItem item = new OrderItem();
         item.setVariantId(request.getVariantId());
         item.setQuantity(request.getQuantity());
-        // orderId, unitPrice, totalPrice, productNameSnapshot được thiết lập trong Service
+        // orderId, unitPrice, totalPrice, productNameSnapshot
+        // sẽ được thiết lập trong Service sau khi query DB lấy giá thực tế
         return item;
     }
 }
