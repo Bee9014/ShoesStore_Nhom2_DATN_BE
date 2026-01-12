@@ -14,5 +14,7 @@ public interface AuthService {
 
     ResponseEntity<?> logout();
 
+    ResponseEntity<?> getCurrentUser();
+
     String getUsernameFromAccessToken(String token);
 }

@@ -26,7 +26,6 @@ public class OrderCreateRequest {
     private String shippingAddress;
 
     private String shippingCity;
-    private String shippingCountry;
     private String note;
 
     @Size(min = 1, message = "Order must contain at least one item")

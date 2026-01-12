@@ -22,7 +22,6 @@ public class OrderResponse {
     private String shippingPhone;
     private String shippingAddress;
     private String shippingCity;
-    private String shippingCountry;
     private String note;
 
     private List<OrderItemResponse> items;

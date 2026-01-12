@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -46,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
         String refreshToken = jwtUtil.generateRefreshToken(username, roleId);
         UserAuthResponseDto loggedUser = userAuthService.findUserByUserName(username);
 
-        //trả về dữ liệu với accessToken, refreshToken, user info
+        // trả về dữ liệu với accessToken, refreshToken, user info
         Map<String, Object> data = new HashMap<>();
         data.put("accessToken", accessToken);
         data.put("refreshToken", refreshToken);
@@ -83,14 +84,14 @@ public class AuthServiceImpl implements AuthService {
 
         try {
             User newUser = userAuthService.registerUser(registerRequest);
-            
+
             ApiResponse<User> apiResponse = ApiResponse.<User>builder()
                     .success(true)
                     .statusCode(HttpStatus.CREATED.value())
                     .message(ErrorCode.REGISTER_SUCCESS.getMessage())
                     .data(newUser)
                     .build();
-            
+
             return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
         } catch (Exception e) {
             return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FAILED_TO_CREATE_ACCOUNT);
@@ -109,7 +110,7 @@ public class AuthServiceImpl implements AuthService {
 
         Map<String, String> data = new HashMap<>();
         data.put("accessToken", newAccessToken);
-        
+
         ApiResponse<Map<String, String>> apiResponse = ApiResponse.<Map<String, String>>builder()
                 .success(true)
                 .statusCode(HttpStatus.OK.value())
@@ -141,6 +142,25 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public ResponseEntity<?> getCurrentUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserAuthResponseDto user = userAuthService.findUserByUserName(username);
+
+        if (user == null) {
+            return buildErrorResponse(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND);
+        }
+
+        ApiResponse<UserAuthResponseDto> apiResponse = ApiResponse.<UserAuthResponseDto>builder()
+                .success(true)
+                .statusCode(HttpStatus.OK.value())
+                .message("Lấy thông tin người dùng thành công")
+                .data(user)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @Override
     public String getUsernameFromAccessToken(String token) {
         return jwtUtil.getUsernameFromToken(token);
     }
@@ -152,7 +172,7 @@ public class AuthServiceImpl implements AuthService {
                 .message(errorCode.getMessage())
                 .data(null)
                 .build();
-        
+
         return ResponseEntity.status(status).body(apiResponse);
     }
 

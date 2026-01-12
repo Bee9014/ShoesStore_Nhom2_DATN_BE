@@ -3,7 +3,6 @@ package com.fpl.edu.shoeStore.order.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,7 +25,6 @@ public class Order {
     private String shippingPhone;
     private String shippingAddress;
     private String shippingCity;
-    private String shippingCountry;
     private BigDecimal ShippingFee;
     private String note;
     private LocalDateTime createdAt;
