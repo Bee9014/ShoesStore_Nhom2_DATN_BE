@@ -25,26 +25,25 @@ public interface ProductMapper {
     int update(Product product);
 
     int deleteById(@Param("productId") Integer id);
-    /** * Phân trang và lọc sản phẩm. 
+
+    /**
+     * * Phân trang và lọc sản phẩm.
      * XML dùng parameterType="map", nên cần @Param chính xác.
      */
     List<Product> findAllPaged(
-        @Param("categoryId") Integer categoryId,
-        @Param("title") String title,
-        @Param("status") String status,
-        @Param("isActive") Boolean isActive,
-        @Param("offset") int offset, 
-        @Param("size") int size
-    );
+            @Param("categoryId") Integer categoryId,
+            @Param("title") String title,
+            @Param("status") String status,
+            @Param("isActive") Boolean isActive,
+            @Param("offset") int offset,
+            @Param("size") int size);
 
     /** Đếm tổng số lượng sản phẩm theo bộ lọc (title, categoryId, status). */
     long countAll(
-        @Param("categoryId") Integer categoryId,
-        @Param("title") String title,
-        @Param("status") String status,
-        @Param("isActive") Boolean isActive
-    );
-
+            @Param("categoryId") Integer categoryId,
+            @Param("title") String title,
+            @Param("status") String status,
+            @Param("isActive") Boolean isActive);
 
     void incrementViewCount(Integer productId);
 
@@ -55,17 +54,15 @@ public interface ProductMapper {
     Long countAllProducts();
 
     List<Product> findBestFiftySellers(
-            @Param("limit") Integer limit,
-            @Param("offset") Integer offset
-    );
+            @Param("size") Integer size,
+            @Param("offset") Integer offset);
 
     Long countBestSellers();
 
     List<Product> findProductsBySearch(
             @Param("keyword") String keyword,
-            @Param("limit") Integer limit,
-            @Param("offset") Integer offset
-    );
+            @Param("size") Integer size,
+            @Param("offset") Integer offset);
 
     Long countSearchResults(@Param("keyword") String keyword);
 

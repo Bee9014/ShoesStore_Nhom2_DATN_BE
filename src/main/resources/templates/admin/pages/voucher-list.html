@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{admin/layout/main-layout}">
+
+<head>
+    <title layout:title-content="Quản lý Voucher">Quản lý Voucher</title>
+    <th:block layout:fragment="page-css">
+        <!-- Reusing same CSS components -->
+        <link rel="stylesheet" th:href="@{/admin/css/components/table.css}" />
+        <!-- If voucher pages needs specific css, create admin/css/pages/voucher.css -->
+        <link rel="stylesheet" th:href="@{/admin/css/pages/user.css}" />
+    </th:block>
+</head>
+
+<body>
+    <!-- Page Actions -->
+    <div layout:fragment="page-actions">
+        <button id="btnCreateVoucher" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i>
+            Thêm Voucher
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <section layout:fragment="content">
+        <div class="px-4 py-2">
+            <!-- Statistics Cards -->
+            <div class="row g-3 mb-4" id="statsCards">
+                <div class="col">
+                    <div class="stat-card">
+                        <div class="stat-label">Tổng Voucher</div>
+                        <div class="stat-value" id="totalVouchers">-</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="stat-card stat-success">
+                        <div class="stat-label">Đang hoạt động</div>
+                        <div class="stat-value" id="activeVouchers">-</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="stat-card stat-warning">
+                        <div class="stat-label">Tạm khóa</div>
+                        <div class="stat-value" id="inactiveVouchers">-</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="stat-card stat-info">
+                        <div class="stat-label">Voucher %</div>
+                        <div class="stat-value" id="percentVouchers">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filters -->
+            <div id="search-container" class="mb-4"></div>
+
+            <!-- Voucher Table & Detail Panel -->
+            <div id="master-detail-wrapper" class="d-flex master-detail-wrapper w-100" style="position: relative;">
+                <div id="masterPanel" class="flex-grow-1 master-panel">
+                    <div id="voucherTableContainer"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Page Scripts -->
+    <th:block layout:fragment="page-scripts">
+        <script type="module" th:src="@{/admin/js/pages/voucher/voucher.page.js}"></script>
+    </th:block>
+</body>
+
+</html>

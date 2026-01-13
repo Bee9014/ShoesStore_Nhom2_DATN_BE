@@ -61,11 +61,11 @@ public class ProductServiceImpl implements ProductService {
             product.setDefaultImage(imagePath);
         }
         if (product.getIsActive() == null) {
-            product.setIsActive(true); 
+            product.setIsActive(true);
         }
         product.setCreateAt(LocalDateTime.now());
         product.setUpdateAt(LocalDateTime.now());
-        
+
         productMapper.insert(product);
 
         if (request.getVariants() != null && !request.getVariants().isEmpty()) {
@@ -84,15 +84,23 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("Không tìm thấy Product id = " + id);
         }
 
-        if (request.getCategoryId() != null) existing.setCategoryId(request.getCategoryId());
-        if (request.getTitle() != null) existing.setTitle(request.getTitle());
-        if (request.getDescription() != null) existing.setDescription(request.getDescription());
-        if (request.getIsActive() != null) existing.setIsActive(request.getIsActive());
-        if (request.getBrand() != null) existing.setBrand(request.getBrand());
-        if (request.getCondition() != null) existing.setCondition(request.getCondition());
-        if (request.getStatus() != null) existing.setStatus(request.getStatus());
-        if (request.getUpdateBy() != null) existing.setUpdateBy(request.getUpdateBy());
-        
+        if (request.getCategoryId() != null)
+            existing.setCategoryId(request.getCategoryId());
+        if (request.getTitle() != null)
+            existing.setTitle(request.getTitle());
+        if (request.getDescription() != null)
+            existing.setDescription(request.getDescription());
+        if (request.getIsActive() != null)
+            existing.setIsActive(request.getIsActive());
+        if (request.getBrand() != null)
+            existing.setBrand(request.getBrand());
+        if (request.getCondition() != null)
+            existing.setCondition(request.getCondition());
+        if (request.getStatus() != null)
+            existing.setStatus(request.getStatus());
+        if (request.getUpdateBy() != null)
+            existing.setUpdateBy(request.getUpdateBy());
+
         String newImagePath = saveFile(file);
         if (newImagePath != null) {
             existing.setDefaultImage(newImagePath);
@@ -131,22 +139,25 @@ public class ProductServiceImpl implements ProductService {
 
     // --- 1. FIND ALL PAGED (FIXED OFFSET ERROR) ---
     @Override
-    public PageResponse<ProductDtoResponse> findAllPaged(Integer categoryId, String title, String status, Boolean isActive, int page, int size) {
-        // Đảm bảo số trang tối thiểu là 1
-        page = Math.max(page, 1);
-        size = Math.max(size, 1);
-        
-        int offset = (page - 1) * size;
-        
+    public PageResponse<ProductDtoResponse> findAllPaged(Integer categoryId, String title, String status,
+            Boolean isActive, int page, int size) {
+        // Đảm bảo số trang không âm
+        if (page < 0)
+            page = 0;
+        if (size < 1)
+            size = 10;
+
+        int offset = page * size;
+
         List<Product> products = productMapper.findAllPaged(categoryId, title, status, isActive, offset, size);
         long totalElements = productMapper.countAll(categoryId, title, status, isActive);
-        
+
         List<ProductDtoResponse> content = products.stream()
                 .map(ProductConverter::toResponse)
                 .collect(Collectors.toList());
-                
+
         int totalPages = (int) Math.ceil((double) totalElements / size);
-        
+
         return PageResponse.<ProductDtoResponse>builder()
                 .content(content)
                 .pageNumber(page)
@@ -175,21 +186,24 @@ public class ProductServiceImpl implements ProductService {
     // --- 2. BEST SELLERS PAGED (FIXED OFFSET ERROR) ---
     @Override
     public PageResponse<ProductDtoResponse> getBestSellersPaged(int page, int size) {
-        page = Math.max(page, 1);
-        size = Math.max(size, 1);
-        
-        if (size > 50) size = 50; // Giới hạn tối đa 50 theo yêu cầu
-        
-        int offset = (page - 1) * size;
-        
+        if (page < 0)
+            page = 0;
+        if (size < 1)
+            size = 12;
+
+        if (size > 50)
+            size = 50; // Giới hạn tối đa 50 theo yêu cầu
+
+        int offset = page * size;
+
         List<Product> products = productMapper.findBestFiftySellers(size, offset);
         List<ProductDtoResponse> productDtos = products.stream()
                 .map(ProductConverter::toResponse)
                 .collect(Collectors.toList());
-        
+
         long totalElements = productMapper.countBestSellers();
         int totalPages = (int) Math.ceil((double) totalElements / size);
-        
+
         return PageResponse.<ProductDtoResponse>builder()
                 .content(productDtos)
                 .pageNumber(page)
@@ -202,19 +216,21 @@ public class ProductServiceImpl implements ProductService {
     // --- 3. SEARCH PRODUCTS (FIXED OFFSET ERROR) ---
     @Override
     public PageResponse<ProductDtoResponse> searchProducts(String keyword, int page, int size) {
-        page = Math.max(page, 1);
-        size = Math.max(size, 1);
-        
-        int offset = (page - 1) * size;
-        
+        if (page < 0)
+            page = 0;
+        if (size < 1)
+            size = 12;
+
+        int offset = page * size;
+
         List<Product> products = productMapper.findProductsBySearch(keyword, size, offset);
         List<ProductDtoResponse> productDtos = products.stream()
                 .map(ProductConverter::toResponse)
                 .collect(Collectors.toList());
-        
+
         long totalElements = productMapper.countSearchResults(keyword);
         int totalPages = (int) Math.ceil((double) totalElements / size);
-        
+
         return PageResponse.<ProductDtoResponse>builder()
                 .content(productDtos)
                 .pageNumber(page)

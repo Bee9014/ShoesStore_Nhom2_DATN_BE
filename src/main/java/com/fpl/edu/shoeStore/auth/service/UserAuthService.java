@@ -11,12 +11,12 @@ public interface UserAuthService {
     boolean checkLoginByUserNameAndPassword(String userName, String password);
 
     Integer getRoleIdByUserName(String userName);
-    
+
     boolean existsByUsername(String username);
-    
+
     boolean existsByEmail(String email);
-    
+
     boolean existsByPhone(String phone);
-    
+
     User registerUser(RegisterRequestDto registerRequest);
 }

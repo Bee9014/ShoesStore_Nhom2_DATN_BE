@@ -8,107 +8,153 @@
     <resultMap id="VoucherResultMap" type="com.fpl.edu.shoeStore.voucher.entity.Voucher">
         <id property="voucherId" column="voucher_id"/>
         <result property="code" column="code"/>
+        <result property="discountType" column="discount_type"/>
+        <result property="discountValue" column="discount_value"/>
+        <result property="maxDiscountAmount" column="max_discount_amount"/>
+        <result property="minOrderValue" column="min_order_value"/>
         <result property="description" column="description"/>
-        <result property="voucherType" column="voucher_type"/>
-        <result property="voucherValue" column="voucher_value"/>
-        <result property="minSpend" column="min_spend"/>
+        <result property="usageLimit" column="usage_limit"/>
+        <result property="usedCount" column="used_count"/>
+        <result property="usageLimitPerUser" column="usage_limit_per_user"/>
         <result property="startDate" column="start_date"/>
         <result property="endDate" column="end_date"/>
-        <result property="usageLimit" column="usage_limit"/>
-        <result property="createdAt" column="create_at"/>
-        <result property="updateAt" column="update_at"/>
+        <result property="isActive" column="is_active"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
-    <sql id="Base_Column_List">
-                voucher_id, [code], [description], voucher_type, voucher_value,
-                min_spend, start_date, end_date, usage_limit, create_at, update_at
-    </sql>
-
     <select id="findAll" resultMap="VoucherResultMap">
-        SELECT <include refid="Base_Column_List" />
-        FROM voucher
-        ORDER BY create_at DESC
+        SELECT voucher_id, code, discount_type, discount_value, max_discount_amount,
+               min_order_value, description, usage_limit, used_count, usage_limit_per_user,
+               start_date, end_date, is_active, created_at, updated_at
+        FROM vouchers
     </select>
-
-    <select id="findById" parameterType="int" resultMap="VoucherResultMap">
-        SELECT <include refid="Base_Column_List" />
-        FROM voucher
-        WHERE voucher_id = #{id}
-    </select>
-
-    <select id="findByCode" parameterType="String" resultMap="VoucherResultMap">
-        SELECT <include refid="Base_Column_List" />
-        FROM voucher
-        WHERE ([code]) LIKE ('%' + (#{code}) + '%')
-    </select>
-
-    <insert id="insert" parameterType="com.fpl.edu.shoeStore.voucher.entity.Voucher" useGeneratedKeys="true" keyProperty="voucherId">
-        INSERT INTO voucher (
-            [code], voucher_type, voucher_value, [description],
-            min_spend, usage_limit, start_date, end_date, create_at, update_at
-        )
-        VALUES (
-                   #{code}, #{voucherType}, #{voucherValue}, #{description},
-                   #{minSpend}, #{usageLimit}, #{startDate}, #{endDate}, GETDATE(), GETDATE()
-               )
-    </insert>
-
-    <update id="update" parameterType="com.fpl.edu.shoeStore.voucher.entity.Voucher">
-        UPDATE voucher
-        SET [code] = #{code},
-            voucher_type = #{voucherType},
-            voucher_value = #{voucherValue},
-            [description] = #{description},
-            min_spend = #{minSpend},
-            start_date = #{startDate},
-            end_date = #{endDate},
-            usage_limit = #{usageLimit},
-            update_at = GETDATE()
-        WHERE voucher_id = #{voucherId}
-    </update>
-
-    <delete id="deleteById" parameterType="int">
-        DELETE FROM voucher WHERE voucher_id = #{id}
-    </delete>
 
     <select id="findAllPaged" parameterType="map" resultMap="VoucherResultMap">
-        SELECT <include refid="Base_Column_List" />
-        FROM voucher
+        SELECT voucher_id, code, discount_type, discount_value, max_discount_amount,
+               min_order_value, description, usage_limit, used_count, usage_limit_per_user,
+               start_date, end_date, is_active, created_at, updated_at
+        FROM vouchers
         <where>
-            <if test="voucherId != null">
-                AND voucher_id = #{voucherId}
+            <if test="keyword != null and keyword != ''">
+                AND (code LIKE '%' + #{keyword} + '%')
             </if>
-            <if test="code != null and code != ''">
-                AND ([code]) LIKE ('%' + (#{code}) + '%')
-            </if>
-            <if test="voucherType != null and voucherType != ''">
-                AND voucher_type = #{voucherType}
-            </if>
-            <if test="minSpend != null">
-                AND min_spend = #{minSpend}
+            <if test="status != null and status != ''">
+                <choose>
+                    <when test="status == 'active'">
+                        AND is_active = 1
+                    </when>
+                    <when test="status == 'inactive'">
+                        AND is_active = 0
+                    </when>
+                </choose>
             </if>
         </where>
-        ORDER BY create_at DESC
+        ORDER BY created_at DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 
     <select id="countAll" parameterType="map" resultType="long">
-        SELECT COUNT(voucher_id)
-        FROM voucher
+        SELECT COUNT(*)
+        FROM vouchers
         <where>
-            <if test="voucherId != null">
-                AND voucher_id = #{voucherId}
+            <if test="keyword != null and keyword != ''">
+                AND (code LIKE '%' + #{keyword} + '%')
             </if>
-            <if test="code != null and code != ''">
-                AND ([code]) LIKE ('%' + (#{code}) + '%')
-            </if>
-            <if test="voucherType != null and voucherType != ''">
-                AND voucher_type = #{voucherType}
-            </if>
-            <if test="minSpend != null">
-                AND min_spend = #{minSpend}
+            <if test="status != null and status != ''">
+                <choose>
+                    <when test="status == 'active'">
+                        AND is_active = 1
+                    </when>
+                    <when test="status == 'inactive'">
+                        AND is_active = 0
+                    </when>
+                </choose>
             </if>
         </where>
     </select>
 
+    <select id="findById" parameterType="int" resultMap="VoucherResultMap">
+        SELECT voucher_id, code, discount_type, discount_value, max_discount_amount,
+               min_order_value, description, usage_limit, used_count, usage_limit_per_user,
+               start_date, end_date, is_active, created_at, updated_at
+        FROM vouchers
+        WHERE voucher_id = #{id}
+    </select>
+    
+    <select id="findByCode" parameterType="String" resultMap="VoucherResultMap">
+        SELECT voucher_id, code, discount_type, discount_value, max_discount_amount,
+               min_order_value, description, usage_limit, used_count, usage_limit_per_user,
+               start_date, end_date, is_active, created_at, updated_at
+        FROM vouchers
+        WHERE code = #{code}
+    </select>
+
+    <insert id="insert" parameterType="com.fpl.edu.shoeStore.voucher.entity.Voucher" useGeneratedKeys="true" keyProperty="voucherId">
+        INSERT INTO vouchers (
+            code, discount_type, discount_value, max_discount_amount,
+            min_order_value, description, usage_limit, used_count, usage_limit_per_user,
+            start_date, end_date, is_active, created_at, updated_at
+        )
+        VALUES (
+            #{code}, #{discountType}, #{discountValue}, #{maxDiscountAmount},
+            #{minOrderValue}, #{description}, #{usageLimit}, 0, #{usageLimitPerUser},
+            #{startDate}, #{endDate}, #{isActive}, GETDATE(), GETDATE()
+        )
+    </insert>
+
+    <update id="update" parameterType="com.fpl.edu.shoeStore.voucher.entity.Voucher">
+        UPDATE vouchers
+        SET code = #{code},
+            discount_type = #{discountType},
+            discount_value = #{discountValue},
+            max_discount_amount = #{maxDiscountAmount},
+            min_order_value = #{minOrderValue},
+            description = #{description},
+            usage_limit = #{usageLimit},
+            usage_limit_per_user = #{usageLimitPerUser},
+            start_date = #{startDate},
+            end_date = #{endDate},
+            is_active = #{isActive},
+            updated_at = GETDATE()
+        WHERE voucher_id = #{voucherId}
+    </update>
+
+    <update id="softDelete" parameterType="int">
+        UPDATE vouchers
+        SET is_active = 0,
+            updated_at = GETDATE()
+        WHERE voucher_id = #{id}
+    </update>
+
+    <select id="countUsageByUser" resultType="int">
+        SELECT COUNT(*)
+        FROM voucher_usage_history
+        WHERE user_id = #{userId}
+          AND voucher_id = #{voucherId}
+    </select>
+
+    <update id="incrementUsedCount" parameterType="int">
+        UPDATE vouchers
+        SET used_count = used_count + 1,
+            updated_at = GETDATE()
+        WHERE voucher_id = #{voucherId}
+    </update>
+
+    <insert id="insertHistory">
+        INSERT INTO voucher_usage_history (user_id, voucher_id, order_id, used_at)
+        VALUES (#{userId}, #{voucherId}, #{orderId}, GETDATE())
+    </insert>
+
+
+    <select id="findValidVouchers" resultMap="VoucherResultMap">
+    SELECT *
+    FROM vouchers
+    WHERE is_active = 1
+      AND start_date &lt;= GETDATE()
+      AND end_date &gt;= GETDATE()
+      -- Sửa dòng dưới để hỗ trợ voucher không giới hạn số lượng
+      AND (usage_limit IS NULL OR used_count &lt; usage_limit)
+    ORDER BY discount_value DESC
+</select>
 </mapper>

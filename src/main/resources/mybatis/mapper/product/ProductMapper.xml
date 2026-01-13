@@ -207,7 +207,7 @@
     <select id="findProductsBySearch" resultMap="ProductResultMap">
         SELECT * FROM products
         WHERE is_active = 1
-        AND (brand LIKE '%' + #{keyword} + '%' OR title LIKE '%' + #{keyword} + '%')
+        AND (brand LIKE N'%' + #{keyword} + N'%' OR title LIKE N'%' + #{keyword} + N'%')
         ORDER BY create_at DESC
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>

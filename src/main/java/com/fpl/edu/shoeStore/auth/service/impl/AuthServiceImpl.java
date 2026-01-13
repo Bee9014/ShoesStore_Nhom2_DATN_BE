@@ -94,6 +94,7 @@ public class AuthServiceImpl implements AuthService {
 
             return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
         } catch (Exception e) {
+            e.printStackTrace(); // Log lỗi ra console để debug
             return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FAILED_TO_CREATE_ACCOUNT);
         }
     }

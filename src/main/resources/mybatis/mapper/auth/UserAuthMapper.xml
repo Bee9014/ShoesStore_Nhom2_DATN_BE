@@ -43,19 +43,19 @@
           AND status = 'active'
     </select>
 
-    <select id="existsByUsername" resultType="boolean">
+    <select id="existsByUsername" resultType="java.lang.Integer">
         SELECT COUNT(1)
         FROM sys_user
         WHERE username = #{username}
     </select>
 
-    <select id="existsByEmail" resultType="boolean">
+    <select id="existsByEmail" resultType="java.lang.Integer">
         SELECT COUNT(1)
         FROM sys_user
         WHERE email = #{email}
     </select>
 
-    <select id="existsByPhone" resultType="boolean">
+    <select id="existsByPhone" resultType="java.lang.Integer">
         SELECT COUNT(1)
         FROM sys_user
         WHERE phone = #{phone}
@@ -68,6 +68,8 @@
             username,
             password_hash,
             full_name,
+            gender,
+            birthday,
             email,
             phone,
             status,
@@ -78,6 +80,8 @@
             #{username},
             #{passwordHash},
             #{fullName},
+            #{gender},
+            #{birthday},    
             #{email},
             #{phone},
             #{status},

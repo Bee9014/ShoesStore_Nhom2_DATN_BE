@@ -23,4 +23,12 @@ public class RegisterRequestDto {
 
     @Pattern(regexp = "^(0|\\+84)[0-9]{9,10}$", message = "Số điện thoại không hợp lệ")
     private String phone;
+
+    private Integer gender; // 1: Nam, 0: Nữ (hoặc ngược lại tùy quy ước)
+
+    // Nếu frontend gửi chuỗi yyyy-MM-dd, Jackson sẽ tự parse vào LocalDate nếu có
+    // cấu hình hoặc dùng @JsonFormat
+    // Tuy nhiên để đơn giản có thể dùng String rồi parse, hoặc dùng LocalDate trực
+    // tiếp
+    private java.time.LocalDate birthday;
 }
