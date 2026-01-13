@@ -133,7 +133,7 @@
         UPDATE orders
         SET [status] = #{status},
             updated_at = GETDATE()
-        WHERE order_id = #{orderId} AND [status] = 'SHIPPING' -- Thêm điều kiện này để an toàn hơn
+        WHERE order_id = #{orderId} 
     </update>
 
     <select id="countByBuyerId" resultType="long">
