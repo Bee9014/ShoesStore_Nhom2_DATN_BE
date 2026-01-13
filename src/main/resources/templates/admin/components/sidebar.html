@@ -1,156 +1,148 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <title>Sidebar Component</title>
 </head>
+
 <body>
-<div th:fragment="sidebar" class="sidebar-wrapper">
-    <div id="sidebar" class="d-flex flex-column">
-        <div>
-            <div class="sidebar-header d-flex justify-content-between align-items-center">
-                <a th:href="@{/admin}" class="logo">
-                    <div class="d-flex align-items-center w-100 gap-3">
-                        <i id="toggleSidebarLogo" class="bi bi-shop-window logo-icon"></i>
-                        <h3 class="logo-text">SHOE STORE</h3>
-                    </div>
-                </a>
-                <button id="toggleSidebarHeader" class="sidebar-toggle">
-                    <i class="bi bi-list"></i>
-                </button>
+    <div th:fragment="sidebar" class="sidebar-wrapper">
+        <div id="sidebar" class="d-flex flex-column">
+            <div>
+                <div class="sidebar-header d-flex justify-content-between align-items-center">
+                    <a th:href="@{/admin}" class="logo">
+                        <div class="d-flex align-items-center w-100 gap-3">
+                            <i id="toggleSidebarLogo" class="bi bi-shop-window logo-icon"></i>
+                            <h3 class="logo-text">SHOE STORE</h3>
+                        </div>
+                    </a>
+                    <button id="toggleSidebarHeader" class="sidebar-toggle">
+                        <i class="bi bi-list"></i>
+                    </button>
+                </div>
+
+                <div id="hiddenToggle" class="align-items-center d-flex justify-content-center mb-3 d-none">
+                    <button id="toggleSidebar" class="sidebar-toggle align-items-center">
+                        <i class="bi bi-list"></i>
+                    </button>
+                </div>
+
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center rounded" th:href="@{/admin}"
+                            th:classappend="${currentPath == '/admin' or currentPath == '/admin/' ? ' active' : ''}">
+                            <i class="bi bi-speedometer2 nav-icon"></i>
+                            <span class="menu-text ms-2">Dashboard</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center rounded" th:href="@{/admin/products}"
+                            th:classappend="${#strings.startsWith(currentPath, '/admin/products') ? ' active' : ''}">
+                            <i class="bi bi-box-seam nav-icon"></i>
+                            <span class="menu-text ms-2">Quản lý sản phẩm</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center rounded" th:href="@{/admin/inventory}"
+                            th:classappend="${currentPath == '/admin/inventory' ? ' active' : ''}">
+                            <i class="bi bi-boxes nav-icon"></i>
+                            <span class="menu-text ms-2">Kho hàng & Tồn kho</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center rounded" th:href="@{/admin/orders}"
+                            th:classappend="${#strings.startsWith(currentPath, '/admin/orders') ? ' active' : ''}">
+                            <i class="bi bi-cart-check nav-icon"></i>
+                            <span class="menu-text ms-2">Quản lý đơn hàng</span>
+                            <span class="badge bg-danger ms-auto menu-text" th:if="${pendingOrdersCount > 0}"
+                                th:text="${pendingOrdersCount}">0</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center rounded" th:href="@{/admin/payments}"
+                            th:classappend="${#strings.startsWith(currentPath, '/admin/payments') ? ' active' : ''}">
+                            <i class="bi bi-credit-card nav-icon"></i>
+                            <span class="menu-text ms-2">Quản lý thanh toán</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center rounded" th:href="@{/admin/users}"
+                            th:classappend="${#strings.startsWith(currentPath, '/admin/users') ? ' active' : ''}">
+                            <i class="bi bi-people nav-icon"></i>
+                            <span class="menu-text ms-2">Quản lý người dùng</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center rounded" th:href="@{/admin/vouchers}"
+                            th:classappend="${#strings.startsWith(currentPath, '/admin/vouchers') ? ' active' : ''}">
+                            <i class="bi bi-percent nav-icon"></i>
+                            <span class="menu-text ms-2">Khuyến mãi</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center rounded" th:href="@{/admin/shipments}"
+                            th:classappend="${#strings.startsWith(currentPath, '/admin/shipments') ? ' active' : ''}">
+                            <i class="bi bi-truck nav-icon"></i>
+                            <span class="menu-text ms-2">Vận chuyển</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item mt-3">
+                        <a class="nav-link d-flex align-items-center rounded" th:href="@{/admin/reports}"
+                            th:classappend="${#strings.startsWith(currentPath, '/admin/reports') ? ' active' : ''}">
+                            <i class="bi bi-graph-up-arrow nav-icon"></i>
+                            <span class="menu-text ms-2">Báo cáo</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center rounded" th:href="@{/admin/settings}"
+                            th:classappend="${#strings.startsWith(currentPath, '/admin/settings') ? ' active' : ''}">
+                            <i class="bi bi-gear nav-icon"></i>
+                            <span class="menu-text ms-2">Cài đặt</span>
+                        </a>
+                    </li>
+                </ul>
             </div>
 
-            <div id="hiddenToggle" class="align-items-center d-flex justify-content-center mb-3 d-none">
-                <button id="toggleSidebar" class="sidebar-toggle align-items-center">
-                    <i class="bi bi-list"></i>
-                </button>
-            </div>
-
-            <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center rounded"
-                       th:href="@{/admin}"
-                       th:classappend="${currentPath == '/admin' or currentPath == '/admin/' ? ' active' : ''}">
-                        <i class="bi bi-speedometer2 nav-icon"></i>
-                        <span class="menu-text ms-2">Dashboard</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center rounded"
-                       th:href="@{/admin/products}"
-                       th:classappend="${#strings.startsWith(currentPath, '/admin/products') ? ' active' : ''}">
-                        <i class="bi bi-box-seam nav-icon"></i>
-                        <span class="menu-text ms-2">Quản lý sản phẩm</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-    <a class="nav-link d-flex align-items-center rounded"
-       th:href="@{/admin/inventory}"
-       th:classappend="${currentPath == '/admin/inventory' ? ' active' : ''}">
-        <i class="bi bi-boxes nav-icon"></i>
-        <span class="menu-text ms-2">Kho hàng & Tồn kho</span>
-    </a>
-</li>
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center rounded"
-                       th:href="@{/admin/orders}"
-                       th:classappend="${#strings.startsWith(currentPath, '/admin/orders') ? ' active' : ''}">
-                        <i class="bi bi-cart-check nav-icon"></i>
-                        <span class="menu-text ms-2">Quản lý đơn hàng</span>
-                        <span class="badge bg-danger ms-auto menu-text" th:if="${pendingOrdersCount > 0}" 
-                              th:text="${pendingOrdersCount}">0</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center rounded"
-                       th:href="@{/admin/payments}"
-                       th:classappend="${#strings.startsWith(currentPath, '/admin/payments') ? ' active' : ''}">
-                        <i class="bi bi-credit-card nav-icon"></i>
-                        <span class="menu-text ms-2">Quản lý thanh toán</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center rounded"
-                       th:href="@{/admin/users}"
-                       th:classappend="${#strings.startsWith(currentPath, '/admin/users') ? ' active' : ''}">
-                        <i class="bi bi-people nav-icon"></i>
-                        <span class="menu-text ms-2">Quản lý người dùng</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center rounded"
-                       th:href="@{/admin/promotions}"
-                       th:classappend="${#strings.startsWith(currentPath, '/admin/promotions') ? ' active' : ''}">
-                        <i class="bi bi-percent nav-icon"></i>
-                        <span class="menu-text ms-2">Khuyến mãi</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center rounded"
-                       th:href="@{/admin/shipments}"
-                       th:classappend="${#strings.startsWith(currentPath, '/admin/shipments') ? ' active' : ''}">
-                        <i class="bi bi-truck nav-icon"></i>
-                        <span class="menu-text ms-2">Vận chuyển</span>
-                    </a>
-                </li>
-
-                <li class="nav-item mt-3">
-                    <a class="nav-link d-flex align-items-center rounded"
-                       th:href="@{/admin/reports}"
-                       th:classappend="${#strings.startsWith(currentPath, '/admin/reports') ? ' active' : ''}">
-                        <i class="bi bi-graph-up-arrow nav-icon"></i>
-                        <span class="menu-text ms-2">Báo cáo</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center rounded"
-                       th:href="@{/admin/settings}"
-                       th:classappend="${#strings.startsWith(currentPath, '/admin/settings') ? ' active' : ''}">
-                        <i class="bi bi-gear nav-icon"></i>
-                        <span class="menu-text ms-2">Cài đặt</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <div class="mt-auto">
-            <div class="user-info-section mb-3" sec:authorize="isAuthenticated()">
-                <div class="d-flex align-items-center gap-2 px-3 py-2">
-                    <div class="user-avatar">
-                        <i class="bi bi-person-circle"></i>
-                    </div>
-                    <div class="user-details menu-text">
-                        <div class="user-name" sec:authentication="name">Admin</div>
-                        <div class="user-role">Administrator</div>
+            <div class="mt-auto">
+                <div class="user-info-section mb-3" sec:authorize="isAuthenticated()">
+                    <div class="d-flex align-items-center gap-2 px-3 py-2">
+                        <div class="user-avatar">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <div class="user-details menu-text">
+                            <div class="user-name" sec:authentication="name">Admin</div>
+                            <div class="user-role">Administrator</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div sec:authorize="isAuthenticated()">
-                <form th:action="@{/admin/logout}" method="post" id="logoutForm">
-                    <button type="submit"
+                <div sec:authorize="isAuthenticated()">
+                    <form th:action="@{/admin/logout}" method="post" id="logoutForm">
+                        <button type="submit"
                             class="footer-nav-item w-100 d-flex gap-2 align-items-center rounded text-decoration-none border-0"
                             onclick="return confirm('Bạn có chắc chắn muốn đăng xuất?')">
-                        <i class="bi bi-box-arrow-right nav-icon"></i>
-                        <span class="menu-text ms-2">Đăng xuất</span>
-                    </button>
-                </form>
-            </div>
+                            <i class="bi bi-box-arrow-right nav-icon"></i>
+                            <span class="menu-text ms-2">Đăng xuất</span>
+                        </button>
+                    </form>
+                </div>
 
-            <div id="sidebar-footer" class="sidebar-footer mt-3">
-                <div class="text-center">
-                    <small class="text-muted menu-text">© 2025 Shoe Store Admin</small>
+                <div id="sidebar-footer" class="sidebar-footer mt-3">
+                    <div class="text-center">
+                        <small class="text-muted menu-text">© 2025 Shoe Store Admin</small>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </body>
+
 </html>

@@ -23,8 +23,8 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     public UserAuthResponseDto findUserByUserName(String userName) {
-       UserAuthResponseDto userAuthResponseDto = UserAuthConverter.toDto(userAuthMapper.findUserByUsername(userName));
-       return userAuthResponseDto;
+        UserAuthResponseDto userAuthResponseDto = UserAuthConverter.toDto(userAuthMapper.findUserByUsername(userName));
+        return userAuthResponseDto;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class UserAuthServiceImpl implements UserAuthService {
         if (userAuthResponseDto == null) {
             return false;
         }
-        
+
         String storedPassword = userAuthMapper.findUserByUsername(userName).getPasswordHash();
         return passwordEncoder.matches(password, storedPassword);
     }
@@ -68,13 +68,16 @@ public class UserAuthServiceImpl implements UserAuthService {
                 .passwordHash(passwordEncoder.encode(registerRequest.getPassword()))
                 .fullName(registerRequest.getFullName())
                 .email(registerRequest.getEmail())
+                .email(registerRequest.getEmail())
                 .phone(registerRequest.getPhone())
+                .gender(registerRequest.getGender() != null ? registerRequest.getGender() : 0) // Mặc định 0 nếu null
+                .birthday(registerRequest.getBirthday())
                 .roleId(2) // Default role: USER
                 .status("active")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-        
+
         userAuthMapper.insertUser(user);
         return user;
     }

@@ -34,7 +34,6 @@ public class ProductController {
 
     private final ProductService productService;
 
-    
     @GetMapping("/featured")
     public ApiResponse<List<ProductDtoResponse>> getFeaturedProducts() {
         try {
@@ -55,20 +54,17 @@ public class ProductController {
         }
     }
 
-
     @GetMapping
     public ApiResponse<PageResponse<ProductDtoResponse>> getAllProducts(
             @RequestParam(required = false) Integer categoryId,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Boolean isActive,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         try {
             PageResponse<ProductDtoResponse> pageResponse = productService.findAllPaged(
-                    categoryId, title, status, isActive, page, size
-            );
+                    categoryId, title, status, isActive, page, size);
 
             return ApiResponse.<PageResponse<ProductDtoResponse>>builder()
                     .success(true).statusCode(HttpStatus.OK.value())
@@ -83,9 +79,10 @@ public class ProductController {
     @GetMapping("/{id}")
     public ApiResponse<ProductDtoResponse> getProductById(@PathVariable Integer id) {
         try {
-            // Khi gọi hàm này, Service đã tự động chạy lệnh: productMapper.incrementViewCount(id)
+            // Khi gọi hàm này, Service đã tự động chạy lệnh:
+            // productMapper.incrementViewCount(id)
             ProductDtoResponse product = productService.findById(id);
-            
+
             if (product == null) {
                 return ApiResponse.<ProductDtoResponse>builder()
                         .success(false).statusCode(HttpStatus.NOT_FOUND.value())
@@ -120,12 +117,10 @@ public class ProductController {
         }
     }
 
-   
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ProductDtoResponse> createProduct(
             @ModelAttribute ProductDtoRequest request,
-            @RequestParam(value = "file", required = false) MultipartFile file
-    ) {
+            @RequestParam(value = "file", required = false) MultipartFile file) {
         try {
             ProductDtoResponse created = productService.createProduct(request, file);
             return ApiResponse.<ProductDtoResponse>builder()
@@ -139,13 +134,11 @@ public class ProductController {
         }
     }
 
-   
     @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ProductDtoResponse> updateProduct(
             @PathVariable Integer id,
             @ModelAttribute ProductDtoRequest request,
-            @RequestParam(value = "file", required = false) MultipartFile file
-    ) {
+            @RequestParam(value = "file", required = false) MultipartFile file) {
         try {
             ProductDtoResponse updated = productService.updateProduct(id, request, file);
             return ApiResponse.<ProductDtoResponse>builder()
@@ -162,7 +155,6 @@ public class ProductController {
                     .message("Lỗi cập nhật: " + e.getMessage()).data(null).build();
         }
     }
-
 
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteProduct(@PathVariable Integer id) {
@@ -187,7 +179,7 @@ public class ProductController {
         try {
             // Gọi Service lấy top bán chạy
             List<ProductDtoResponse> bestSellers = productService.getBestSellers();
-            
+
             return ApiResponse.<List<ProductDtoResponse>>builder()
                     .success(true)
                     .statusCode(HttpStatus.OK.value())
@@ -203,7 +195,7 @@ public class ProductController {
                     .build();
         }
     }
-    
+
     /**
      * GET /api/v1/products/bestsellers/paged
      * Lấy danh sách sản phẩm bán chạy với phân trang (max 50)
@@ -214,7 +206,7 @@ public class ProductController {
             @RequestParam(defaultValue = "12") int size) {
         try {
             PageResponse<ProductDtoResponse> result = productService.getBestSellersPaged(page, size);
-            
+
             return ApiResponse.<PageResponse<ProductDtoResponse>>builder()
                     .success(true)
                     .statusCode(HttpStatus.OK.value())
@@ -230,7 +222,7 @@ public class ProductController {
                     .build();
         }
     }
-    
+
     /**
      * GET /api/v1/products/search?keyword=nike&page=0&size=12
      * Tìm kiếm sản phẩm theo brand hoặc tên
@@ -242,7 +234,7 @@ public class ProductController {
             @RequestParam(defaultValue = "12") int size) {
         try {
             PageResponse<ProductDtoResponse> result = productService.searchProducts(keyword, page, size);
-            
+
             return ApiResponse.<PageResponse<ProductDtoResponse>>builder()
                     .success(true)
                     .statusCode(HttpStatus.OK.value())

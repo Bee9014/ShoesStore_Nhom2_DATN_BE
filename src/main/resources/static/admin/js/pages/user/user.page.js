@@ -53,40 +53,40 @@ const Utils = {
 // ==================== TABLE CONFIGURATION ====================
 const tableConfig = {
   columns: [
-    { 
-      key: 'userId', 
+    {
+      key: 'userId',
       label: 'ID',
       render: (v) => `<span class="fw-bold">#${v}</span>`
     },
-    { 
-      key: 'username', 
+    {
+      key: 'username',
       label: 'Username',
       render: (v) => `<code>${v}</code>`
     },
-    { 
-      key: 'fullName', 
+    {
+      key: 'fullName',
       label: 'Họ tên'
     },
-    { 
-      key: 'email', 
+    {
+      key: 'email',
       label: 'Email'
     },
-    { 
-      key: 'phone', 
+    {
+      key: 'phone',
       label: 'Số điện thoại'
     },
-    { 
-      key: 'roleId', 
+    {
+      key: 'roleId',
       label: 'Vai trò',
       render: (v) => Utils.getRoleBadge(v)
     },
-    { 
-      key: 'status', 
+    {
+      key: 'status',
       label: 'Trạng thái',
       render: (v) => Utils.getStatusBadge(v)
     },
-    { 
-      key: 'createdAt', 
+    {
+      key: 'createdAt',
       label: 'Ngày tạo',
       render: (v) => Utils.formatDate(v)
     }
@@ -123,14 +123,14 @@ const tableConfig = {
 async function loadStatistics() {
   try {
     const res = await App.api.get(`${App.API.USERS.ROOT()}?page=1&size=1000`);
-    
+
     if (res.data?.success && res.data.data) {
       const users = res.data.data.content || [];
-      
+
       const total = users.length;
       const active = users.filter(u => u.status === 'active').length;
       const blocked = users.filter(u => u.status === 'blocked').length;
-      
+
       const now = new Date();
       const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
       const newUsers = users.filter(u => {
@@ -159,7 +159,7 @@ function initSearchInput() {
       if (values.phoneSearch) currentFilters.phone = values.phoneSearch;
       if (values.roleFilter && values.roleFilter !== '') currentFilters.roleId = values.roleFilter;
       if (values.statusFilter && values.statusFilter !== '') currentFilters.status = values.statusFilter;
-      
+
       if (tableInstance) {
         tableInstance.loadData();
       }
@@ -227,6 +227,24 @@ const UserDetail = {
           </div>
           
           <div class="mb-3">
+            <label class="form-label">Số điện thoại</label>
+            <input type="text" class="form-control" id="edit-phone" value="${user.phone || ''}" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Ngày sinh</label>
+            <input type="date" class="form-control" id="edit-birthday" value="${user.birthday || ''}">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Giới tính</label>
+            <select class="form-select" id="edit-gender">
+              <option value="1" ${user.gender === 1 ? 'selected' : ''}>Nam</option>
+              <option value="0" ${user.gender === 0 ? 'selected' : ''}>Nữ</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
             <label class="form-label">Vai trò</label>
             <select class="form-select" id="edit-roleId" required>
               <option value="1" ${user.roleId === 1 ? 'selected' : ''}>Admin</option>
@@ -264,16 +282,16 @@ const UserDetail = {
     // Handle form submit
     const form = document.getElementById('editUserForm');
     if (form) {
-        form.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          await UserDetail.handleUpdate();
-        });
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await UserDetail.handleUpdate();
+      });
     }
 
     // Handle cancel button
     const btnCancel = document.getElementById('btn-cancel-edit');
-    if(btnCancel) {
-        btnCancel.addEventListener('click', () => panel.closeLast());
+    if (btnCancel) {
+      btnCancel.addEventListener('click', () => panel.closeLast());
     }
   },
 
@@ -287,13 +305,15 @@ const UserDetail = {
         fullName: document.getElementById('edit-fullName').value,
         email: document.getElementById('edit-email').value,
         phone: document.getElementById('edit-phone').value,
+        birthday: document.getElementById('edit-birthday').value,
+        gender: parseInt(document.getElementById('edit-gender').value),
         roleId: parseInt(document.getElementById('edit-roleId').value),
         status: document.getElementById('edit-status').value
       };
 
       // Chỉ gửi password nếu người dùng có nhập
       if (newPassword) {
-          data.passwordHash = newPassword;
+        data.passwordHash = newPassword;
       }
 
       const res = await App.api.put(App.API.USERS.BY_ID(userId), data);
@@ -344,6 +364,19 @@ const ModalHandlers = {
           <label class="form-label">Số điện thoại</label>
           <input type="text" class="form-control" id="create-phone" required>
         </div>
+
+        <div class="mb-3">
+          <label class="form-label">Ngày sinh</label>
+          <input type="date" class="form-control" id="create-birthday">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Giới tính</label>
+          <select class="form-select" id="create-gender">
+            <option value="1">Nam</option>
+            <option value="0">Nữ</option>
+          </select>
+        </div>
         
         <div class="mb-3">
           <label class="form-label">Vai trò</label>
@@ -384,6 +417,8 @@ const ModalHandlers = {
         fullName: document.getElementById('create-fullName').value,
         email: document.getElementById('create-email').value,
         phone: document.getElementById('create-phone').value,
+        birthday: document.getElementById('create-birthday').value,
+        gender: parseInt(document.getElementById('create-gender').value),
         roleId: parseInt(document.getElementById('create-roleId').value),
         status: 'active'
       };
@@ -434,7 +469,7 @@ window.UserPage = {
         onEdit: (user) => UserDetail.openEditPanel(detailPanelInstance, user),
         onDelete: async (user) => {
           if (!confirm('Bạn có chắc chắn muốn xóa người dùng này?')) return;
-          
+
           try {
             const res = await App.api.delete(App.API.USERS.BY_ID(user.userId));
             if (res.data?.success) {
@@ -460,8 +495,8 @@ window.UserPage = {
           modalId: 'globalModal',
           contentId: 'globalModalBody'
         });
-        
-        btnCreate.addEventListener('click', () => 
+
+        btnCreate.addEventListener('click', () =>
           ModalHandlers.openCreateUserModal(modal)
         );
       }

@@ -11,10 +11,10 @@
 export const App = {
   API: {
     BASE: "/api/v1", // Chỉ cần đổi version ở đây khi upgrade API
-    
+
     // Note: Auth endpoints (login/register) are hardcoded in login.html
     // for better performance (no need to load app.config on login page)
-    
+
     // ==================== PRODUCTS ====================
     PRODUCTS: {
       ROOT: () => `/products`,
@@ -26,7 +26,7 @@ export const App = {
       BEST_SELLING: (limit = 10) => `/products/best-selling?limit=${limit}`,
       UPDATE_STOCK: (id) => `/products/${id}/stock`,
     },
-    
+
     // ==================== ORDERS (Admin) ====================
     ORDERS: {
       ROOT: () => `/admin/orders`,
@@ -34,7 +34,7 @@ export const App = {
       UPDATE_STATUS: (id) => `/admin/orders/${id}/status`,
       STATISTICS: () => `/admin/orders/statistics`,
     },
-    
+
     // ==================== USERS ====================
     USERS: {
       ROOT: () => `/users`,
@@ -47,7 +47,13 @@ export const App = {
       TOGGLE_STATUS: (id) => `/users/${id}/status`,
       NEW_THIS_MONTH: () => `/users/new-this-month`,
     },
-    
+
+    // ==================== VOUCHERS ====================
+    VOUCHERS: {
+      ROOT: () => `/vouchers`,
+      BY_ID: (id) => `/vouchers/${id}`,
+    },
+
     // ==================== PAYMENTS ====================
     PAYMENTS: {
       ROOT: () => `/payments`,
@@ -55,7 +61,7 @@ export const App = {
       VNPAY_CREATE: () => `/payments/vnpay/create-payment`,
       VNPAY_CALLBACK: () => `/payments/vnpay/callback`,
     },
-    
+
     // ==================== CATEGORIES ====================
     CATEGORIES: {
       ROOT: () => `/categories`,
@@ -64,7 +70,7 @@ export const App = {
       WITH_PRODUCTS: (id) => `/categories/${id}/products`,
       GET_ALL: () => App.API.CATEGORIES.ROOT(),
     },
-    
+
     // ==================== DASHBOARD ====================
     DASHBOARD: {
       ROOT: () => `/dashboard`,
@@ -74,7 +80,7 @@ export const App = {
       RECENT_ORDERS: (limit = 5) => `/dashboard/recent-orders?limit=${limit}`,
       STATS_BY_MONTH: (year, month) => `/dashboard/stats?year=${year}&month=${month}`,
     },
-    
+
     // ==================== PROMOTIONS ====================
     PROMOTIONS: {
       ROOT: () => `/promotions`,
@@ -82,7 +88,7 @@ export const App = {
       ACTIVE: () => `/promotions/active`,
       APPLY: (code) => `/promotions/apply/${code}`,
     },
-    
+
     // ==================== SHIPMENTS ====================
     SHIPMENTS: {
       ROOT: () => `/shipments`,
@@ -92,33 +98,33 @@ export const App = {
     },
 
     PRODUCT_VARIANTS: {
-  ROOT: () => `/product-variants`,
-  BY_ID: (id) => `/product-variants/${id}`,
-  BY_PRODUCT: (productId) => `/product-variants/product/${productId}`,
-  BY_CODE: (code) => `/product-variants/code/${code}`,
-  UPDATE_STOCK: (id) => `/product-variants/${id}/stock`,
-},
+      ROOT: () => `/product-variants`,
+      BY_ID: (id) => `/product-variants/${id}`,
+      BY_PRODUCT: (productId) => `/product-variants/product/${productId}`,
+      BY_CODE: (code) => `/product-variants/code/${code}`,
+      UPDATE_STOCK: (id) => `/product-variants/${id}/stock`,
+    },
 
-// ==================== STOCK HISTORY ====================
-STOCK_HISTORY: {
-  BY_VARIANT: (variantId) => `/stock-history/${variantId}`,
-},
-    
+    // ==================== STOCK HISTORY ====================
+    STOCK_HISTORY: {
+      BY_VARIANT: (variantId) => `/stock-history/${variantId}`,
+    },
+
     // Template để thêm module mới:
     // MODULE_NAME: {
     //   ROOT: () => `/module`,
     //   BY_ID: (id) => `/module/${id}`,
     // }
   },
-  
+
   /**
    * Get Authorization header with JWT token
    * Supports both localStorage (SPA) and cookie (SSR fallback)
    */
-  getAuthHeader: function() {
+  getAuthHeader: function () {
     // Ưu tiên localStorage (SPA)
     let token = localStorage.getItem('accessToken');
-    
+
     // Fallback: Tìm trong cookie (SSR)
     if (!token) {
       token = document.cookie.replace(
@@ -126,33 +132,33 @@ STOCK_HISTORY: {
         "$1"
       );
     }
-    
+
     return token ? { Authorization: `Bearer ${token}` } : {};
   },
-  
+
   /**
    * Clear all auth data (logout helper)
    */
-  clearAuth: function() {
+  clearAuth: function () {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('userInfo');
-    
+
     // Clear cookie
     document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
   },
-  
+
   /**
    * Check if user is authenticated
    */
-  isAuthenticated: function() {
+  isAuthenticated: function () {
     return !!this.getAuthHeader().Authorization;
   },
-  
+
   /**
    * Get user info from localStorage
    */
-  getUserInfo: function() {
+  getUserInfo: function () {
     const userInfo = localStorage.getItem('userInfo');
     return userInfo ? JSON.parse(userInfo) : null;
   }
@@ -181,21 +187,21 @@ App.api.interceptors.request.use(
       ...config.headers,
       ...App.getAuthHeader()
     };
-    
+
     // Log request trong dev mode (optional)
     if (window.location.hostname === 'localhost') {
       console.log(`[API Request] ${config.method.toUpperCase()} ${config.url}`);
     }
     if (config.data instanceof FormData) {
-            // Xóa Content-Type mặc định (application/json)
-            // Để trình duyệt tự động set là "multipart/form-data; boundary=..."
-            delete config.headers['Content-Type'];
-        }
-        else {
-            // Nếu không phải file thì mới dùng JSON
-            config.headers['Content-Type'] = 'application/json';
-        }
-    
+      // Xóa Content-Type mặc định (application/json)
+      // Để trình duyệt tự động set là "multipart/form-data; boundary=..."
+      delete config.headers['Content-Type'];
+    }
+    else {
+      // Nếu không phải file thì mới dùng JSON
+      config.headers['Content-Type'] = 'application/json';
+    }
+
     return config;
   },
   (error) => {
@@ -220,19 +226,19 @@ App.api.interceptors.response.use(
   (error) => {
     // Log error
     console.error('[API Error]', error.response?.data || error.message);
-    
+
     // Handle specific error codes
     if (error.response) {
       const status = error.response.status;
-      
-      switch(status) {
+
+      switch (status) {
         case 401:
           // Unauthorized - Token expired or invalid
           console.warn('[401 Unauthorized] Redirecting to login...');
           App.clearAuth();
           window.location.href = '/admin/login?error=' + encodeURIComponent('Phiên đăng nhập hết hạn');
           break;
-          
+
         case 403:
           // Forbidden - Insufficient permissions
           console.warn('[403 Forbidden] Insufficient permissions');
@@ -240,7 +246,7 @@ App.api.interceptors.response.use(
             Toast.error('Bạn không có quyền thực hiện thao tác này');
           }
           break;
-          
+
         case 404:
           // Not Found
           console.warn('[404 Not Found]', error.config.url);
@@ -248,7 +254,7 @@ App.api.interceptors.response.use(
             Toast.error('Không tìm thấy dữ liệu');
           }
           break;
-          
+
         case 500:
           // Internal Server Error
           console.error('[500 Server Error]', error.response.data);
@@ -256,7 +262,7 @@ App.api.interceptors.response.use(
             Toast.error('Lỗi máy chủ. Vui lòng thử lại sau');
           }
           break;
-          
+
         case 422:
           // Validation Error
           console.warn('[422 Validation Error]', error.response.data);
@@ -265,7 +271,7 @@ App.api.interceptors.response.use(
             Toast.error(errorMsg);
           }
           break;
-          
+
         default:
           console.error(`[${status} Error]`, error.response.data);
       }
@@ -279,11 +285,11 @@ App.api.interceptors.response.use(
       // Something else happened
       console.error('[Request Error]', error.message);
     }
-    
+
     return Promise.reject(error);
   }
 );
 
- window.App = App;
+window.App = App;
 
 

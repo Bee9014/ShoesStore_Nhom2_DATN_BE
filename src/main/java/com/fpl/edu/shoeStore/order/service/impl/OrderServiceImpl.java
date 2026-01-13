@@ -24,6 +24,10 @@ import com.fpl.edu.shoeStore.product.entity.ProductVariant;
 import com.fpl.edu.shoeStore.product.mapper.ProductMapper;
 import com.fpl.edu.shoeStore.product.mapper.ProductVariantMapper;
 import com.fpl.edu.shoeStore.user.mapper.UserMapper;
+import com.fpl.edu.shoeStore.voucher.dto.response.VoucherCalcResponse;
+import com.fpl.edu.shoeStore.voucher.entity.Voucher;
+import com.fpl.edu.shoeStore.voucher.mapper.VoucherMapper;
+import com.fpl.edu.shoeStore.voucher.service.VoucherService;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -34,24 +38,32 @@ public class OrderServiceImpl implements OrderService {
     private final ProductMapper productMapper;
     private final UserMapper userMapper;
 
+    // Thêm Dependency cho Voucher
+    private final VoucherService voucherService;
+    private final VoucherMapper voucherMapper;
+
     @Autowired
     public OrderServiceImpl(
             OrderMapper orderMapper,
             OrderConverter orderConverter,
             ProductVariantMapper variantMapper,
             ProductMapper productMapper,
-            UserMapper userMapper) {
+            UserMapper userMapper,
+            VoucherService voucherService,
+            VoucherMapper voucherMapper) {
         this.orderMapper = orderMapper;
         this.orderConverter = orderConverter;
         this.variantMapper = variantMapper;
         this.productMapper = productMapper;
         this.userMapper = userMapper;
+        this.voucherService = voucherService;
+        this.voucherMapper = voucherMapper;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public OrderResponse createOrder(OrderCreateRequest request) throws OrderException {
-        // 0. CHECK USER EXISTENCE (Fix lỗi Foreign Key)
+        // 0. CHECK USER EXISTENCE
         if (userMapper.findById(request.getUserId()) == null) {
             throw new OrderException(
                     "Người dùng không tồn tại (ID: " + request.getUserId() + "). Vui lòng đăng nhập lại.");
@@ -91,34 +103,26 @@ public class OrderServiceImpl implements OrderService {
             // Tạo OrderItem với dữ liệu thật từ DB
             OrderItem item = orderConverter.toItemEntity(itemReq);
 
-            // Sử dụng price từ variant (BigDecimal)
-            BigDecimal unitPrice = variant.getPrice() != null
-                    ? variant.getPrice()
-                    : BigDecimal.ZERO;
+            BigDecimal unitPrice = variant.getPrice() != null ? variant.getPrice() : BigDecimal.ZERO;
 
             item.setUnitPrice(unitPrice);
             item.setTotalPrice(unitPrice.multiply(BigDecimal.valueOf(itemReq.getQuantity())));
 
-            // 👇 SỬA ĐOẠN NÀY: Snapshot tên sản phẩm + Size + Color
+            // Snapshot tên sản phẩm + Size + Color
             String productName = product.getTitle();
             String variantInfo = "";
 
-            // Nếu có size
             if (variant.getSize() != null && !variant.getSize().isEmpty()) {
                 variantInfo += variant.getSize();
             }
-
-            // Nếu có color
             if (variant.getColor() != null && !variant.getColor().isEmpty()) {
                 if (!variantInfo.isEmpty())
                     variantInfo += " - ";
                 variantInfo += variant.getColor();
             }
-
             if (!variantInfo.isEmpty()) {
                 productName += " (" + variantInfo + ")";
             }
-            // 👆 HẾT SỬA
 
             item.setProductNameSnapshot(productName);
 
@@ -128,33 +132,66 @@ public class OrderServiceImpl implements OrderService {
 
         order.setTotalAmount(totalGoodsValue);
 
-        // 3. KIỂM TRA VOUCHER TỪ DB (TODO: Implement voucher logic)
-        BigDecimal discount = BigDecimal.ZERO;
+        // 3. XỬ LÝ VOUCHER (Đã cập nhật Logic)
+        BigDecimal discountAmount = BigDecimal.ZERO;
+
         if (request.getVoucherId() != null) {
-            // Logic voucher...
+            // Lấy thông tin Voucher từ DB để lấy Code
+            Voucher voucher = voucherMapper.findById(request.getVoucherId());
+            if (voucher == null) {
+                throw new OrderException("Voucher không tồn tại (ID: " + request.getVoucherId() + ")");
+            }
+
+            // Gọi Service tính toán (Re-validate các điều kiện như ngày, số lượng,
+            // min_spend...)
+            VoucherCalcResponse vCalc = voucherService.applyVoucher(
+                    voucher.getCode(),
+                    totalGoodsValue, // Tính giảm giá dựa trên tổng tiền hàng
+                    request.getUserId());
+
+            discountAmount = vCalc.getDiscountAmount();
+            order.setVoucherId(voucher.getVoucherId());
+        } else {
+            order.setVoucherId(null);
         }
-        order.setDiscountAmount(discount);
+
+        order.setDiscountAmount(discountAmount);
 
         // 4. TÍNH TỔNG TIỀN CUỐI CÙNG
         BigDecimal shippingFee = request.getShippingFee() != null ? request.getShippingFee() : BigDecimal.ZERO;
-        order.setFinalAmount(totalGoodsValue.subtract(discount).add(shippingFee));
+
+        // Final = Total - Discount + Ship
+        BigDecimal finalAmount = totalGoodsValue.subtract(discountAmount).add(shippingFee);
+
+        // Đảm bảo không âm tiền
+        if (finalAmount.compareTo(BigDecimal.ZERO) < 0) {
+            finalAmount = BigDecimal.ZERO;
+        }
+        order.setFinalAmount(finalAmount);
 
         // 5. LƯU THỰC TẾ XUỐNG DB
-        orderMapper.insertOrder(order);
+        orderMapper.insertOrder(order); // orderId sẽ được map lại vào entity sau dòng này
 
         for (OrderItem item : items) {
             item.setOrderId(order.getOrderId());
             orderMapper.insertOrderItem(item);
         }
 
-        // 6. Trừ tồn kho (Nên bật cái này lên nhé)
+        // 6. TRỪ TỒN KHO SẢN PHẨM
         for (var itemReq : request.getItems()) {
-            // Logic updateStock đã có trong ProductVariantService, nên inject service đó
-            // vào đây để dùng
-            // productVariantService.updateStock(itemReq.getVariantId(),
-            // -itemReq.getQuantity());
-            // Hoặc dùng tạm variantMapper như cũ:
             variantMapper.updateStock(itemReq.getVariantId(), -itemReq.getQuantity());
+        }
+
+        // 7. XỬ LÝ VOUCHER SAU KHI TẠO ĐƠN THÀNH CÔNG (Trừ lượt dùng + Lưu lịch sử)
+        if (request.getVoucherId() != null) {
+            // Tăng số lượng đã dùng của Voucher lên 1
+            voucherMapper.incrementUsedCount(request.getVoucherId());
+
+            // Lưu lịch sử: User A dùng Voucher B cho Đơn C
+            voucherMapper.insertHistory(
+                    request.getUserId(),
+                    request.getVoucherId(),
+                    order.getOrderId());
         }
 
         return orderConverter.toResponse(order, items);
@@ -186,19 +223,11 @@ public class OrderServiceImpl implements OrderService {
             page = 1;
         if (size < 1)
             size = 10;
-
-        // Tính offset cho SQL
         int offset = (page - 1) * size;
 
-        // 1. Gọi Mapper lấy danh sách (có phân trang DB và lọc status)
-        // ⚠️ Lưu ý: Bạn cần chắc chắn Interface OrderMapper đã có hàm
-        // findByBuyerId(userId, status, offset, size)
         List<Order> orders = orderMapper.findByBuyerId(userId, status, offset, size);
-
-        // 2. Gọi Mapper đếm tổng số bản ghi (có lọc status)
         long totalElements = orderMapper.countByBuyerId(userId, status);
 
-        // 3. Convert sang DTO
         List<OrderResponse> orderResponses = orders.stream()
                 .map(order -> {
                     List<OrderItem> items = orderMapper.findItemsByOrderId(order.getOrderId());
@@ -224,14 +253,17 @@ public class OrderServiceImpl implements OrderService {
         if (size < 1)
             size = 20;
         int offset = (page - 1) * size;
+
         List<Order> orders = orderMapper.findAllPaged(status, searchTerm, offset, size);
         long totalElements = orderMapper.countAll(status, searchTerm);
+
         List<OrderResponse> orderResponses = orders.stream()
                 .map(order -> {
                     List<OrderItem> items = orderMapper.findItemsByOrderId(order.getOrderId());
                     return orderConverter.toResponse(order, items);
                 })
                 .collect(Collectors.toList());
+
         int totalPages = (int) Math.ceil((double) totalElements / size);
         return PageResponse.<OrderResponse>builder()
                 .content(orderResponses).pageNumber(page).pageSize(size)
@@ -253,9 +285,10 @@ public class OrderServiceImpl implements OrderService {
         int affectedRows = orderMapper.updateStatus(orderId, "CANCELLED");
         if (affectedRows == 0)
             throw new OrderException("Hủy đơn hàng thất bại");
+
+        // Hoàn lại kho
         List<OrderItem> items = orderMapper.findItemsByOrderId(orderId);
         for (OrderItem item : items) {
-            // Cộng lại số lượng (truyền số dương vào hàm updateStock)
             variantMapper.updateStock(item.getVariantId(), item.getQuantity());
         }
     }
