@@ -96,8 +96,15 @@ public class ProductServiceImpl implements ProductService {
             existing.setBrand(request.getBrand());
         if (request.getCondition() != null)
             existing.setCondition(request.getCondition());
-        if (request.getStatus() != null)
+        if (request.getStatus() != null) {
             existing.setStatus(request.getStatus());
+            // Sync isActive based on status
+            if ("selling".equalsIgnoreCase(request.getStatus()) || "active".equalsIgnoreCase(request.getStatus())) {
+                existing.setIsActive(true);
+            } else {
+                existing.setIsActive(false);
+            }
+        }
         if (request.getUpdateBy() != null)
             existing.setUpdateBy(request.getUpdateBy());
 
@@ -120,7 +127,7 @@ public class ProductServiceImpl implements ProductService {
         if (existing == null) {
             throw new RuntimeException("Không tìm thấy Product để xóa");
         }
-        return productMapper.deleteById(id);
+        return productMapper.deleteById(id, 1);
     }
 
     // --- FIND BY ID/TITLE ---
@@ -140,7 +147,7 @@ public class ProductServiceImpl implements ProductService {
     // --- 1. FIND ALL PAGED (FIXED OFFSET ERROR) ---
     @Override
     public PageResponse<ProductDtoResponse> findAllPaged(Integer categoryId, String title, String status,
-            Boolean isActive, int page, int size) {
+            Boolean isActive, String productCode, int page, int size) {
         // Đảm bảo số trang không âm
         if (page < 0)
             page = 0;
@@ -149,8 +156,9 @@ public class ProductServiceImpl implements ProductService {
 
         int offset = page * size;
 
-        List<Product> products = productMapper.findAllPaged(categoryId, title, status, isActive, offset, size);
-        long totalElements = productMapper.countAll(categoryId, title, status, isActive);
+        List<Product> products = productMapper.findAllPaged(categoryId, title, status, isActive, productCode, offset,
+                size);
+        long totalElements = productMapper.countAll(categoryId, title, status, isActive, productCode);
 
         List<ProductDtoResponse> content = products.stream()
                 .map(ProductConverter::toResponse)

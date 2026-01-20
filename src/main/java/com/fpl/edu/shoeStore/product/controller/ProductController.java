@@ -60,11 +60,12 @@ public class ProductController {
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Boolean isActive,
+            @RequestParam(required = false) String productCode,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         try {
             PageResponse<ProductDtoResponse> pageResponse = productService.findAllPaged(
-                    categoryId, title, status, isActive, page, size);
+                    categoryId, title, status, isActive, productCode, page, size);
 
             return ApiResponse.<PageResponse<ProductDtoResponse>>builder()
                     .success(true).statusCode(HttpStatus.OK.value())

@@ -13,18 +13,18 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/admin")
 public class AdminController {
 
-    @GetMapping({"", "/"})
+    @GetMapping({ "", "/" })
     public String dashboard(Model model, Authentication authentication, HttpServletRequest request) {
         // Redirect to login if not authenticated
-        if (authentication == null || !authentication.isAuthenticated() 
-            || authentication.getPrincipal().equals("anonymousUser")) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication.getPrincipal().equals("anonymousUser")) {
             return "redirect:/admin/login";
         }
-        
+
         model.addAttribute("pageTitle", "Dashboard");
         model.addAttribute("currentPath", request.getRequestURI());
         model.addAttribute("pendingOrdersCount", 5); // TODO: Get from service
-        
+
         return "admin/pages/dashboard";
     }
 
@@ -33,6 +33,13 @@ public class AdminController {
         model.addAttribute("pageTitle", "Quản lý sản phẩm");
         model.addAttribute("currentPath", request.getRequestURI());
         return "admin/pages/product";
+    }
+
+    @GetMapping("/categories")
+    public String categoryList(Model model, HttpServletRequest request) {
+        model.addAttribute("pageTitle", "Quản lý danh mục");
+        model.addAttribute("currentPath", request.getRequestURI());
+        return "admin/pages/category";
     }
 
     @GetMapping("/products/add")
@@ -57,8 +64,6 @@ public class AdminController {
         // TODO: Load product by id
         return "admin/product/detail";
     }
-
-
 
     @GetMapping("/promotions")
     public String promotionList(Model model) {
@@ -88,12 +93,12 @@ public class AdminController {
         return "admin/settings";
     }
 
- @GetMapping("/inventory")
-public String inventoryPage(Model model, HttpServletRequest request) {
-    model.addAttribute("pageTitle", "Quản lý kho hàng");
-    
-    model.addAttribute("currentPath", request.getRequestURI()); 
-    
-    return "admin/pages/inventory"; 
-}
+    @GetMapping("/inventory")
+    public String inventoryPage(Model model, HttpServletRequest request) {
+        model.addAttribute("pageTitle", "Quản lý kho hàng");
+
+        model.addAttribute("currentPath", request.getRequestURI());
+
+        return "admin/pages/inventory";
+    }
 }

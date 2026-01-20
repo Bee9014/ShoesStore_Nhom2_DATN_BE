@@ -12,6 +12,7 @@ public interface ProductVariantMapper {
 
     /**
      * Lấy danh sách tất cả các biến thể thuộc về một sản phẩm cụ thể.
+     * 
      * @param productId ID của sản phẩm cha.
      */
     List<ProductVariant> findByProductId(@Param("productId") Integer productId);
@@ -22,7 +23,7 @@ public interface ProductVariantMapper {
     ProductVariant findById(@Param("variantId") Integer variantId);
 
     /**
-     * Thêm mới một biến thể sản phẩm. 
+     * Thêm mới một biến thể sản phẩm.
      * ID tự tăng từ SQL Server sẽ được gán vào trường variantId của object.
      */
     int insert(ProductVariant variant);
@@ -44,8 +45,9 @@ public interface ProductVariantMapper {
 
     /**
      * Cập nhật số lượng tồn kho (Stock Quantity).
+     * 
      * @param variantId ID biến thể.
-     * @param quantity Số lượng thay đổi (cộng thêm hoặc trừ đi).
+     * @param quantity  Số lượng thay đổi (cộng thêm hoặc trừ đi).
      */
     int updateStock(@Param("variantId") Integer variantId, @Param("quantity") Integer quantity);
 
@@ -58,5 +60,10 @@ public interface ProductVariantMapper {
      * LƯU Ý: Phương thức countLowStock hiện chưa có trong file XML bạn cung cấp.
      * Nếu bạn muốn sử dụng, hãy thêm thẻ <select id="countLowStock"> vào XML.
      */
-     Long countLowStock(@Param("threshold") Integer threshold);
+    Long countLowStock(@Param("threshold") Integer threshold);
+
+    /**
+     * Tính tổng tồn kho của toàn bộ biến thể thuộc sản phẩm.
+     */
+    Long sumStockByProductId(@Param("productId") Integer productId);
 }

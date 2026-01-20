@@ -101,24 +101,41 @@
     <delete id="deleteById" parameterType="int">
         UPDATE products
         SET is_active = 0,
+            [status] = 'draft',
             update_at = GETDATE(),
             update_by = #{updateBy}
         WHERE product_id = #{productId}
     </delete>
 
     <select id="findAllPaged" parameterType="map" resultMap="ProductResultMap">
-        SELECT * FROM products
-        <where>
-            <if test="title != null and title != ''">
-                AND title LIKE ('%' + #{title} + '%')
-            </if>
-            <if test="categoryId != null">
-                AND category_id = #{categoryId}
-            </if>
-        </where>
-        ORDER BY create_at DESC
-        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
-    </select>
+    SELECT * FROM products
+    <where>
+        <if test="title != null and title != ''">
+            <bind name="patternTitle" value="'%' + title + '%'" />
+            AND title LIKE #{patternTitle}
+        </if>
+
+        <if test="productCode != null and productCode != ''">
+            <bind name="patternCode" value="'%' + productCode + '%'" />
+            AND product_code LIKE #{patternCode}
+        </if>
+
+        <if test="categoryId != null">
+            AND category_id = #{categoryId}
+        </if>
+
+        <if test="status != null and status != ''">
+            AND [status] = #{status}
+        </if>
+        <if test="isActive != null">
+            AND is_active = #{isActive}
+        </if>
+    </where>
+
+    ORDER BY create_at DESC, product_id DESC
+    
+    OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+</select>
 
     <select id="countAll" parameterType="map" resultType="long">
         SELECT COUNT(*)
@@ -130,8 +147,14 @@
             <if test="title != null and title != ''">
                 AND title LIKE ('%' + #{title} + '%')
             </if>
+             <if test="productCode != null and productCode != ''">
+                AND product_code LIKE ('%' + #{productCode} + '%')
+            </if>
             <if test="status != null and status != ''">
                 AND [status] = #{status}
+            </if>
+            <if test="isActive != null">
+                AND is_active = #{isActive}
             </if>
         </where>
     </select>

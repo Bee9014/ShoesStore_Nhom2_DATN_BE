@@ -117,6 +117,10 @@
         WHERE product_variant_code = #{productVariantCode}
     </select>
 
+    <select id="sumStockByProductId" resultType="long">
+        SELECT COALESCE(SUM(stock_qty), 0) FROM product_variants WHERE product_id = #{productId}
+    </select>
+
     <select id="countLowStock" resultType="java.lang.Long">
         SELECT COUNT(*)
         FROM [product_variants]

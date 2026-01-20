@@ -8,6 +8,7 @@ import { CustomTable } from "/admin/js/components/table.js";
 import { App } from "/admin/js/config/app.config.js";
 import { Toast } from "/admin/js/components/toast.js";
 import { SearchInput } from "/admin/js/components/search.input.js";
+import { Modal as ConfirmModal } from "/admin/js/components/confirm.modal.js";
 
 let currentFilters = {
   status: '',
@@ -94,46 +95,46 @@ const Utils = {
 const tableConfig = {
   columns: [
     // 1. Cột Mã Đơn Hàng (orderId)
-    { 
-      key: 'orderId', 
+    {
+      key: 'orderId',
       label: 'Mã ĐH',
       render: (v) => `<span class="text-primary fw-bold">#${v}</span>`
     },
     // 2. Cột Khách hàng (shippingFullname - Khớp với JSON)
-    { 
-      key: 'shippingFullname', 
+    {
+      key: 'shippingFullname',
       label: 'Người nhận',
       render: (v) => `<span class="fw-bold">${v || 'Khách lẻ'}</span>`
     },
     // 3. Cột Số điện thoại (shippingPhone - Khớp với JSON)
-    { 
-      key: 'shippingPhone', 
+    {
+      key: 'shippingPhone',
       label: 'SĐT',
       render: (v) => v || '-'
     },
     // 4. Cột Ngày đặt (orderDate - Khớp với JSON)
-    { 
-      key: 'orderDate', 
+    {
+      key: 'orderDate',
       label: 'Ngày đặt',
       render: (v) => Utils.formatDate(v)
     },
     // 5. Cột Tổng tiền (finalAmount - Khớp với JSON)
-    { 
-      key: 'finalAmount', 
+    {
+      key: 'finalAmount',
       label: 'Tổng tiền',
       render: (v) => `<span class="text-danger fw-bold">${Utils.formatPrice(v)}</span>`
     },
     // 6. Cột Trạng thái (status - Khớp với JSON)
-    { 
-      key: 'status', 
+    {
+      key: 'status',
       label: 'Trạng thái',
       render: (v) => Utils.getStatusBadge(v)
     },
     // 7. Cột Thao tác (Nút bấm)
     {
-        key: 'actions',
-        label: 'Thao tác',
-        render: (_, row) => Utils.getQuickActionButtons(row)
+      key: 'actions',
+      label: 'Thao tác',
+      render: (_, row) => Utils.getQuickActionButtons(row)
     }
   ],
 
@@ -141,7 +142,7 @@ const tableConfig = {
   async fetchData(page, size) {
     try {
       const params = new URLSearchParams({
-        page: page || 1, 
+        page: page || 1,
         size: size || 10,
         ...currentFilters
       }).toString();
@@ -151,21 +152,21 @@ const tableConfig = {
       console.log('Fetching URL:', url);
 
       const res = await App.api.get(url);
-      
+
       // LOG DỮ LIỆU RA ĐỂ KIỂM TRA
-      console.log('✅ Dữ liệu nhận được:', res.data); 
+      console.log('✅ Dữ liệu nhận được:', res.data);
 
       // XỬ LÝ KẾT QUẢ TRẢ VỀ
       // Cấu trúc JSON của bạn là: { success: true, data: { content: [...] } }
       if (res.data?.success && res.data?.data) {
-          const pageData = res.data.data;
-          
-          return {
-              // Lấy mảng content từ bên trong data
-              content: pageData.content || [], 
-              // Lấy tổng số dòng để phân trang
-              totalElements: pageData.totalElements || 0 
-          };
+        const pageData = res.data.data;
+
+        return {
+          // Lấy mảng content từ bên trong data
+          content: pageData.content || [],
+          // Lấy tổng số dòng để phân trang
+          totalElements: pageData.totalElements || 0
+        };
       }
 
       return { content: [], totalElements: 0 };
@@ -221,25 +222,25 @@ async function loadStatistics() {
 }
 
 // ==================== SEARCH INPUT ====================
-     function initSearchInput() {
-       const search = new SearchInput({
-         containerId: 'search-container',
-         onChange: (values) => {
-           // SearchInput returns object with all field values
-           currentFilters.searchTerm = values.orderSearch || '';
-           if (tableInstance) {
-             tableInstance.loadData();
-           }
-         }
-       });
+function initSearchInput() {
+  const search = new SearchInput({
+    containerId: 'search-container',
+    onChange: (values) => {
+      // SearchInput returns object with all field values
+      currentFilters.searchTerm = values.orderSearch || '';
+      if (tableInstance) {
+        tableInstance.loadData();
+      }
+    }
+  });
 
-       // Add search input field
-       search.addTextInput({
-         id: 'orderSearch',
-         placeholder: 'Tìm theo mã ĐH, tên khách hàng, SĐT...',
-         className: 'w-100'
-       });
-     }
+  // Add search input field
+  search.addTextInput({
+    id: 'orderSearch',
+    placeholder: 'Tìm theo mã ĐH, tên khách hàng, SĐT...',
+    className: 'w-100'
+  });
+}
 
 // ==================== PUBLIC METHODS ====================
 window.OrderPage = {
@@ -266,7 +267,22 @@ window.OrderPage = {
         fetchData: tableConfig.fetchData,
         pageSize: 20,
         onEdit: (order) => OrderPage.viewDetail(order.orderId),
-        onDelete: null // Orders should not be deleted
+        onDelete: async (order) => {
+          if (!await ConfirmModal.show(`Xác nhận xóa (hoàn tiền) đơn hàng #${order.orderId}?`)) return;
+          try {
+            const res = await App.api.delete(App.API.ORDERS.BY_ID(order.orderId));
+            if (res.data?.success) {
+              Toast.success('Đã chuyển trạng thái hoàn tiền');
+              tableInstance.loadData();
+              loadStatistics();
+            } else {
+              Toast.error(res.data?.message || 'Xóa thất bại');
+            }
+          } catch (error) {
+            console.error('Delete order error:', error);
+            Toast.error('Không thể xóa đơn hàng');
+          }
+        }
       });
 
       // Load initial data
@@ -310,7 +326,7 @@ window.OrderPage = {
       'DELIVERED': 'Đã giao'
     };
 
-    if (!confirm(`Xác nhận chuyển sang trạng thái "${statusLabels[newStatus]}"?`)) {
+    if (!await ConfirmModal.show(`Xác nhận chuyển sang trạng thái "${statusLabels[newStatus]}"?`)) {
       return;
     }
 

@@ -45,6 +45,14 @@
                     </li>
 
                     <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center rounded" th:href="@{/admin/categories}"
+                            th:classappend="${#strings.startsWith(currentPath, '/admin/categories') ? ' active' : ''}">
+                            <i class="bi bi-tags nav-icon"></i>
+                            <span class="menu-text ms-2">Quản lý danh mục</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
                         <a class="nav-link d-flex align-items-center rounded" th:href="@{/admin/inventory}"
                             th:classappend="${currentPath == '/admin/inventory' ? ' active' : ''}">
                             <i class="bi bi-boxes nav-icon"></i>

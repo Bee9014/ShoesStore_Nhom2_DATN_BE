@@ -9,6 +9,7 @@ import { Toast } from "/admin/js/components/toast.js";
 import { SearchInput } from "/admin/js/components/search.input.js";
 import { DetailPanel } from "/admin/js/components/detail.panel.js";
 import { CustomModal } from "/admin/js/components/modal.js";
+import { Modal as ConfirmModal } from "/admin/js/components/confirm.modal.js";
 
 let currentFilters = {};
 let tableInstance = null;
@@ -105,7 +106,7 @@ const tableConfig = {
             const fetchSize = 1000;
 
             const params = new URLSearchParams();
-            params.append('page', 1);
+            params.append('page', 1); // Backend expects 1-based index
             params.append('size', fetchSize);
 
             if (currentFilters.keyword) params.append('keyword', currentFilters.keyword);
@@ -137,7 +138,7 @@ const tableConfig = {
                 // Let's assume CustomTable displays what we give it. 
                 // We will slice the data manually to return only the requested page!
 
-                const start = (page - 1) * size;
+                const start = page * size;
                 const end = start + size;
                 const pagedData = data.slice(start, end);
 
@@ -493,7 +494,7 @@ window.VoucherPage = {
                 pageSize: 10,
                 onEdit: (voucher) => VoucherDetail.openEditPanel(detailPanelInstance, voucher),
                 onDelete: async (voucher) => {
-                    if (!confirm(`Xác nhận xóa voucher ${voucher.code}?`)) return;
+                    if (!await ConfirmModal.show(`Xác nhận xóa voucher ${voucher.code}?`)) return;
                     try {
                         const res = await App.api.delete(App.API.VOUCHERS.BY_ID(voucher.voucherId));
                         if (res.data?.success) {

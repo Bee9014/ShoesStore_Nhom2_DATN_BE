@@ -679,6 +679,21 @@
   align-items: flex-end;
 }
 
+/* New Grid Layout for Search */
+.search-container-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+    align-items: end;
+}
+/* Responsive: Stack on mobile */
+@media (max-width: 768px) {
+    .search-container-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Wrapper cho select để dễ thêm icon */
 .search-select-wrapper {
   position: relative;

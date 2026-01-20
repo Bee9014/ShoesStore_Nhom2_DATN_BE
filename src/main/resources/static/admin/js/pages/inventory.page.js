@@ -29,8 +29,8 @@ const Utils = {
     }
 };
 
-let allVariants = []; 
-let filterLowStock = false; 
+let allVariants = [];
+let filterLowStock = false;
 let currentFilter = { keyword: '' };
 
 const tableConfig = {
@@ -38,7 +38,7 @@ const tableConfig = {
         { key: 'variantId', label: 'ID', width: '5%' },
         { key: 'image', label: 'Ảnh', width: '10%', render: (v) => Utils.renderImage(v) },
         { key: 'productVariantCode', label: 'SKU Code', render: (v) => `<code class="fw-bold text-primary">${v}</code>` },
-        
+
         { key: 'price', label: 'Giá bán', render: (v) => `<span class="text-success fw-bold">${Utils.formatPrice(v)}</span>` },
         { key: 'stockQty', label: 'Tồn kho', render: (v) => Utils.renderStockBadge(v) },
         {
@@ -59,14 +59,14 @@ const tableConfig = {
             if (filterLowStock) filtered = filtered.filter(v => v.stockQty < 10);
             if (currentFilter.keyword) {
                 const kw = currentFilter.keyword.toLowerCase();
-                filtered = filtered.filter(v => 
+                filtered = filtered.filter(v =>
                     (v.productVariantCode && v.productVariantCode.toLowerCase().includes(kw)) ||
                     (v.attribute && v.attribute.toLowerCase().includes(kw))
                 );
             }
 
             const totalElements = filtered.length;
-            const start = (page - 1) * size;
+            const start = page * size;
             return { content: filtered.slice(start, start + size), totalElements };
         } catch (error) {
             console.error('Lỗi tải kho hàng:', error);
@@ -81,14 +81,14 @@ const InventoryHandler = {
     init(modalInstance, tableInstance) {
         this.modal = modalInstance;
         this.table = tableInstance;
-        
+
         document.getElementById('inventoryTableContainer').addEventListener('click', (e) => {
             const btn = e.target.closest('.btn-quick-edit');
             if (btn) this.openQuickEdit(btn.getAttribute('data-id'));
         });
 
         const btnFilter = document.getElementById('btnFilterStock');
-        if(btnFilter) {
+        if (btnFilter) {
             btnFilter.onclick = () => {
                 filterLowStock = !filterLowStock;
                 btnFilter.className = filterLowStock ? 'btn btn-warning w-100' : 'btn btn-outline-warning w-100';
@@ -146,7 +146,7 @@ const InventoryHandler = {
                 Toast.success('Cập nhật thành công!');
                 this.modal.close();
                 allVariants = []; // Clear cache to reload
-                this.table.loadData(1); 
+                this.table.loadData(1);
             }
         } catch (error) {
             Toast.error('Lỗi khi cập nhật');

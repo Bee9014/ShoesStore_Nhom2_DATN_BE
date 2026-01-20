@@ -10,60 +10,62 @@ import com.fpl.edu.shoeStore.product.entity.Product;
 @Mapper
 public interface ProductMapper {
 
-    /** Lấy danh sách toàn bộ sản phẩm không lọc. */
-    List<Product> findAll();
+        /** Lấy danh sách toàn bộ sản phẩm không lọc. */
+        List<Product> findAll();
 
-    Product findByTitle(@Param("title") String title);
+        Product findByTitle(@Param("title") String title);
 
-    /** Tìm chi tiết sản phẩm theo mã ID. */
-    Product findById(@Param("productId") int productId);
+        /** Tìm chi tiết sản phẩm theo mã ID. */
+        Product findById(@Param("productId") int productId);
 
-    /** Thêm sản phẩm mới. ID tự tăng sẽ gán vào đối tượng product. */
-    int insert(Product product);
+        /** Thêm sản phẩm mới. ID tự tăng sẽ gán vào đối tượng product. */
+        int insert(Product product);
 
-    /** Cập nhật thông tin chi tiết sản phẩm. */
-    int update(Product product);
+        /** Cập nhật thông tin chi tiết sản phẩm. */
+        int update(Product product);
 
-    int deleteById(@Param("productId") Integer id);
+        int deleteById(@Param("productId") Integer id, @Param("updateBy") Integer updateBy);
 
-    /**
-     * * Phân trang và lọc sản phẩm.
-     * XML dùng parameterType="map", nên cần @Param chính xác.
-     */
-    List<Product> findAllPaged(
-            @Param("categoryId") Integer categoryId,
-            @Param("title") String title,
-            @Param("status") String status,
-            @Param("isActive") Boolean isActive,
-            @Param("offset") int offset,
-            @Param("size") int size);
+        /**
+         * * Phân trang và lọc sản phẩm.
+         * XML dùng parameterType="map", nên cần @Param chính xác.
+         */
+        List<Product> findAllPaged(
+                        @Param("categoryId") Integer categoryId,
+                        @Param("title") String title,
+                        @Param("status") String status,
+                        @Param("isActive") Boolean isActive,
+                        @Param("productCode") String productCode,
+                        @Param("offset") int offset,
+                        @Param("size") int size);
 
-    /** Đếm tổng số lượng sản phẩm theo bộ lọc (title, categoryId, status). */
-    long countAll(
-            @Param("categoryId") Integer categoryId,
-            @Param("title") String title,
-            @Param("status") String status,
-            @Param("isActive") Boolean isActive);
+        /** Đếm tổng số lượng sản phẩm theo bộ lọc (title, categoryId, status). */
+        long countAll(
+                        @Param("categoryId") Integer categoryId,
+                        @Param("title") String title,
+                        @Param("status") String status,
+                        @Param("isActive") Boolean isActive,
+                        @Param("productCode") String productCode);
 
-    void incrementViewCount(Integer productId);
+        void incrementViewCount(Integer productId);
 
-    List<Product> findTopFeatured();
+        List<Product> findTopFeatured();
 
-    List<Product> findBestSellers();
+        List<Product> findBestSellers();
 
-    Long countAllProducts();
+        Long countAllProducts();
 
-    List<Product> findBestFiftySellers(
-            @Param("size") Integer size,
-            @Param("offset") Integer offset);
+        List<Product> findBestFiftySellers(
+                        @Param("size") Integer size,
+                        @Param("offset") Integer offset);
 
-    Long countBestSellers();
+        Long countBestSellers();
 
-    List<Product> findProductsBySearch(
-            @Param("keyword") String keyword,
-            @Param("size") Integer size,
-            @Param("offset") Integer offset);
+        List<Product> findProductsBySearch(
+                        @Param("keyword") String keyword,
+                        @Param("size") Integer size,
+                        @Param("offset") Integer offset);
 
-    Long countSearchResults(@Param("keyword") String keyword);
+        Long countSearchResults(@Param("keyword") String keyword);
 
 }

@@ -24,8 +24,9 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
 
-    // Nếu bạn chưa cấu hình BCryptPasswordEncoder bean thì có thể comment dòng này lại
-    private final PasswordEncoder passwordEncoder; 
+    // Nếu bạn chưa cấu hình BCryptPasswordEncoder bean thì có thể comment dòng này
+    // lại
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -43,8 +44,9 @@ public class UserServiceImpl implements UserService {
         // 3. Xử lý mật khẩu (Tạm thời để nguyên, sau này bạn mở comment để mã hóa)
         String rawPassword = request.getPasswordHash();
         user.setPasswordHash(passwordEncoder.encode(rawPassword));
-        
-        // Lưu ý: Do Converter map "password" -> "passwordHash" rồi, nên ở đây user đã có pass.
+
+        // Lưu ý: Do Converter map "password" -> "passwordHash" rồi, nên ở đây user đã
+        // có pass.
 
         // 4. Insert vào DB
         userMapper.insert(user);
@@ -63,21 +65,29 @@ public class UserServiceImpl implements UserService {
         }
 
         // 2. Update từng trường (Chỉ update nếu request có gửi lên)
-        if (request.getUsername() != null) existingUser.setUsername(request.getUsername());
-        if (request.getFullName() != null) existingUser.setFullName(request.getFullName());
-        if (request.getGender() != null) existingUser.setGender(request.getGender());
-        if (request.getBirthday() != null) existingUser.setBirthday(request.getBirthday());
-        if (request.getEmail() != null) existingUser.setEmail(request.getEmail());
-        if (request.getPhone() != null) existingUser.setPhone(request.getPhone());
-        if (request.getStatus() != null) existingUser.setStatus(request.getStatus());
-        if (request.getRoleId() != 0) existingUser.setRoleId(request.getRoleId());
+        if (request.getUsername() != null)
+            existingUser.setUsername(request.getUsername());
+        if (request.getFullName() != null)
+            existingUser.setFullName(request.getFullName());
+        if (request.getGender() != null)
+            existingUser.setGender(request.getGender());
+        if (request.getBirthday() != null)
+            existingUser.setBirthday(request.getBirthday());
+        if (request.getEmail() != null)
+            existingUser.setEmail(request.getEmail());
+        if (request.getPhone() != null)
+            existingUser.setPhone(request.getPhone());
+        if (request.getStatus() != null)
+            existingUser.setStatus(request.getStatus());
+        if (request.getRoleId() != 0)
+            existingUser.setRoleId(request.getRoleId());
 
         // Xử lý password khi update (Nếu có gửi pass mới thì mới đổi)
         if (request.getPasswordHash() != null && !request.getPasswordHash().isBlank()) {
-         String rawPassword = request.getPasswordHash();
-         String encodedPassword = passwordEncoder.encode(rawPassword);
-         existingUser.setPasswordHash(encodedPassword);
-     }
+            String rawPassword = request.getPasswordHash();
+            String encodedPassword = passwordEncoder.encode(rawPassword);
+            existingUser.setPasswordHash(encodedPassword);
+        }
 
         existingUser.setUpdatedAt(LocalDateTime.now());
 
@@ -132,20 +142,19 @@ public class UserServiceImpl implements UserService {
             Integer roleId,
             String status,
             int page,
-            int size
-    ) {
+            int size) {
         // 1. Tính toán offset
+        if (page < 1)
+            page = 1;
         int offset = (page - 1) * size;
 
         // 2. Gọi Mapper
         // Lưu ý: Mapper này phải khớp với file UserMapper.java bạn vừa sửa
         List<User> users = userMapper.findAllPaged(
-                userId, username, fullName, gender, birthday, email, phone, roleId, status, offset, size
-        );
+                userId, username, fullName, gender, birthday, email, phone, roleId, status, offset, size);
 
         long totalElements = userMapper.countAll(
-                userId, username, fullName, gender, birthday, email, phone, roleId, status
-        );
+                userId, username, fullName, gender, birthday, email, phone, roleId, status);
 
         // 3. Convert sang DTO List
         List<UserDtoResponse> userDtos = UserConverter.toDtoList(users);
