@@ -10,6 +10,7 @@ import { Toast } from "/admin/js/components/toast.js";
 import { SearchInput } from "/admin/js/components/search.input.js";
 import { DetailPanel } from "/admin/js/components/detail.panel.js";
 import { CustomModal } from "/admin/js/components/modal.js";
+import { Modal as ConfirmModal } from "/admin/js/components/confirm.modal.js";
 
 let currentFilters = {};
 let tableInstance = null;
@@ -219,11 +220,6 @@ const UserDetail = {
           <div class="mb-3">
             <label class="form-label">Email</label>
             <input type="email" class="form-control" id="edit-email" value="${user.email || ''}" required>
-          </div>
-          
-          <div class="mb-3">
-            <label class="form-label">Số điện thoại</label>
-            <input type="text" class="form-control" id="edit-phone" value="${user.phone || ''}" required>
           </div>
           
           <div class="mb-3">
@@ -468,7 +464,7 @@ window.UserPage = {
         pageSize: 10,
         onEdit: (user) => UserDetail.openEditPanel(detailPanelInstance, user),
         onDelete: async (user) => {
-          if (!confirm('Bạn có chắc chắn muốn xóa người dùng này?')) return;
+          if (!await ConfirmModal.show('Bạn có chắc chắn muốn xóa người dùng này?')) return;
 
           try {
             const res = await App.api.delete(App.API.USERS.BY_ID(user.userId));

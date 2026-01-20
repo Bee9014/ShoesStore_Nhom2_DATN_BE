@@ -33,20 +33,19 @@ public class PaymentServiceImpl implements PaymentService {
             BigDecimal amount,
             String transactionRef,
             int page,
-            int size
-    ) {
+            int size) {
+        if (page < 1)
+            page = 1;
         int offset = (page - 1) * size;
 
         List<Payment> payments = paymentMapper.findAllPaged(
                 paymentId, orderId, payerId, paymentMethod,
                 paymentDate, status, amount, transactionRef,
-                offset, size
-        );
+                offset, size);
 
         long totalElements = paymentMapper.countAll(
                 paymentId, orderId, payerId, paymentMethod,
-                paymentDate, status, amount, transactionRef
-        );
+                paymentDate, status, amount, transactionRef);
 
         List<PaymentDTOResponse> dtoList = payments.stream()
                 .map(PaymentConverter::toDTO)
@@ -65,7 +64,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public PaymentDTOResponse createPayment(PaymentDTORequest request) {
         Payment payment = PaymentConverter.toEntity(request);
-        
+
         // Set default status nếu chưa có
         if (payment.getStatus() == null || payment.getStatus().isEmpty()) {
             payment.setStatus("PENDING");
@@ -101,14 +100,12 @@ public class PaymentServiceImpl implements PaymentService {
             String transactionRef,
             String status,
             String gatewayTransactionId,
-            String bankCode
-    ) {
+            String bankCode) {
         int updated = paymentMapper.updatePaymentStatus(
                 transactionRef,
                 status,
                 gatewayTransactionId,
-                bankCode
-        );
+                bankCode);
 
         if (updated == 0) {
             throw new RuntimeException("Không tìm thấy payment với transactionRef: " + transactionRef);
@@ -123,7 +120,9 @@ public class PaymentServiceImpl implements PaymentService {
             throw new RuntimeException("Payment không tồn tại với id: " + id);
         }
 
-        return paymentMapper.deleteById(id);
+        // Soft delete: Change status to REFUNDED
+        existing.setStatus("REFUNDED");
+        return paymentMapper.update(existing);
     }
 
     @Override

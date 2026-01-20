@@ -1,7 +1,15 @@
 export class SearchInput {
-  constructor({ containerId, onChange, onEnter }) {
+  constructor({ containerId, onChange, onEnter, className = "" }) {
     this.container = document.getElementById(containerId);
     if (!this.container) throw new Error(`Container ${containerId} not found`);
+
+    if (className) {
+      this.container.classList.add(...className.split(" "));
+    } else {
+      // Default class if no className provided
+      this.container.classList.add("search-wrapper");
+    }
+
     this.onChange = onChange; // callback khi input thay đổi
     this.onEnter = onEnter; // callback khi nhấn Enter
     this.inputs = {}; // lưu reference các input

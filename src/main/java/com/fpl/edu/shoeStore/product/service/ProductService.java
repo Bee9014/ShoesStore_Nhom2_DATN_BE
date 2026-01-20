@@ -24,25 +24,29 @@ public interface ProductService {
             String title,
             String status,
             Boolean isActive,
+            String productCode,
             int page,
             int size);
 
     List<ProductDtoResponse> getFeaturedProducts();
+
     List<ProductDtoResponse> getBestSellers();
-    
+
     /**
      * Get best selling products with pagination (max 50)
+     * 
      * @param page Page number (0-indexed)
      * @param size Page size (max 50)
      * @return PageResponse with best selling products
      */
     PageResponse<ProductDtoResponse> getBestSellersPaged(int page, int size);
-    
+
     /**
      * Search products by brand or name
+     * 
      * @param keyword Search keyword
-     * @param page Page number (0-indexed)
-     * @param size Page size
+     * @param page    Page number (0-indexed)
+     * @param size    Page size
      * @return PageResponse with search results
      */
     PageResponse<ProductDtoResponse> searchProducts(String keyword, int page, int size);

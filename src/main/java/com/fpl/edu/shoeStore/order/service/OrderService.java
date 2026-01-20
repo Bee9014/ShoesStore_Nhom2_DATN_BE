@@ -8,9 +8,11 @@ import com.fpl.edu.shoeStore.order.exception.OrderException;
 public interface OrderService {
     /**
      * Tạo một đơn hàng mới. Bao gồm tính toán giá, áp dụng voucher và lưu vào CSDL.
+     * 
      * @param request DTO chứa thông tin đơn hàng cần tạo.
      * @return OrderResponse DTO của đơn hàng đã tạo.
-     * @throws OrderException nếu có lỗi trong quá trình tạo (ví dụ: hết hàng, voucher không hợp lệ).
+     * @throws OrderException nếu có lỗi trong quá trình tạo (ví dụ: hết hàng,
+     *                        voucher không hợp lệ).
      */
     OrderResponse createOrder(OrderCreateRequest request) throws OrderException;
 
@@ -53,4 +55,9 @@ public interface OrderService {
      * ADMIN: Đếm số đơn hàng theo status
      */
     long countOrdersByStatus(String status);
+
+    /**
+     * ADMIN: Xóa đơn hàng (Soft Delete -> REFUNDED)
+     */
+    void deleteOrder(int orderId) throws OrderException;
 }

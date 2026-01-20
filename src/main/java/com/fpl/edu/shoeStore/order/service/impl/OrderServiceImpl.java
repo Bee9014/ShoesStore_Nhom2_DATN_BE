@@ -99,6 +99,9 @@ public class OrderServiceImpl implements OrderService {
             if (product == null) {
                 throw new OrderException("Không tìm thấy thông tin sản phẩm");
             }
+            if ("draft".equalsIgnoreCase(product.getStatus()) || Boolean.FALSE.equals(product.getIsActive())) {
+                throw new OrderException("Sản phẩm đã ngừng kinh doanh: " + product.getTitle());
+            }
 
             // Tạo OrderItem với dữ liệu thật từ DB
             OrderItem item = orderConverter.toItemEntity(itemReq);
@@ -177,9 +180,23 @@ public class OrderServiceImpl implements OrderService {
             orderMapper.insertOrderItem(item);
         }
 
-        // 6. TRỪ TỒN KHO SẢN PHẨM
+        // 6. TRỪ TỒN KHO SẢN PHẨM & TỰ ĐỘNG CẬP NHẬT TRẠNG THÁI
         for (var itemReq : request.getItems()) {
             variantMapper.updateStock(itemReq.getVariantId(), -itemReq.getQuantity());
+
+            // Check Low Stock Logic
+            ProductVariant variant = variantMapper.findById(itemReq.getVariantId());
+            if (variant != null) {
+                // Calculate total stock of the product
+                Long totalStock = variantMapper.sumStockByProductId(variant.getProductId());
+                if (totalStock != null && totalStock < 5) {
+                    Product product = productMapper.findById(variant.getProductId());
+                    if (product != null && "selling".equalsIgnoreCase(product.getStatus())) {
+                        product.setStatus("draft");
+                        productMapper.update(product);
+                    }
+                }
+            }
         }
 
         // 7. XỬ LÝ VOUCHER SAU KHI TẠO ĐƠN THÀNH CÔNG (Trừ lượt dùng + Lưu lịch sử)
@@ -306,5 +323,24 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public long countOrdersByStatus(String status) {
         return orderMapper.countByStatus(status);
+    }
+
+    @Override
+    @Transactional
+    public void deleteOrder(int orderId) throws OrderException {
+        Order order = orderMapper.findById(orderId);
+        if (order == null) {
+            throw new OrderException("Order not found: " + orderId);
+        }
+
+        if ("CANCELLED".equalsIgnoreCase(order.getStatus())) {
+            throw new OrderException("Không thể xóa (hoàn tiền) đơn hàng đã bị hủy.");
+        }
+
+        // Soft Delete: Change status to REFUNDED
+        int affected = orderMapper.updateStatus(orderId, "REFUNDED");
+        if (affected == 0) {
+            throw new OrderException("Failed to delete order (update to REFUNDED)");
+        }
     }
 }

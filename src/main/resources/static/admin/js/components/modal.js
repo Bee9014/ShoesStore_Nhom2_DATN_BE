@@ -26,10 +26,10 @@ export class CustomModal {
     }
   }
 
-// 👇 1. BỔ SUNG HÀM setTitle
+  // 👇 1. BỔ SUNG HÀM setTitle
   setTitle(title) {
     if (this.titleEl) {
-      this.titleEl.textContent = title;
+      this.titleEl.innerHTML = title;
     }
   }
 
@@ -44,9 +44,17 @@ export class CustomModal {
   }
 
 
-  open({ title = "Thông tin", body = "" } = {}) {
-    if (title) this.titleEl.textContent = title;
+  open({ title = "Thông tin", body = "", size = null } = {}) {
+    if (title) this.titleEl.innerHTML = title;
     if (body) this.setContent(body);
+
+    // Reset sizes
+    this.dialog.classList.remove("modal-sm", "modal-lg", "modal-xl");
+
+    if (size) {
+      this.dialog.classList.add(size);
+    }
+
     this.bsModal.show();
   }
 

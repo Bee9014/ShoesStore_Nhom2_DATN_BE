@@ -5,6 +5,7 @@
 
 import { App } from "/admin/js/config/app.config.js";
 import { Toast } from "/admin/js/components/toast.js";
+import { Modal as ConfirmModal } from "/admin/js/components/confirm.modal.js";
 
 let currentOrder = null;
 
@@ -47,20 +48,20 @@ const Utils = {
 function renderTimeline(order) {
   const status = order.status;
   const steps = [
-    { 
-      key: 'PENDING', 
+    {
+      key: 'PENDING',
       label: 'Đơn hàng đã đặt',
       icon: 'bi-clock',
       date: order.orderDate
     },
-    { 
-      key: 'SHIPPING', 
+    {
+      key: 'SHIPPING',
       label: 'Đang giao hàng',
       icon: 'bi-truck',
       date: status !== 'PENDING' ? order.updatedAt : null
     },
-    { 
-      key: 'DELIVERED', 
+    {
+      key: 'DELIVERED',
       label: 'Đã giao hàng',
       icon: 'bi-check-circle',
       date: status === 'DELIVERED' ? order.updatedAt : null
@@ -282,18 +283,18 @@ async function renderOrderDetail(orderId) {
 
     // Kiểm tra xem dữ liệu có lồng trong object .order không?
     if (responseData.order) {
-        // Trường hợp A: { data: { order: {...}, items: [...] } }
-        currentOrder = responseData.order;
-        items = responseData.items || responseData.order.items || [];
+      // Trường hợp A: { data: { order: {...}, items: [...] } }
+      currentOrder = responseData.order;
+      items = responseData.items || responseData.order.items || [];
     } else {
-        // Trường hợp B: { data: { orderId: 1, ... items: [...] } } (Dạng phẳng)
-        currentOrder = responseData;
-        items = responseData.items || [];
+      // Trường hợp B: { data: { orderId: 1, ... items: [...] } } (Dạng phẳng)
+      currentOrder = responseData;
+      items = responseData.items || [];
     }
 
     // 4. Kiểm tra an toàn lần cuối
     if (!currentOrder || !currentOrder.orderId) {
-        throw new Error("Dữ liệu trả về thiếu orderId. Vui lòng kiểm tra Console.");
+      throw new Error("Dữ liệu trả về thiếu orderId. Vui lòng kiểm tra Console.");
     }
 
     // 5. Render giao diện
@@ -360,7 +361,7 @@ window.OrderDetail = {
       'CANCELLED': 'Hủy đơn hàng'
     };
 
-    if (!confirm(`Xác nhận chuyển sang trạng thái "${statusLabels[newStatus]}"?`)) {
+    if (!await ConfirmModal.show(`Xác nhận chuyển sang trạng thái "${statusLabels[newStatus]}"?`)) {
       return;
     }
 

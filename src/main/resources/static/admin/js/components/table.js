@@ -31,7 +31,7 @@ export class CustomTable {
         if (size > 0) this.pageSize = size;
       }
 
-      const response = await this.fetchData(this.currentPage, this.pageSize);
+      const response = await this.fetchData(this.currentPage - 1, this.pageSize);
       this.data = response.content || [];
       this.totalPages = Math.ceil(response.totalElements / this.pageSize) || 1;
       this.render();

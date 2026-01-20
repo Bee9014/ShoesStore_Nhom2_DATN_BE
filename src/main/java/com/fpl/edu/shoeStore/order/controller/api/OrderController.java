@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,7 +34,7 @@ public class OrderController {
     private final OrderService orderService;
 
     // ==================== USER ENDPOINTS ====================
-    
+
     /**
      * USER: Tạo đơn hàng mới
      * POST /api/v1/orders
@@ -105,8 +106,7 @@ public class OrderController {
             @RequestParam Integer userId, // REQUIRED - No fallback
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String status
-    ) {
+            @RequestParam(required = false) String status) {
         try {
             PageResponse<OrderResponse> pageResponse = orderService.getMyOrders(userId, status, page, size);
             return ApiResponse.<PageResponse<OrderResponse>>builder()
@@ -170,17 +170,18 @@ public class OrderController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String searchTerm,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "20") int size) {
         try {
             // Validate page and size
-            if (page < 1) page = 1;
-            if (size <= 0) size = 20;
-            if (size > 100) size = 100;
+            if (page < 1)
+                page = 1;
+            if (size <= 0)
+                size = 20;
+            if (size > 100)
+                size = 100;
 
             PageResponse<OrderResponse> pageResponse = orderService.getAllOrdersForAdmin(
-                    status, searchTerm, page, size
-            );
+                    status, searchTerm, page, size);
 
             return ApiResponse.<PageResponse<OrderResponse>>builder()
                     .success(true)
@@ -241,8 +242,7 @@ public class OrderController {
     @PutMapping("/admin/orders/{orderId}/status")
     public ApiResponse<Void> updateOrderStatus(
             @PathVariable int orderId,
-            @RequestBody Map<String, String> requestBody
-    ) {
+            @RequestBody Map<String, String> requestBody) {
         try {
             String newStatus = requestBody.get("status");
 
@@ -326,12 +326,43 @@ public class OrderController {
         }
     }
 
+    /**
+     * ADMIN: Xóa đơn hàng (Soft Delete -> REFUNDED)
+     * DELETE /api/v1/admin/orders/{orderId}
+     */
+    @DeleteMapping("/admin/orders/{orderId}")
+    public ApiResponse<Void> deleteOrder(@PathVariable int orderId) {
+        try {
+            orderService.deleteOrder(orderId);
+            return ApiResponse.<Void>builder()
+                    .success(true)
+                    .statusCode(HttpStatus.OK.value())
+                    .message("Đã chuyển đơn hàng sang trạng thái REFUNDED")
+                    .data(null)
+                    .build();
+        } catch (OrderException e) {
+            return ApiResponse.<Void>builder()
+                    .success(false)
+                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                    .message(e.getMessage())
+                    .data(null)
+                    .build();
+        } catch (Exception e) {
+            return ApiResponse.<Void>builder()
+                    .success(false)
+                    .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .message("Lỗi hệ thống: " + e.getMessage())
+                    .data(null)
+                    .build();
+        }
+    }
+
     // ==================== HELPER METHODS ====================
 
     private boolean isValidStatus(String status) {
         return "PENDING".equals(status) ||
-               "SHIPPING".equals(status) ||
-               "DELIVERED".equals(status) ||
-               "CANCELLED".equals(status);
+                "SHIPPING".equals(status) ||
+                "DELIVERED".equals(status) ||
+                "CANCELLED".equals(status);
     }
 }

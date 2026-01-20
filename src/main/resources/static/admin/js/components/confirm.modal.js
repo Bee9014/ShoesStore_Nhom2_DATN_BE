@@ -28,13 +28,27 @@ export class ConfirmModal {
   }
 
   show(message, onConfirm) {
-    this.messageEl.textContent = message;
+    return new Promise((resolve) => {
+      this.messageEl.innerHTML = message; // Use innerHTML for flexible content
 
-    this.confirmBtn.onclick = () => {
-      onConfirm?.();
-      this.bsModal.hide();
-    };
+      let isConfirmed = false;
 
-    this.bsModal.show();
+      this.confirmBtn.onclick = () => {
+        isConfirmed = true;
+        onConfirm?.();
+        resolve(true);
+        this.bsModal.hide();
+      };
+
+      const hiddenHandler = () => {
+        if (!isConfirmed) resolve(false);
+        this.modalEl.removeEventListener('hidden.bs.modal', hiddenHandler);
+      };
+
+      this.modalEl.addEventListener('hidden.bs.modal', hiddenHandler);
+      this.bsModal.show();
+    });
   }
 }
+// Export instance for singleton-like usage or class
+export const Modal = new ConfirmModal();

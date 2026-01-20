@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{admin/layout/main-layout}">
+
+<head>
+    <title>Quản lý danh mục</title>
+</head>
+
+<body>
+
+    <!-- Page Actions -->
+    <div layout:fragment="page-actions">
+        <button class="btn btn-sm btn-outline-secondary me-2" onclick="CategoryPage.refresh()">
+            <i class="bi bi-arrow-clockwise"></i> Làm mới
+        </button>
+        <button class="btn btn-sm btn-primary" onclick="CategoryPage.openCreateModal()">
+            <i class="bi bi-plus-lg"></i> Thêm danh mục
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <section layout:fragment="content">
+        <!-- Search & Filter -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6" id="search-container">
+                        <!-- SearchInput component injected here -->
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <div class="btn-group" role="group" id="statusTabs">
+                            <!-- Status tabs injected via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card">
+            <div class="card-body">
+                <div id="categoryTableContainer">
+                    <!-- Table injected via JS (CustomTable) -->
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail/Create/Edit Modal -->
+        <div class="modal fade" id="categoryModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="categoryModalTitle">Thông tin danh mục</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="categoryForm">
+                            <input type="hidden" id="categoryId">
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="categoryName" class="form-label">Tên danh mục <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="categoryName" required>
+                                    <div class="invalid-feedback">Vui lòng nhập tên danh mục</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="categoryParent" class="form-label">Danh mục cha</label>
+                                    <select class="form-select" id="categoryParent">
+                                        <option value="">-- Không có --</option>
+                                        <!-- Options injected via JS -->
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="categoryDescription" class="form-label">Mô tả</label>
+                                <textarea class="form-control" id="categoryDescription" rows="3"></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="categorySortOrder" class="form-label">Thứ tự ưu tiên</label>
+                                    <input type="number" class="form-control" id="categorySortOrder" value="0">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Trạng thái</label>
+                                    <div class="form-check form-switch pt-2">
+                                        <input class="form-check-input" type="checkbox" id="categoryIsActive" checked>
+                                        <label class="form-check-label" for="categoryIsActive">Đang hoạt động</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="button" class="btn btn-primary" onclick="CategoryPage.saveCategory()">Lưu thay
+                            đổi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Page Scripts -->
+    <th:block layout:fragment="page-scripts">
+        <script type="module" src="/admin/js/pages/category.page.js"></script>
+    </th:block>
+
+</body>
+
+</html>
